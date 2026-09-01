@@ -1,0 +1,143 @@
+// TAPS Prisma Schema
+// Database: PostgreSQL (Supabase)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  EMPLOYEE
+  SECTION_CHIEF
+  DIVISION_CHIEF
+  HEAD_PENRO
+  ACCOUNT_MANAGER
+  ADMIN
+}
+
+enum UserStatus {
+  PENDING_REVIEW
+  ACTIVE
+  DEACTIVATED
+}
+
+enum TARequestStatus {
+  DRAFT
+  PENDING_SECTION_CHIEF
+  PENDING_DIVISION_CHIEF
+  PENDING_HEAD_PENRO
+  APPROVED
+  REJECTED_MANUAL
+  REJECTED_OVERDUE
+}
+
+enum ApprovalAction {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum NotificationChannel {
+  IN_APP
+  SMS
+  BOTH
+}
+
+enum SMSStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  username     String?    @unique
+  email        String     @unique
+  password     String
+  phoneNumber  String
+  image        String?
+  role         Role       @default(EMPLOYEE)
+  status       UserStatus @default(PENDING_REVIEW)
+  section      String?
+  position     String?
+  birthday     String?
+  address      String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relations
+  createdRequests   TARequest[]       @relation("CreatedBy")
+  teamMemberships   TARequestMember[]
+  approvalSteps     ApprovalStep[]
+  notifications     Notification[]
+}
+
+model TARequest {
+  id             String          @id @default(cuid())
+  trackingNumber String          @unique
+  createdById    String
+  createdBy      User            @relation("CreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  purpose        String
+  destination    String
+  destinationLat Float?
+  destinationLng Float?
+  startDate      DateTime
+  endDate        DateTime
+  status         TARequestStatus @default(DRAFT)
+  resubmitCount  Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  // Relations
+  teamMembers   TARequestMember[]
+  approvalSteps ApprovalStep[]
+  notifications Notification[]
+}
+
+model TARequestMember {
+  id        String    @id @default(cuid())
+  requestId String
+  request   TARequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name      String
+  position  String?
+  createdAt DateTime  @default(now())
+}
+
+model ApprovalStep {
+  id           String         @id @default(cuid())
+  requestId    String
+  request      TARequest      @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  order        Int            // 1 = Section Chief, 2 = Division Chief, 3 = Head of PENRO
+  approverRole Role           // SECTION_CHIEF, DIVISION_CHIEF, HEAD_PENRO
+  approverId   String?
+  approver     User?          @relation(fields: [approverId], references: [id], onDelete: SetNull)
+  action       ApprovalAction @default(PENDING)
+  remarks      String?
+  actionDate   DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@unique([requestId, order])
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestId String?
+  request   TARequest?          @relation(fields: [requestId], references: [id], onDelete: SetNull)
+  title     String
+  message   String
+  isRead    Boolean             @default(false)
+  channel   NotificationChannel @default(BOTH)
+  smsStatus SMSStatus           @default(PENDING)
+  createdAt DateTime            @default(now())
+}
