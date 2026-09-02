@@ -1566,24 +1566,29 @@ function StaffDashboardContent() {
     };
 
     return (
-      <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-6 animate-fade-in">
+      <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-6 animate-fade-in pb-10 flex flex-col min-h-[560px]">
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#0F4C2E] text-white flex items-center justify-center font-bold">
-              🔔
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#0B5A3A] border border-emerald-100 flex items-center justify-center font-bold">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-900">Signatory Notification Center</h3>
-              <p className="text-xs text-slate-500">{unreadCount} unread notification(s)</p>
+              <p className="text-xs text-slate-500">{unreadCount} unread system notification{unreadCount === 1 ? '' : 's'}</p>
             </div>
           </div>
 
-          <button onClick={handleMarkAllRead} className="text-xs font-bold text-[#2E6F4E] hover:underline cursor-pointer">
-            ✓ Mark all as read
+          <button onClick={handleMarkAllRead} className="text-xs font-bold text-[#0B5A3A] hover:underline flex items-center gap-1.5 cursor-pointer">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Mark all as read</span>
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 flex-1">
           {notifications.length > 0 ? (
             notifications.map((notif: any, idx: number) => {
               // Find the linked TA request (if any) so we can navigate to it on click
@@ -1628,7 +1633,7 @@ function StaffDashboardContent() {
               return (
                 <div key={notif.id || idx} className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-5 sm:p-6 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
                       {formatDayHeading(notif.createdAt)}
                     </span>
                     <span className="text-[10px] text-slate-400 font-semibold">
@@ -1639,12 +1644,20 @@ function StaffDashboardContent() {
                     onClick={handleNotifClick}
                     className={`flex items-start gap-4 p-3.5 rounded-xl border transition-all ${
                       notif.isRead
-                        ? 'bg-slate-50/80 border-slate-100 hover:bg-slate-100'
-                        : 'bg-emerald-50/70 border-emerald-100 hover:bg-emerald-50 shadow-2xs'
-                    } ${linkedRequest ? 'cursor-pointer' : 'cursor-default'}`}
+                        ? 'bg-slate-50 border-slate-100 hover:bg-slate-100'
+                        : 'bg-emerald-50/60 border-emerald-100 hover:bg-emerald-50'
+                    } ${linkedRequest || notif.requestId ? 'cursor-pointer' : 'cursor-default'}`}
                   >
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0">
-                      {notif.isRead ? '✓' : '🔔'}
+                    <div className="shrink-0 mt-0.5">
+                      {notif.isRead ? (
+                        <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5 text-[#0B5A3A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline justify-between gap-2">
@@ -1654,9 +1667,9 @@ function StaffDashboardContent() {
                         </span>
                       </div>
                       <p className="text-xs text-slate-600 mt-1">{notif.message}</p>
-                      {linkedRequest && (
+                      {(linkedRequest || notif.requestId) && (
                         <div className="flex items-center justify-end mt-2">
-                          <span className="text-[10px] font-bold text-[#0F4C2E] flex items-center gap-0.5">
+                          <span className="text-[10px] font-bold text-[#0B5A3A] flex items-center gap-0.5">
                             Review Request →
                           </span>
                         </div>
@@ -1667,10 +1680,17 @@ function StaffDashboardContent() {
               );
             })
           ) : (
-            <div className="p-8 text-center text-xs text-slate-500 bg-white rounded-2xl border border-slate-200/80">
-              No notifications found.
+            <div className="p-12 text-center text-xs text-slate-500 bg-white rounded-2xl border border-slate-200/80">
+              No notifications found. You are all caught up!
             </div>
           )}
+        </div>
+
+        <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between text-xs text-slate-500">
+          <span>Real-time email and push notifications are active for all signatory step endorsements.</span>
+          <button onClick={() => router.push('/staff?tab=dashboard')} className="font-bold text-[#0B5A3A] hover:underline cursor-pointer">
+            Back to Dashboard →
+          </button>
         </div>
       </div>
     );
