@@ -5,6 +5,8 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ProfileDropdown from '@/components/profile/ProfileDropdown';
+import NotificationBellDropdown from '@/components/notifications/NotificationBellDropdown';
+import NotificationToastStack, { NotificationPopupItem } from '@/components/notifications/NotificationToastStack';
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
@@ -14,6 +16,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const currentTab = searchParams.get('tab') || 'dashboard';
 
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [notificationsList, setNotificationsList] = useState<NotificationPopupItem[]>([]);
+  const [popups, setPopups] = useState<NotificationPopupItem[]>([]);
+  const shownToastIdsRef = React.useRef<Set<string>>(new Set());
+  const isFirstFetchRef = React.useRef<boolean>(true);
   const [sessionTimedOut, setSessionTimedOut] = useState(false);
 
   const user = session?.user as any;
@@ -45,27 +51,130 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     }
   }, [status, sessionTimedOut, session]);
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await fetch('/api/notifications');
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.data) {
-            setUnreadNotifications(data.data.unreadCount ?? 0);
+  const fetchNotifications = async (triggerPopups = true) => {
+    try {
+      const res = await fetch('/api/notifications');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.data) {
+          const fetchedNotifs: NotificationPopupItem[] = data.data.notifications || [];
+          const count = data.data.unreadCount ?? 0;
+
+          setNotificationsList(fetchedNotifs);
+          setUnreadNotifications(count);
+
+          // Real-time pop-up notification detection
+          if (triggerPopups && fetchedNotifs.length > 0) {
+            const unreadItems = fetchedNotifs.filter((n) => !n.isRead);
+
+            if (isFirstFetchRef.current) {
+              // Mark all initial items as seen on initial load to avoid popup spam on page refresh
+              fetchedNotifs.forEach((n) => shownToastIdsRef.current.add(n.id));
+              isFirstFetchRef.current = false;
+            } else {
+              // Find new unread notifications that haven't popped up yet
+              const newUnshown = unreadItems.filter((n) => !shownToastIdsRef.current.has(n.id));
+              if (newUnshown.length > 0) {
+                newUnshown.forEach((n) => shownToastIdsRef.current.add(n.id));
+                // Stack new popups (capped at 4 on screen)
+                setPopups((prev) => [...newUnshown, ...prev].slice(0, 4));
+              }
+            }
           }
         }
-      } catch (err) {
-        console.error('Failed to fetch notification count', err);
       }
-    };
+    } catch (err) {
+      console.error('Failed to fetch notification count', err);
+    }
+  };
 
+  useEffect(() => {
     if (session?.user) {
-      fetchNotifications();
-      const interval = setInterval(fetchNotifications, 15000);
-      return () => clearInterval(interval);
+      fetchNotifications(true);
+      const interval = setInterval(() => fetchNotifications(true), 12000);
+
+      // Listen for custom immediate notification dispatch events from user actions
+      const handleManualNotification = (e: any) => {
+        if (e.detail) {
+          const notif = e.detail as NotificationPopupItem;
+          shownToastIdsRef.current.add(notif.id);
+          setPopups((prev) => [notif, ...prev.filter((p) => p.id !== notif.id)].slice(0, 4));
+          setNotificationsList((prev) => [notif, ...prev.filter((p) => p.id !== notif.id)]);
+          setUnreadNotifications((prev) => prev + 1);
+        }
+      };
+
+      const handleRefresh = () => {
+        fetchNotifications(true);
+      };
+
+      window.addEventListener('taps:new-notification', handleManualNotification);
+      window.addEventListener('taps:refresh-notifications', handleRefresh);
+
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('taps:new-notification', handleManualNotification);
+        window.removeEventListener('taps:refresh-notifications', handleRefresh);
+      };
     }
   }, [session]);
+
+  const handleMarkAllRead = async () => {
+    try {
+      setUnreadNotifications(0);
+      setNotificationsList((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      setPopups([]);
+
+      await fetch('/api/notifications/read', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ markAll: true }),
+      });
+    } catch (err) {
+      console.error('Failed to mark all notifications as read', err);
+    }
+  };
+
+  const handleMarkSingleRead = async (id: string) => {
+    try {
+      setUnreadNotifications((prev) => Math.max(prev - 1, 0));
+      setNotificationsList((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+      );
+      setPopups((prev) => prev.filter((p) => p.id !== id));
+
+      await fetch('/api/notifications/read', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notificationId: id }),
+      });
+    } catch (err) {
+      console.error('Failed to mark notification as read', err);
+    }
+  };
+
+  const handleDismissPopup = (id: string) => {
+    setPopups((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  const handleDismissAllPopups = () => {
+    setPopups([]);
+  };
+
+  const handleViewNotification = (item: NotificationPopupItem) => {
+    handleDismissPopup(item.id);
+    if (!item.isRead) {
+      handleMarkSingleRead(item.id);
+    }
+    const targetHref = pathname.startsWith('/staff')
+      ? '/staff?tab=notifications'
+      : pathname.startsWith('/account-manager')
+      ? '/account-manager?tab=dashboard'
+      : pathname.startsWith('/admin')
+      ? '/admin?tab=home'
+      : '/employee?tab=notifications';
+    router.push(targetHref);
+  };
 
   // Sidebar links based on role using clean vector SVG outline icons matching PDF
   const isEmployee = role === 'EMPLOYEE';
@@ -586,6 +695,11 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     <Link
                       key={link.id}
                       href={link.href}
+                      onClick={() => {
+                        if (typeof window !== 'undefined') {
+                          window.dispatchEvent(new CustomEvent('taps:reset-views'));
+                        }
+                      }}
                       className={`flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-xs tracking-wide transition-all ${
                         isActive
                           ? 'bg-[#2E6F4E] text-white shadow-md font-bold'
@@ -609,6 +723,11 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                   <Link
                     key={link.id}
                     href={link.href}
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        window.dispatchEvent(new CustomEvent('taps:reset-views'));
+                      }
+                    }}
                     className={`flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-xs tracking-wide transition-all ${
                       isActive
                         ? 'bg-[#2E6F4E] text-white shadow-md font-bold'
@@ -640,6 +759,11 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                   <Link
                     key={link.href}
                     href={link.href}
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        window.dispatchEvent(new CustomEvent('taps:reset-views'));
+                      }
+                    }}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-xs transition-all ${
                       isActive
                         ? 'bg-[#2E6F4E] text-white shadow-md font-bold'
@@ -668,8 +792,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* Main Right Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Top Header Bar */}
-        <header className="h-16 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between shadow-xs sticky top-0 z-10 shrink-0">
+        {/* Top Header Bar (High z-index to cleanly overlay all page elements) */}
+        <header className="h-16 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between shadow-xs sticky top-0 z-50 shrink-0">
           <div>
             <h2 className="text-base font-bold text-slate-800">{getPageTitle()}</h2>
           </div>
@@ -694,18 +818,33 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
               </div>
             )}
 
-            {/* Notification Bell Icon */}
-            <Link
-              href={pathname.startsWith('/staff') ? '/staff?tab=notifications' : '/employee?tab=notifications'}
-              className="relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              {unreadNotifications > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#E63946] ring-2 ring-white"></span>
-              )}
-            </Link>
+            {/* Revised Interactive Notification Bell Dropdown (Matching Reference) */}
+            <NotificationBellDropdown
+              unreadCount={unreadNotifications}
+              notifications={notificationsList}
+              onMarkAllRead={handleMarkAllRead}
+              onMarkSingleRead={handleMarkSingleRead}
+              onViewNotification={handleViewNotification}
+              currentTab={currentTab}
+              dashboardHref={
+                pathname.startsWith('/staff')
+                  ? '/staff?tab=dashboard'
+                  : pathname.startsWith('/account-manager')
+                  ? '/account-manager?tab=dashboard'
+                  : pathname.startsWith('/admin')
+                  ? '/admin?tab=home'
+                  : '/employee?tab=dashboard'
+              }
+              notificationCenterHref={
+                pathname.startsWith('/staff')
+                  ? '/staff?tab=notifications'
+                  : pathname.startsWith('/account-manager')
+                  ? '/account-manager?tab=dashboard'
+                  : pathname.startsWith('/admin')
+                  ? '/admin?tab=home'
+                  : '/employee?tab=notifications'
+              }
+            />
 
             {/* Top User Badge with Google Account-style Profile Management Dropdown */}
             <div className="pl-2 sm:pl-3 border-l border-slate-200">
@@ -713,6 +852,14 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </header>
+
+        {/* Real-time Stacked Pop-up Notification Toasts for Employee and Verifiers */}
+        <NotificationToastStack
+          popups={popups}
+          onDismiss={handleDismissPopup}
+          onDismissAll={handleDismissAllPopups}
+          onView={handleViewNotification}
+        />
 
         {/* Page Content View */}
         <main className="flex-1 p-6 sm:p-8 w-full overflow-y-auto flex flex-col">

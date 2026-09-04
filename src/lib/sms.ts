@@ -17,7 +17,7 @@ export * from './email';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://rltypymiubbwdhbthsky.supabase.co';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : (null as any);
 
 export interface SendSmsParams {
   to: string;
@@ -45,62 +45,112 @@ export interface NotifyRoleParams {
 }
 
 /**
- * Sends an SMS via Semaphore API (Philippine SMS gateway).
- * Falls back to console log stub if no API key is available.
+ * Sends an SMS via PhilSMS API (Primary Philippine SMS Gateway) with Semaphore fallback.
+ * Automatically normalizes Philippine phone numbers to 639XXXXXXXXX format for PhilSMS.
  */
 export async function sendSms({ to, message }: SendSmsParams): Promise<boolean> {
-  const apiKey = process.env.SEMAPHORE_API_KEY || '130d0c89952e681757e880d8fb018d49';
-  const senderName = process.env.SEMAPHORE_SENDER_NAME;
+  const philsmsToken = process.env.PHILSMS_API_TOKEN || '3846|uFWtHFbfSY5fWiXMUr8DKSqbO0ZNyz2erK2SquVE39d83d80';
+  const philsmsSenderId = process.env.PHILSMS_SENDER_ID || 'PhilSMS';
+  const semaphoreApiKey = process.env.SEMAPHORE_API_KEY;
+  const semaphoreSenderName = process.env.SEMAPHORE_SENDER_NAME;
 
   if (!to || !to.trim()) {
     console.warn('[SMS] No phone number provided for dispatch.');
     return false;
   }
 
-  // Normalize Philippine mobile numbers to standard format (e.g., 09171234567)
+  // Extract digits
   const cleanNumber = to.replace(/[^0-9]/g, '');
-  const formattedNumber = cleanNumber.startsWith('63')
-    ? '0' + cleanNumber.slice(2)
-    : cleanNumber.startsWith('9')
-    ? '0' + cleanNumber
-    : cleanNumber;
 
-  if (!apiKey) {
-    console.log(`[SMS STUB] To: ${formattedNumber} | Message: ${message}`);
-    return true; // Stub success
+  // 1. Primary: PhilSMS API (Requires 639XXXXXXXXX international format)
+  if (philsmsToken) {
+    const philSmsRecipient = cleanNumber.startsWith('63')
+      ? cleanNumber
+      : cleanNumber.startsWith('0')
+      ? '63' + cleanNumber.slice(1)
+      : cleanNumber.startsWith('9')
+      ? '63' + cleanNumber
+      : cleanNumber;
+
+    try {
+      const payload = {
+        recipient: philSmsRecipient,
+        sender_id: philsmsSenderId,
+        type: 'plain',
+        message: message,
+      };
+
+      const response = await fetch('https://dashboard.philsms.com/api/v3/sms/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${philsmsToken}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const resJson = await response.json().catch(() => null);
+
+      if (
+        response.ok &&
+        (resJson?.status === 'success' ||
+          resJson?.status === 200 ||
+          resJson?.message?.toLowerCase().includes('success') ||
+          resJson?.message?.toLowerCase().includes('delivered'))
+      ) {
+        console.log(`[PhilSMS Sent] Successfully dispatched SMS to ${philSmsRecipient}:`, resJson);
+        return true;
+      } else {
+        console.warn(`[PhilSMS Warning] Response status ${response.status}:`, resJson);
+      }
+    } catch (philsmsError) {
+      console.error('[PhilSMS Exception] PhilSMS request error, trying fallback:', philsmsError);
+    }
   }
 
-  try {
-    const payload: Record<string, string> = {
-      apikey: apiKey,
-      number: formattedNumber,
-      message: message,
-    };
+  // 2. Secondary Fallback: Semaphore API (Requires 09XXXXXXXXX local format)
+  if (semaphoreApiKey) {
+    const semaphoreRecipient = cleanNumber.startsWith('63')
+      ? '0' + cleanNumber.slice(2)
+      : cleanNumber.startsWith('9')
+      ? '0' + cleanNumber
+      : cleanNumber;
 
-    // Only attach sendername if explicitly set & registered on Semaphore
-    if (senderName && senderName.trim()) {
-      payload.sendername = senderName.trim();
+    try {
+      const payload: Record<string, string> = {
+        apikey: semaphoreApiKey,
+        number: semaphoreRecipient,
+        message: message,
+      };
+
+      if (semaphoreSenderName && semaphoreSenderName.trim()) {
+        payload.sendername = semaphoreSenderName.trim();
+      }
+
+      const response = await fetch('https://api.semaphore.co/api/v4/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(payload),
+      });
+
+      if (response.ok) {
+        const resJson = await response.json().catch(() => null);
+        console.log(`[Semaphore Sent] Successfully dispatched SMS to ${semaphoreRecipient}:`, resJson);
+        return true;
+      } else {
+        const errorText = await response.text();
+        console.error(`[Semaphore Error] Status ${response.status}: ${errorText}`);
+      }
+    } catch (semaphoreError) {
+      console.error('[Semaphore Exception] Failed to send SMS via Semaphore:', semaphoreError);
     }
-
-    const response = await fetch('https://api.semaphore.co/api/v4/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(payload),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`[SMS Error] Semaphore returned status ${response.status}: ${errorText}`);
-      return false;
-    }
-
-    const resJson = await response.json().catch(() => null);
-    console.log(`[SMS Sent] Successfully dispatched SMS to ${formattedNumber}:`, resJson);
-    return true;
-  } catch (error) {
-    console.error('[SMS Exception] Failed to send SMS:', error);
-    return false;
   }
+
+  // 3. Fallback stub if gateways unavailable
+  const fallbackNumber = cleanNumber.startsWith('0') ? cleanNumber : '0' + cleanNumber;
+  console.log(`[SMS STUB] To: ${fallbackNumber} | Message: ${message}`);
+  return true;
 }
 
 /**
@@ -201,7 +251,7 @@ export async function notifyUser({
       try {
         const smsSuccess = await sendSms({
           to: phoneNumber,
-          message: `[DENR TAPS] ${title}: ${message}`,
+          message: `[ETAPS] ${title}: ${message}`,
         });
 
         if (notification?.id) {

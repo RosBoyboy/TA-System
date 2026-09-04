@@ -73,6 +73,23 @@ function StaffDashboardContent() {
     }
   }, [reviewRequest?.id, reviewRequest?.destinationLat, reviewRequest?.destinationLng, reviewRequest?.destination]);
 
+  // Reset active review/modal view whenever sidebar tab changes or reset event occurs
+  useEffect(() => {
+    setReviewRequest(null);
+    setShowApproveModal(false);
+    setShowHistoryModal(false);
+  }, [currentTab]);
+
+  useEffect(() => {
+    const handleResetViews = () => {
+      setReviewRequest(null);
+      setShowApproveModal(false);
+      setShowHistoryModal(false);
+    };
+    window.addEventListener('taps:reset-views', handleResetViews);
+    return () => window.removeEventListener('taps:reset-views', handleResetViews);
+  }, []);
+
   // Selection & Search State
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -236,10 +253,33 @@ function StaffDashboardContent() {
       }
 
       setShowApproveModal(false);
+      const reqRef = reviewRequest;
       setReviewRequest(null);
       setRemarks('');
       setHasDigitalSignature(false);
       fetchRequests();
+      fetchNotifications();
+
+      if (typeof window !== 'undefined') {
+        const actionTitle = action === 'APPROVED' ? 'Travel Endorsement Approved' : 'Travel Request Returned';
+        const actionMsg = action === 'APPROVED'
+          ? `TA Request ${reqRef.trackingNumber || ''} has been endorsed and forwarded to the next signatory.`
+          : `TA Request ${reqRef.trackingNumber || ''} has been returned with your remarks.`;
+
+        window.dispatchEvent(
+          new CustomEvent('taps:new-notification', {
+            detail: {
+              id: `notif-${Date.now()}`,
+              title: actionTitle,
+              message: actionMsg,
+              createdAt: new Date().toISOString(),
+              requestId: reqRef.id,
+              isRead: false,
+            },
+          })
+        );
+        window.dispatchEvent(new CustomEvent('taps:refresh-notifications'));
+      }
     } catch (err: any) {
       setActionError(err.message || 'An error occurred during submission.');
     } finally {

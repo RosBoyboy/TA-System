@@ -329,17 +329,17 @@ function AccountManagerContent() {
   const [wizardStep, setWizardStep] = useState(1);
   const [formError, setFormError] = useState('');
 
-  const [createForm, setCreateForm] = useState({
-    departureDate: '2026-08-15',
-    returnDate: '2026-08-17',
+  const getInitialCreateForm = () => ({
+    departureDate: '',
+    returnDate: '',
     employeeName: 'Account Manager User',
     position: 'Account Manager',
     designation: 'System Administrator / Account Manager',
     travelArea: 'WITHIN AOR',
-    destination: 'Fili National High School, Fili',
+    destination: '',
     destinationLat: 14.275,
     destinationLng: 121.415,
-    purpose: 'Conduct field inspection and compliance verification for industrial site.',
+    purpose: '',
     salaryGrade: '18',
     division: 'Management Services Division',
     station: 'PENRO Laguna',
@@ -352,6 +352,8 @@ function AccountManagerContent() {
     certification: 'I hereby certify that the travel requested is necessary for official public service.',
     contactNumber: '09170000000',
   });
+
+  const [createForm, setCreateForm] = useState(() => getInitialCreateForm());
 
   const [locationSuggestions, setLocationSuggestions] = useState<
     { name: string; fullAddress: string; lat: number; lng: number }[]
@@ -698,6 +700,7 @@ function AccountManagerContent() {
 
       showToast(`Travel Authority request ${data.data.trackingNumber} submitted successfully!`, 'success');
       setWizardStep(1);
+      setCreateForm(getInitialCreateForm());
       setTaSubTab('list');
       fetchMyTaRequests();
     } catch (err: any) {

@@ -308,33 +308,47 @@ function EmployeeContent() {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [notificationFilter, setNotificationFilter] = useState('ALL');
 
+  // Toast Banner State
+  const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const showToast = (text: string, type: 'success' | 'error' = 'success') => {
+    setToastMessage({ text, type });
+    setTimeout(() => setToastMessage(null), 4500);
+  };
+
+  // Helper to reset Create Travel Wizard form to initial state
+  const getInitialCreateForm = (list: Array<{ id: string; name: string; position: string | null }> = []) => {
+    const defaultEmp = list.length > 0 ? list[0] : null;
+    return {
+      departureDate: '',
+      returnDate: '',
+      employeeName: defaultEmp?.name || 'Juan Dela Cruz',
+      position: defaultEmp?.position || 'Environmental Management Specialist II',
+      designation: defaultEmp?.position || 'Section Chief, Environmental Management Section',
+      travelArea: 'WITHIN AOR',
+      destination: '',
+      destinationLat: 14.5547,
+      destinationLng: 121.0244,
+      purpose: '',
+      salaryGrade: '18',
+      division: 'MSD/Planning Section',
+      station: 'PENRO ADN PLANNING',
+      employmentStatus: 'Permanent',
+      office: 'PENRO ADN',
+      signatoryStation: 'PENRO ADN PLANNING',
+      perDiems: '',
+      appropriations: '',
+      remarks: '',
+      certification: '',
+      contactNumber: '09295855403',
+      attachments: [] as string[],
+      teamMembers: [] as { name: string; position: string }[],
+    };
+  };
+
   // Create Travel Wizard State (5 Steps matching PDF pages 2-8)
   const [wizardStep, setWizardStep] = useState(1);
-  const [createForm, setCreateForm] = useState({
-    departureDate: '2026-08-15',
-    returnDate: '2026-08-17',
-    employeeName: 'Juan Dela Cruz',
-    position: 'Environmental Management Specialist II',
-    designation: 'Section Chief, Environmental Management Section',
-    travelArea: 'WITHIN AOR',
-    destination: 'Makati City',
-    destinationLat: 14.5547,
-    destinationLng: 121.0244,
-    purpose: 'Conduct field inspection and compliance verification for industrial facilities.',
-    salaryGrade: '18',
-    division: 'MSD/Planning Section',
-    station: 'PENRO ADN PLANNING',
-    employmentStatus: 'Permanent',
-    office: 'PENRO ADN',
-    signatoryStation: 'PENRO ADN PLANNING',
-    perDiems: '',
-    appropriations: '',
-    remarks: '',
-    certification: '',
-    contactNumber: '09295855403',
-    attachments: [] as string[],
-    teamMembers: [] as { name: string; position: string }[],
-  });
+  const [createForm, setCreateForm] = useState(() => getInitialCreateForm());
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
@@ -553,7 +567,72 @@ function EmployeeContent() {
     }
   }, [requests]);
 
+  // Reset active modals/detail view whenever sidebar tab changes or reset event occurs
+  useEffect(() => {
+    setSelectedRequest(null);
+    setTravelOrderModalRequest(null);
+  }, [currentTab]);
+
+  useEffect(() => {
+    const handleResetViews = () => {
+      setSelectedRequest(null);
+      setTravelOrderModalRequest(null);
+    };
+    window.addEventListener('taps:reset-views', handleResetViews);
+    return () => window.removeEventListener('taps:reset-views', handleResetViews);
+  }, []);
+
+  const handleWizardNext = () => {
+    setFormError('');
+    if (wizardStep === 1) {
+      if (!createForm.departureDate || !createForm.returnDate) {
+        setFormError('Please select both departure and return dates before proceeding.');
+        return;
+      }
+      if (new Date(createForm.departureDate) > new Date(createForm.returnDate)) {
+        setFormError('Return date must be equal to or after departure date.');
+        return;
+      }
+    } else if (wizardStep === 2) {
+      if (!createForm.employeeName) {
+        setFormError('Please select an employee name.');
+        return;
+      }
+    } else if (wizardStep === 3) {
+      if (!createForm.destination.trim()) {
+        setFormError('Please specify a travel destination.');
+        return;
+      }
+      if (!createForm.purpose.trim()) {
+        setFormError('Please provide a purpose of travel.');
+        return;
+      }
+    }
+    setWizardStep((prev) => Math.min(prev + 1, 5));
+  };
+
   const handleCreateSubmit = async () => {
+    if (!createForm.departureDate || !createForm.returnDate) {
+      setFormError('Please select both departure and return dates.');
+      setWizardStep(1);
+      return;
+    }
+    if (!createForm.employeeName) {
+      setFormError('Please select an employee name.');
+      setWizardStep(2);
+      return;
+    }
+    if (!createForm.destination.trim()) {
+      setFormError('Please enter a travel destination.');
+      setWizardStep(3);
+      return;
+    }
+    if (!createForm.purpose.trim()) {
+      setFormError('Please enter the purpose of travel.');
+      setWizardStep(3);
+      return;
+    }
+
     setIsSubmitting(true);
     setFormError('');
 
@@ -562,8 +641,8 @@ function EmployeeContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          purpose: createForm.purpose,
-          destination: createForm.destination,
+          purpose: createForm.purpose.trim(),
+          destination: createForm.destination.trim(),
           destinationLat: createForm.destinationLat,
           destinationLng: createForm.destinationLng,
           startDate: createForm.departureDate,
@@ -576,15 +655,44 @@ function EmployeeContent() {
       const data = await res.json();
       if (!res.ok || !data.success) {
         setFormError(data.error || 'Failed to submit Travel Authority request.');
+        showToast(data.error || 'Failed to submit Travel Authority request.', 'error');
         setIsSubmitting(false);
         return;
       }
 
+      // Reset wizard step back to Step 1
+      setWizardStep(1);
+      // Reset form state back to initial clean state
+      setCreateForm(getInitialCreateForm(employeeList));
+      setLocationSuggestions([]);
+      setShowLocationDropdown(false);
+      setFormError('');
+
+      showToast(`Travel Authority request ${data.data?.trackingNumber || ''} submitted successfully!`, 'success');
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('taps:new-notification', {
+            detail: {
+              id: `notif-${Date.now()}`,
+              title: 'TA Request Submitted',
+              message: `Your Travel Authority request ${data.data?.trackingNumber || ''} for ${data.data?.destination || 'field travel'} has been submitted for approval.`,
+              createdAt: new Date().toISOString(),
+              requestId: data.data?.id,
+              isRead: false,
+            },
+          })
+        );
+        window.dispatchEvent(new CustomEvent('taps:refresh-notifications'));
+      }
+
       setIsSubmitting(false);
       fetchRequests();
+      fetchNotifications();
       router.push('/employee?tab=requests');
     } catch (err: any) {
       setFormError(err.message || 'An error occurred during submission.');
+      showToast(err.message || 'An error occurred during submission.', 'error');
       setIsSubmitting(false);
     }
   };
@@ -1750,7 +1858,11 @@ function EmployeeContent() {
             <div className="pt-6 border-t border-slate-200/80 flex items-center justify-between">
               <button
                 type="button"
-                onClick={() => router.push('/employee?tab=dashboard')}
+                onClick={() => {
+                  setWizardStep(1);
+                  setFormError('');
+                  router.push('/employee?tab=dashboard');
+                }}
                 className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
               >
                 Cancel
@@ -1760,7 +1872,10 @@ function EmployeeContent() {
                 {wizardStep > 1 && (
                   <button
                     type="button"
-                    onClick={() => setWizardStep((prev) => Math.max(prev - 1, 1))}
+                    onClick={() => {
+                      setFormError('');
+                      setWizardStep((prev) => Math.max(prev - 1, 1));
+                    }}
                     className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1773,7 +1888,7 @@ function EmployeeContent() {
                 {/* Save Draft Button (Matching Page 2 PDF) */}
                 <button
                   type="button"
-                  onClick={() => alert('Draft saved successfully!')}
+                  onClick={() => showToast('Draft saved successfully!', 'success')}
                   className="px-5 py-2.5 rounded-xl border border-[#0B5A3A] text-[#0B5A3A] bg-white hover:bg-emerald-50 text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1785,7 +1900,7 @@ function EmployeeContent() {
                 {wizardStep < 5 ? (
                   <button
                     type="button"
-                    onClick={() => setWizardStep((prev) => Math.min(prev + 1, 5))}
+                    onClick={handleWizardNext}
                     className="px-6 py-2.5 bg-[#0B5A3A] hover:bg-[#06452F] text-white rounded-xl text-xs font-bold shadow-2xs transition-all inline-flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>Next</span>
@@ -2484,6 +2599,20 @@ function EmployeeContent() {
 
   return (
     <>
+      {/* Toast Notification Banner */}
+      {toastMessage && (
+        <div
+          className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl shadow-2xl font-semibold text-xs flex items-center gap-2.5 border transition-all animate-bounce ${
+            toastMessage.type === 'success'
+              ? 'bg-[#0B5A3A] text-white border-emerald-400/40 ring-4 ring-emerald-500/10'
+              : 'bg-[#DC3545] text-white border-rose-400/40 ring-4 ring-rose-500/10'
+          }`}
+        >
+          <span className="text-base">{toastMessage.type === 'success' ? '✅' : '⚠️'}</span>
+          <span>{toastMessage.text}</span>
+        </div>
+      )}
+
       {renderTabContent()}
 
       {/* Floating View History Page / Modal (Matching Reference UI strictly: Document History & Signatory List) */}
