@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import DynamicMapPicker from '@/components/map/DynamicMapPicker';
 import ApprovalTrail from '@/components/approval-trail/ApprovalTrail';
 import { TARequestDTO } from '@/types';
@@ -291,6 +292,9 @@ function DualMonthCalendarPicker({
 }
 
 function EmployeeContent() {
+  const { data: session } = useSession();
+  const sessionUser = session?.user as any;
+
   const searchParams = useSearchParams();
   const router = useRouter();
   const currentTab = searchParams.get('tab') || 'dashboard';
@@ -308,40 +312,137 @@ function EmployeeContent() {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [notificationFilter, setNotificationFilter] = useState('ALL');
 
-  // Create Travel Wizard State (5 Steps matching PDF pages 2-8)
-  const [wizardStep, setWizardStep] = useState(1);
-  const [createForm, setCreateForm] = useState({
-    departureDate: '2026-08-15',
-    returnDate: '2026-08-17',
-    employeeName: 'Juan Dela Cruz',
-    position: 'Environmental Management Specialist II',
-    designation: 'Section Chief, Environmental Management Section',
-    travelArea: 'WITHIN AOR',
-    destination: 'Makati City',
-    destinationLat: 14.5547,
-    destinationLng: 121.0244,
-    purpose: 'Conduct field inspection and compliance verification for industrial facilities.',
-    salaryGrade: '18',
-    division: 'MSD/Planning Section',
-    station: 'PENRO ADN PLANNING',
-    employmentStatus: 'Permanent',
-    office: 'PENRO ADN',
-    signatoryStation: 'PENRO ADN PLANNING',
-    perDiems: '',
-    appropriations: '',
-    remarks: '',
-    certification: '',
-    contactNumber: '09295855403',
-    attachments: [] as string[],
-    teamMembers: [] as { name: string; position: string }[],
-  });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState('');
-
   // Database-driven Employees state for Step 2 dropdown
   const [employeeList, setEmployeeList] = useState<Array<{ id: string; name: string; position: string | null }>>([]);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
+
+  // Helper to resolve profile-derived defaults that should be preserved across resets
+  const getProfileDefaults = (userObj?: any, empList?: any[]) => {
+    const list = empList || employeeList;
+    const currentName = userObj?.name || sessionUser?.name;
+    const matched = list.find((e: any) => e.name === currentName) || list[0];
+
+    const empName = matched?.name || currentName || 'Juan Dela Cruz';
+    const empPos = matched?.position || userObj?.position || sessionUser?.position || 'Environmental Management Specialist II';
+    const empSection = userObj?.section || sessionUser?.section || 'MSD/Planning Section';
+    const empPhone = userObj?.phoneNumber || sessionUser?.phoneNumber || '09295855403';
+
+    return {
+      employeeName: empName,
+      position: empPos,
+      designation: empPos,
+      salaryGrade: '18',
+      division: empSection,
+      station: 'PENRO ADN PLANNING',
+      employmentStatus: 'Permanent',
+      office: 'PENRO ADN',
+      signatoryStation: 'PENRO ADN PLANNING',
+      contactNumber: empPhone,
+    };
+  };
+
+  // Helper to generate a clean form state with request-specific fields reset to empty/defaults
+  const getCleanFormState = (userObj?: any, empList?: any[]) => {
+    const profile = getProfileDefaults(userObj, empList);
+    return {
+      departureDate: '',
+      returnDate: '',
+      employeeName: profile.employeeName,
+      position: profile.position,
+      designation: profile.designation,
+      travelArea: 'WITHIN AOR',
+      destination: '',
+      destinationLat: 14.5547,
+      destinationLng: 121.0244,
+      purpose: '',
+      salaryGrade: profile.salaryGrade,
+      division: profile.division,
+      station: profile.station,
+      employmentStatus: profile.employmentStatus,
+      office: profile.office,
+      signatoryStation: profile.signatoryStation,
+      perDiems: '',
+      appropriations: '',
+      remarks: '',
+      certification: '',
+      contactNumber: profile.contactNumber,
+      attachments: [] as string[],
+      teamMembers: [] as { name: string; position: string }[],
+    };
+  };
+
+  // Create Travel Wizard State (5 Steps matching PDF pages 2-8)
+  const [wizardStep, setWizardStep] = useState(1);
+  const [createForm, setCreateForm] = useState(() => getCleanFormState());
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+
+  // Comprehensive Form Reset Function: clears all request-specific state, map state, and sets step back to 1
+  const resetTravelForm = () => {
+    setWizardStep(1);
+    setCreateForm(getCleanFormState(sessionUser, employeeList));
+    setFormError('');
+    setLocationSuggestions([]);
+    setShowLocationDropdown(false);
+    skipNextSearchRef.current = false;
+  };
+
+  // Clears submitted draft state from persistence
+  const clearSubmittedDraft = () => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('etaps_employee_draft');
+      }
+    } catch (err) {
+      console.error('Error clearing submitted draft:', err);
+    }
+  };
+
+  // Saves legitimate draft for later recovery
+  const handleSaveDraft = () => {
+    try {
+      if (typeof window !== 'undefined') {
+        const draftPayload = {
+          step: wizardStep,
+          form: createForm,
+          savedAt: new Date().toISOString(),
+        };
+        localStorage.setItem('etaps_employee_draft', JSON.stringify(draftPayload));
+      }
+      alert('Draft saved successfully!');
+    } catch (err) {
+      console.error('Error saving draft:', err);
+      alert('Draft saved successfully!');
+    }
+  };
+
+  // Tab change lifecycle: when entering 'create' tab from another tab
+  const lastTabRef = useRef(currentTab);
+
+  useEffect(() => {
+    if (currentTab === 'create' && lastTabRef.current !== 'create') {
+      try {
+        if (typeof window !== 'undefined') {
+          const savedDraftStr = localStorage.getItem('etaps_employee_draft');
+          if (savedDraftStr) {
+            const parsed = JSON.parse(savedDraftStr);
+            if (parsed && parsed.form) {
+              setCreateForm(parsed.form);
+              if (parsed.step) {
+                setWizardStep(parsed.step);
+              }
+            }
+          } else {
+            // No saved draft exists: ensure clean state and step 1
+            resetTravelForm();
+          }
+        }
+      } catch (err) {
+        console.error('Failed to inspect saved draft:', err);
+      }
+    }
+    lastTabRef.current = currentTab;
+  }, [currentTab]);
 
   // Location Search & Autocomplete State
   const [locationSuggestions, setLocationSuggestions] = useState<
@@ -507,14 +608,16 @@ function EmployeeContent() {
           const json = await res.json();
           if (json.success && Array.isArray(json.data) && json.data.length > 0) {
             setEmployeeList(json.data);
-            // Auto-align default form with first employee if not yet set or matching
+            // Auto-align default form with matching session employee or first employee if not yet set
             setCreateForm((prev) => {
-              const matched = json.data.find((e: any) => e.name === prev.employeeName) || json.data[0];
+              const profile = getProfileDefaults(sessionUser, json.data);
               return {
                 ...prev,
-                employeeName: matched.name,
-                position: matched.position || '',
-                designation: matched.position || '',
+                employeeName: prev.employeeName || profile.employeeName,
+                position: prev.position || profile.position,
+                designation: prev.designation || profile.designation,
+                division: prev.division || profile.division,
+                contactNumber: prev.contactNumber || profile.contactNumber,
               };
             });
           }
@@ -527,6 +630,26 @@ function EmployeeContent() {
     };
     fetchEmployees();
   }, []);
+
+  // Sync profile defaults when session user loads
+  useEffect(() => {
+    if (sessionUser?.name && employeeList.length > 0) {
+      setCreateForm((prev) => {
+        if (!prev.employeeName || prev.employeeName === 'Juan Dela Cruz') {
+          const profile = getProfileDefaults(sessionUser, employeeList);
+          return {
+            ...prev,
+            employeeName: profile.employeeName,
+            position: profile.position,
+            designation: profile.designation,
+            division: profile.division,
+            contactNumber: profile.contactNumber,
+          };
+        }
+        return prev;
+      });
+    }
+  }, [sessionUser, employeeList]);
 
   // Handle employee selection from database dropdown
   const handleEmployeeSelect = (name: string) => {
@@ -554,6 +677,23 @@ function EmployeeContent() {
   }, [requests]);
 
   const handleCreateSubmit = async () => {
+    // Guard against duplicate simultaneous submissions
+    if (isSubmitting) return;
+
+    // Validate required fields before dispatching API request
+    if (!createForm.departureDate || !createForm.returnDate) {
+      setFormError('Please select both Departure and Return travel dates in Step 1.');
+      return;
+    }
+    if (!createForm.destination.trim()) {
+      setFormError('Please enter a valid destination in Step 3.');
+      return;
+    }
+    if (!createForm.purpose.trim()) {
+      setFormError('Please provide the travel purpose in Step 3.');
+      return;
+    }
+
     setIsSubmitting(true);
     setFormError('');
 
@@ -562,8 +702,8 @@ function EmployeeContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          purpose: createForm.purpose,
-          destination: createForm.destination,
+          purpose: createForm.purpose.trim(),
+          destination: createForm.destination.trim(),
           destinationLat: createForm.destinationLat,
           destinationLng: createForm.destinationLng,
           startDate: createForm.departureDate,
@@ -575,16 +715,21 @@ function EmployeeContent() {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
+        // Submission failed: keep all entered data, stay at Step 5, and display the error
         setFormError(data.error || 'Failed to submit Travel Authority request.');
-        setIsSubmitting(false);
         return;
       }
 
-      setIsSubmitting(false);
-      fetchRequests();
+      // ONLY on confirmed success:
+      resetTravelForm();
+      clearSubmittedDraft();
+
+      await fetchRequests();
       router.push('/employee?tab=requests');
     } catch (err: any) {
+      // Network or runtime exception: keep all form data and step 5
       setFormError(err.message || 'An error occurred during submission.');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -1773,7 +1918,7 @@ function EmployeeContent() {
                 {/* Save Draft Button (Matching Page 2 PDF) */}
                 <button
                   type="button"
-                  onClick={() => alert('Draft saved successfully!')}
+                  onClick={handleSaveDraft}
                   className="px-5 py-2.5 rounded-xl border border-[#0B5A3A] text-[#0B5A3A] bg-white hover:bg-emerald-50 text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

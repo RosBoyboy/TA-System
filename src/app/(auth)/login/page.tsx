@@ -82,25 +82,45 @@ function LoginForm() {
     <div className="min-h-screen bg-[#F4F6F5] flex flex-col lg:flex-row font-sans text-slate-800">
       {/* Left Split Hero Panel */}
       <div className="hidden lg:flex lg:w-[52%] relative bg-emerald-950 flex-col justify-between p-12 overflow-hidden border-r border-emerald-900/30">
+        {/* Real photo background */}
         <div
-          className="absolute inset-0 z-0 bg-cover bg-center scale-105 transition-transform duration-1000"
+          className="absolute inset-0 z-0 bg-cover bg-no-repeat"
           style={{
-            backgroundImage: `url('/denr-forest-stream.jpg')`,
-            opacity: 0.7,
+            backgroundImage: `url('/hero%20banner2.jpg')`,
+            backgroundPosition: 'center 35%',
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-950/30 to-emerald-950/20 z-0" />
 
-        {/* Top Header Logo on Hero Panel */}
-        <div className="relative z-10 flex items-center gap-3">
-          <img src="/taps-logo.png" alt="TAPS Logo" className="w-11 h-11 object-contain drop-shadow-md" />
+        {/* Dark DENR Green Overlay */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(90deg, rgba(0, 55, 35, 0.92) 0%, rgba(0, 55, 35, 0.70) 55%, rgba(0, 55, 35, 0.45) 100%)',
+          }}
+        />
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(5, 30, 15, 0.50) 0%, rgba(5, 30, 15, 0.0) 30%, rgba(5, 30, 15, 0.20) 70%, rgba(5, 30, 15, 0.75) 100%)',
+          }}
+        />
+
+        {/* Top Header Logo on Hero Panel - Clickable to Landing Page */}
+        <Link
+          href="/"
+          className="relative z-10 flex items-center gap-3 group w-fit transition-transform hover:scale-[1.02]"
+          title="Return to Landing Page"
+        >
+          <img src="/taps-logo.png" alt="TAPS Logo" className="w-11 h-11 object-contain drop-shadow-md group-hover:brightness-110 transition-all" />
           <div>
             <h1 className="text-xl font-black tracking-tight text-white leading-none">TAPS</h1>
             <p className="text-[9px] font-bold tracking-widest text-emerald-300 uppercase mt-0.5">
               TRAVEL AUTHORITY PROCESSING SYSTEM
             </p>
           </div>
-        </div>
+        </Link>
 
         {/* Middle Hero Content */}
         <div className="relative z-10 my-auto py-12 max-w-xl space-y-6">
@@ -169,13 +189,19 @@ function LoginForm() {
       {/* Right Split Panel */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md bg-white rounded-3xl p-8 sm:p-10 shadow-xl border border-slate-100/80">
-          {/* Logo Header */}
+          {/* Logo Header - Clickable to Landing Page */}
           <div className="text-center mb-5">
-            <img src="/taps-logo.png" alt="TAPS Logo" className="w-16 h-16 object-contain mx-auto mb-2" />
-            <h1 className="text-xl font-black text-[#0F4C2E] tracking-tight">TAPS</h1>
-            <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
-              TRAVEL AUTHORITY PROCESSING SYSTEM
-            </p>
+            <Link
+              href="/"
+              className="inline-block group transition-transform hover:scale-[1.02]"
+              title="Return to Landing Page"
+            >
+              <img src="/taps-logo.png" alt="TAPS Logo" className="w-16 h-16 object-contain mx-auto mb-2 drop-shadow-sm group-hover:brightness-105 transition-all" />
+              <h1 className="text-xl font-black text-[#0F4C2E] tracking-tight group-hover:text-emerald-700 transition-colors">TAPS</h1>
+              <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                TRAVEL AUTHORITY PROCESSING SYSTEM
+              </p>
+            </Link>
           </div>
 
           <div className="text-center mb-6">

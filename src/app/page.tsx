@@ -8,55 +8,31 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const heroSlides = [
+  const heroBackgrounds = [
     {
-      bgImage: '/denr-building-hero.jpg',
-      eyebrow: 'Secure and Paperless Processing',
-      titleLine1: 'Streamline Your',
-      titleLine2: 'Travel Authority',
-      titleAccent1: 'Requests',
-      titleAccent2: 'Digitally',
-      description: 'Submit, review, track, and manage travel authority requests through one secure and organized digital platform.',
-      primaryBtnText: 'Submit a Request',
-      primaryBtnHref: '/login',
-      secondaryBtnText: 'Learn More',
-      secondaryBtnHref: '#about',
+      src: '/hero banner2.jpg',
+      alt: 'Orange arch bridge spanning over the river during golden hour',
+      position: 'center 35%',
     },
     {
-      bgImage: '/denr-sunset-landscape.jpg',
-      eyebrow: 'Official DENR-PENRO Digital Service',
-      titleLine1: 'Travel Authority',
-      titleLine2: 'Processing',
-      titleAccent1: 'Made Faster',
-      titleAccent2: 'and Smarter',
-      description: 'Digitize travel authority requests, approvals, notifications, and destination tracking for DENR-PENRO.',
-      primaryBtnText: 'Get Started',
-      primaryBtnHref: '/register',
-      secondaryBtnText: 'Login',
-      secondaryBtnHref: '/login',
+      src: '/hero banner1.jpg',
+      alt: 'Historic gazebo belfry landmark shaded by an ancient banyan tree',
+      position: 'center 50%',
     },
     {
-      bgImage: '/denr-forest-stream.jpg',
-      eyebrow: 'Real-Time Updates and Mapping',
-      titleLine1: 'Stay Informed',
-      titleLine2: 'Throughout',
-      titleAccent1: 'Every',
-      titleAccent2: 'Journey',
-      description: 'Receive SMS and in-app notifications while viewing and confirming travel destinations through map integration.',
-      primaryBtnText: 'Create Account',
-      primaryBtnHref: '/register',
-      secondaryBtnText: 'Explore Features',
-      secondaryBtnHref: '#features',
+      src: '/denr_hero_baner2.png',
+      alt: 'Scenic dam and cascading waterfall surrounded by lush green mountain slopes',
+      position: 'center 45%',
     },
   ];
 
   // Auto rotate hero slides every 6 seconds
   useEffect(() => {
     const timer = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % heroSlides.length);
+      setActiveSlide((prev) => (prev + 1) % heroBackgrounds.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, [heroSlides.length]);
+  }, [heroBackgrounds.length]);
 
   // Handle sticky header scroll effect
   useEffect(() => {
@@ -70,8 +46,6 @@ export default function LandingPage() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const currentSlideData = heroSlides[activeSlide];
 
   return (
     <div className="min-h-screen bg-[#F0F4F0] font-sans text-slate-800 flex flex-col selection:bg-emerald-800 selection:text-white">
@@ -169,74 +143,101 @@ export default function LandingPage() {
         )}
       </header>
 
-      {/* ===================== Hero Section (Fit Container Height) ===================== */}
-      <section id="home" className="relative pt-24 pb-20 sm:pt-28 sm:pb-28 overflow-hidden bg-[#051E0F]">
-        {/* Carousel Background Images */}
-        {heroSlides.map((slide, idx) => (
-          <div
-            key={idx}
-            className={`absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${
-              idx === activeSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'
-            }`}
-            style={{ backgroundImage: `url('${slide.bgImage}')` }}
+      {/* ===================== Hero Section (Immersive Large Screen Banner) ===================== */}
+      <section
+        id="home"
+        className="relative min-h-[85vh] lg:min-h-screen flex items-center pt-28 pb-24 sm:pt-32 sm:pb-32 overflow-hidden bg-[#051E0F]"
+      >
+        {/* Preload hero images for instant transitions */}
+        {heroBackgrounds.map((bg) => (
+          <img
+            key={`preload-${bg.src}`}
+            src={bg.src}
+            alt=""
+            className="sr-only"
+            aria-hidden="true"
+            loading="eager"
           />
         ))}
 
-        {/* Dark Emerald Gradient Overlay matching exact 105deg CSS gradient from reference bundle */}
+        {/* Carousel Background Images with smooth 1.2s crossfade transition */}
+        {heroBackgrounds.map((bg, idx) => (
+          <div
+            key={bg.src}
+            className={`absolute inset-0 z-0 bg-cover bg-no-repeat transition-opacity duration-1200 ease-in-out motion-reduce:transition-none ${
+              idx === activeSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+            style={{
+              backgroundImage: `url('${encodeURI(bg.src)}')`,
+              backgroundPosition: bg.position,
+            }}
+            aria-hidden="true"
+          />
+        ))}
+
+        {/* Dark DENR Green / Charcoal Gradient Overlay for strong typography contrast */}
         <div
-          className="absolute inset-0 z-1 pointer-events-none"
+          className="absolute inset-0 z-[1] pointer-events-none"
           style={{
-            background: 'linear-gradient(105deg, rgba(5, 30, 15, 0.92) 0%, rgba(5, 30, 15, 0.75) 40%, rgba(5, 30, 15, 0.30) 70%, rgba(5, 30, 15, 0.10) 100%)',
+            background:
+              'linear-gradient(90deg, rgba(0, 45, 25, 0.92) 0%, rgba(0, 45, 25, 0.78) 35%, rgba(0, 35, 20, 0.40) 70%, rgba(0, 20, 10, 0.15) 100%)',
           }}
         />
 
-        {/* Hero Content Container shifted left to fill gap */}
+        {/* Subtle top/bottom vertical gradient for navbar contrast and smooth blend into wave */}
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(5, 30, 15, 0.50) 0%, rgba(5, 30, 15, 0.0) 25%, rgba(5, 30, 15, 0.0) 75%, rgba(5, 30, 15, 0.70) 100%)',
+          }}
+        />
+
+        {/* Stationary Hero Content Container (stays rock-solid while backgrounds transition) */}
         <div className="relative z-10 max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-12 w-full">
-          <div className="max-w-[620px] text-left space-y-5">
+          <div className="max-w-[640px] text-left space-y-5">
             {/* Eyebrow Pill */}
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#003C14]/70 border border-[#A5D6A7]/40 text-xs font-semibold text-[#4ADE80] shadow-md backdrop-blur-sm">
               <svg className="w-3.5 h-3.5 text-[#A5D6A7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 21c9 0 13-6 13-15 0 0-9-1-13 4C2 14 2 21 6 21Z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 21c0-5 2-9 6-12" />
               </svg>
-              <span>{currentSlideData.eyebrow}</span>
+              <span>Official DENR-PENRO Digital Service</span>
             </span>
 
-            {/* Title matching clamp(40px, 5.5vw, 64px) from reference CSS */}
+            {/* Title matching clamp(40px, 5.5vw, 64px) */}
             <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-extrabold text-white tracking-tight leading-[1.1]">
-              <span className="block">{currentSlideData.titleLine1}</span>
-              <span className="block">{currentSlideData.titleLine2}</span>
-              <span className="block text-[#4ADE80]">
-                {currentSlideData.titleAccent1} {currentSlideData.titleAccent2}
-              </span>
+              <span className="block">Travel Authority</span>
+              <span className="block">Processing</span>
+              <span className="block text-[#4ADE80]">Made Faster and Smarter</span>
             </h1>
 
-            {/* Description matching max-width 480px & 16px text */}
-            <p className="text-base text-white/80 leading-relaxed max-w-[480px] font-normal pt-1">
-              {currentSlideData.description}
+            {/* Description */}
+            <p className="text-base sm:text-lg text-white/85 leading-relaxed max-w-[500px] font-normal pt-1">
+              Digitize travel authority requests, approvals, notifications, and destination tracking for DENR-PENRO.
             </p>
 
-            {/* CTAs matching reference CSS */}
+            {/* CTAs */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
-                href={currentSlideData.primaryBtnHref}
-                className="px-7 py-3.5 bg-[#1B5E20] hover:bg-[#2E7D32] text-white font-semibold text-sm rounded-full shadow-lg transition-all flex items-center gap-2 hover:scale-[1.02]"
+                href="/register"
+                className="px-7 py-3.5 bg-[#1B5E20] hover:bg-[#2E7D32] text-white font-semibold text-sm rounded-full shadow-lg transition-all flex items-center gap-2 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[#4ADE80]"
               >
-                <span>{currentSlideData.primaryBtnText}</span>
+                <span>Get Started</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
               </Link>
 
-              <a
-                href={currentSlideData.secondaryBtnHref}
-                className="px-7 py-3.5 bg-transparent border-2 border-white/50 text-white hover:bg-white/10 font-semibold text-sm rounded-full transition-all"
+              <Link
+                href="/login"
+                className="px-7 py-3.5 bg-transparent border-2 border-white/50 text-white hover:bg-white/10 font-semibold text-sm rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-[#4ADE80]"
               >
-                {currentSlideData.secondaryBtnText}
-              </a>
+                Login
+              </Link>
             </div>
 
-            {/* Stats Strip inside Hero matching reference CSS */}
+            {/* Stats Strip inside Hero */}
             <div className="pt-6 flex flex-wrap items-center gap-8 text-xs">
               <div className="flex items-center gap-2.5">
                 <svg className="w-5 h-5 text-[#4ADE80]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,23 +279,10 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Carousel Slide Indicators */}
-        <div className="absolute bottom-8 right-8 z-10 flex gap-2">
-          {heroSlides.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setActiveSlide(i)}
-              className={`h-2.5 rounded-full transition-all ${
-                i === activeSlide ? 'w-8 bg-[#4ADE80]' : 'w-2.5 bg-white/40 hover:bg-white/70'
-              }`}
-              aria-label={`Slide ${i + 1}`}
-            />
-          ))}
-        </div>
 
-        {/* Bottom Hero Smooth Wave Curve matching 80px/96px height */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 leading-none">
+
+        {/* Bottom Hero Smooth Wave Curve */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 leading-none pointer-events-none">
           <svg
             className="w-full h-14 sm:h-20 text-[#F0F4F0]"
             viewBox="0 0 1440 120"
