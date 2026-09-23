@@ -4,11 +4,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import ProfileModal from './ProfileModal';
 
-interface ProfileDropdownProps {
-  viewRole?: string;
-}
+const roleDisplayNames: Record<string, string> = {
+  EMPLOYEE: 'Employee',
+  SECTION_CHIEF: 'Section Chief',
+  DIVISION_CHIEF: 'Division Chief',
+  HEAD_PENRO: 'Head of PENRO',
+  ACCOUNT_MANAGER: 'Account Manager',
+  ADMIN: 'Administrator',
+};
 
-export default function ProfileDropdown({ viewRole }: ProfileDropdownProps) {
+export default function ProfileDropdown() {
   const { data: session } = useSession();
   const user = session?.user as any;
 
@@ -80,7 +85,7 @@ export default function ProfileDropdown({ viewRole }: ProfileDropdownProps) {
     });
   };
 
-  const displaySubtitle = position || viewRole || (role === 'EMPLOYEE' ? 'Employee' : role.replace(/_/g, ' '));
+  const displaySubtitle = position || roleDisplayNames[role] || (role === 'EMPLOYEE' ? 'Employee' : role.replace(/_/g, ' '));
 
   return (
     <div className="relative" ref={dropdownRef}>

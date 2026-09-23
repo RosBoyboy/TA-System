@@ -150,25 +150,29 @@ function StaffDashboardContent() {
     // Fully terminal statuses are the same for everyone
     if (status === 'APPROVED')
       return (
-        <span className="px-3 py-1 text-[11px] font-extrabold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 inline-block uppercase tracking-wider">
+        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span>
           APPROVED
         </span>
       );
     if (status === 'REJECTED_MANUAL' || status === 'DISAPPROVED')
       return (
-        <span className="px-3 py-1 text-[11px] font-extrabold rounded-full bg-rose-100 text-rose-800 border border-rose-200 inline-block uppercase tracking-wider">
+        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-700 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-600 shrink-0"></span>
           RETURNED
         </span>
       );
     if (status === 'REJECTED_OVERDUE')
       return (
-        <span className="px-3 py-1 text-[11px] font-extrabold rounded-full bg-rose-100 text-rose-800 border border-rose-200 inline-block uppercase tracking-wider">
+        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-700 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-600 shrink-0"></span>
           OVERDUE
         </span>
       );
     if (status === 'DRAFT')
       return (
-        <span className="px-3 py-1 text-[11px] font-extrabold rounded-full bg-purple-100 text-purple-800 border border-purple-200 inline-block uppercase tracking-wider">
+        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-700 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-purple-600 shrink-0"></span>
           DRAFT
         </span>
       );
@@ -191,7 +195,8 @@ function StaffDashboardContent() {
     if (myStep > 0 && currentStep > myStep) {
       // This verifier already endorsed — request passed their step
       return (
-        <span className="px-3 py-1 text-[11px] font-extrabold rounded-full bg-sky-100 text-sky-800 border border-sky-200 inline-block uppercase tracking-wider">
+        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-600 shrink-0"></span>
           ENDORSED
         </span>
       );
@@ -199,14 +204,16 @@ function StaffDashboardContent() {
     if (myStep > 0 && currentStep === myStep) {
       // Request is currently sitting at this verifier's step
       return (
-        <span className="px-3 py-1 text-[11px] font-extrabold rounded-full bg-amber-100 text-amber-800 border border-amber-200 inline-block uppercase tracking-wider">
+        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
           FOR REVIEW
         </span>
       );
     }
     // Fallback — steps before this verifier (should rarely appear in their history)
     return (
-      <span className="px-3 py-1 text-[11px] font-extrabold rounded-full bg-slate-100 text-slate-600 border border-slate-200 inline-block uppercase tracking-wider">
+      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 uppercase tracking-wider">
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
         IN PROGRESS
       </span>
     );
@@ -870,15 +877,13 @@ function StaffDashboardContent() {
   if (currentTab === 'dashboard') {
     return (
       <div className="w-full max-w-[1600px] mx-auto space-y-6 animate-fade-in">
-        {/* 4 Stat Cards Row (Matching PDF Page 1) */}
+        {/* 4 Stat Cards Row (Clean, Standalone Outline Icons) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Stat 1: Total */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 border border-sky-100">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
+            <svg className="w-7 h-7 text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total</p>
               <h3 className="text-2xl font-black text-slate-900 mt-0.5">{displayList.length}</h3>
@@ -887,11 +892,9 @@ function StaffDashboardContent() {
 
           {/* Stat 2: Approved */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
+            <svg className="w-7 h-7 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Approved</p>
               <h3 className="text-2xl font-black text-slate-900 mt-0.5">{approvedCount}</h3>
@@ -900,11 +903,9 @@ function StaffDashboardContent() {
 
           {/* Stat 3: Pending */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
+            <svg className="w-7 h-7 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending</p>
               <h3 className="text-2xl font-black text-slate-900 mt-0.5">{pendingCount}</h3>
@@ -913,11 +914,9 @@ function StaffDashboardContent() {
 
           {/* Stat 4: Ongoing */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </div>
+            <svg className="w-7 h-7 text-purple-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ongoing</p>
               <h3 className="text-2xl font-black text-slate-900 mt-0.5">{ongoingCount}</h3>
@@ -1168,9 +1167,11 @@ function StaffDashboardContent() {
 
                           <button
                             onClick={() => setReviewRequest(req)}
-                            className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px] transition-colors shadow-2xs inline-flex items-center gap-1"
+                            className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px] transition-colors shadow-2xs inline-flex items-center gap-1.5"
                           >
-                            <span>📄</span>
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
                             <span>View Docs</span>
                           </button>
                         </td>
@@ -1200,7 +1201,9 @@ function StaffDashboardContent() {
               onClick={() => alert('Printing selected requests...')}
               className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs"
             >
-              <span>🖨️</span>
+              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
               <span>Print</span>
             </button>
 
@@ -1239,7 +1242,9 @@ function StaffDashboardContent() {
               onClick={() => setShowExportMenu(!showExportMenu)}
               className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-2 shadow-2xs self-start sm:self-auto transition-all cursor-pointer"
             >
-              <span>📥</span>
+              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
               <span>Export Report</span>
               <svg className={`w-3.5 h-3.5 text-slate-400 transition-transform ${showExportMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -1260,7 +1265,9 @@ function StaffDashboardContent() {
                     }}
                     className="w-full px-3 py-2.5 text-left text-xs rounded-xl hover:bg-emerald-50 text-slate-700 hover:text-[#0F4C2E] flex items-center gap-3 transition-colors cursor-pointer"
                   >
-                    <span className="text-lg">📊</span>
+                    <svg className="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
                     <div>
                       <div className="font-bold text-slate-800">Export to CSV / Excel</div>
                       <div className="text-[10px] text-slate-400">Download spreadsheet (.csv)</div>
@@ -1289,7 +1296,9 @@ function StaffDashboardContent() {
                     }}
                     className="w-full px-3 py-2.5 text-left text-xs rounded-xl hover:bg-emerald-50 text-slate-700 hover:text-[#0F4C2E] flex items-center gap-3 transition-colors cursor-pointer"
                   >
-                    <span className="text-lg">🖨️</span>
+                    <svg className="w-4 h-4 text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
                     <div>
                       <div className="font-bold text-slate-800">Print / Save as PDF</div>
                       <div className="text-[10px] text-slate-400">Official government summary report</div>
@@ -1337,7 +1346,9 @@ function StaffDashboardContent() {
                   : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              <span>📅</span>
+              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
               <span>
                 {startDateFilter || endDateFilter
                   ? `${startDateFilter ? formatDateDisplay(startDateFilter) : 'Start'} – ${endDateFilter ? formatDateDisplay(endDateFilter) : 'Now'}`
@@ -1366,7 +1377,10 @@ function StaffDashboardContent() {
             <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4 border border-slate-100">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                  <span>📅</span> Filter by Filing Date Range
+                  <svg className="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Filter by Filing Date Range
                 </h3>
                 <button
                   onClick={() => setShowDateRangeModal(false)}
@@ -1569,9 +1583,9 @@ function StaffDashboardContent() {
       <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-6 animate-fade-in">
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#0F4C2E] text-white flex items-center justify-center font-bold">
-              🔔
-            </div>
+            <svg className="w-6 h-6 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
             <div>
               <h3 className="text-sm font-bold text-slate-900">Signatory Notification Center</h3>
               <p className="text-xs text-slate-500">{unreadCount} unread notification(s)</p>
@@ -1637,14 +1651,22 @@ function StaffDashboardContent() {
                   </div>
                   <div
                     onClick={handleNotifClick}
-                    className={`flex items-start gap-4 p-3.5 rounded-xl border transition-all ${
+                    className={`flex items-start gap-3.5 p-3.5 rounded-xl border transition-all ${
                       notif.isRead
                         ? 'bg-slate-50/80 border-slate-100 hover:bg-slate-100'
                         : 'bg-emerald-50/70 border-emerald-100 hover:bg-emerald-50 shadow-2xs'
                     } ${linkedRequest ? 'cursor-pointer' : 'cursor-default'}`}
                   >
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0">
-                      {notif.isRead ? '✓' : '🔔'}
+                    <div className="mt-0.5 shrink-0">
+                      {notif.isRead ? (
+                        <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline justify-between gap-2">

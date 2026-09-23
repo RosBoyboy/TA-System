@@ -106,7 +106,6 @@ export default function RegisterPage() {
             href="/login"
             className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-[#0F4C2E] hover:bg-[#165E3A] text-white font-bold text-xs rounded-xl shadow-md transition-all"
           >
-            <span>←</span>
             <span>Return to Sign In</span>
           </Link>
         </div>
@@ -401,10 +400,7 @@ export default function RegisterPage() {
                   <span>Submitting Credentials...</span>
                 </>
               ) : (
-                <>
-                  <span>Submit Registration for HR Review</span>
-                  <span>→</span>
-                </>
+                <span>Submit Registration for HR Review</span>
               )}
             </button>
           </form>

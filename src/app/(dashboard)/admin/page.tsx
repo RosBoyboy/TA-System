@@ -545,39 +545,39 @@ function AdminPortalContent() {
       }));
   }, [filteredRecords]);
 
-  // Helper to render Status Badges
+  // Helper to render Status Badges (Clean, text-based semantic dot style)
   const renderStatusBadge = (status: string) => {
     if (status === 'APPROVED') {
       return (
-        <span className="px-2 py-0.5 text-[11px] font-semibold rounded bg-emerald-50 text-emerald-800 border border-emerald-200 inline-flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Approved
+        <span className="text-xs font-semibold text-emerald-700 inline-flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span> Approved
         </span>
       );
     }
     if (status === 'PENDING_SECTION_CHIEF' || status === 'PENDING') {
       return (
-        <span className="px-2 py-0.5 text-[11px] font-semibold rounded bg-amber-50 text-amber-800 border border-amber-200 inline-flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Pending
+        <span className="text-xs font-semibold text-amber-700 inline-flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span> Pending
         </span>
       );
     }
     if (status === 'PENDING_DIVISION_CHIEF' || status === 'PENDING_HEAD_PENRO') {
       return (
-        <span className="px-2 py-0.5 text-[11px] font-semibold rounded bg-sky-50 text-sky-800 border border-sky-200 inline-flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-sky-600"></span> On Process
+        <span className="text-xs font-semibold text-sky-700 inline-flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-600 shrink-0"></span> On Process
         </span>
       );
     }
     if (status.startsWith('REJECTED')) {
       return (
-        <span className="px-2 py-0.5 text-[11px] font-semibold rounded bg-rose-50 text-rose-800 border border-rose-200 inline-flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Cancelled
+        <span className="text-xs font-semibold text-rose-700 inline-flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-600 shrink-0"></span> Cancelled
         </span>
       );
     }
     return (
-      <span className="px-2 py-0.5 text-[11px] font-semibold rounded bg-slate-50 text-slate-700 border border-slate-200">
-        Draft
+      <span className="text-xs font-semibold text-slate-600 inline-flex items-center gap-1.5">
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span> Draft
       </span>
     );
   };
@@ -662,9 +662,9 @@ function AdminPortalContent() {
             <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">TOTAL TRAVEL AUTHORITIES</p>
             <p className="text-2xl font-semibold text-slate-900 mt-1 tracking-tight">{stats.total}</p>
           </div>
-          <div className="w-9 h-9 rounded-md bg-emerald-50 text-[#1B4332] border border-emerald-200 flex items-center justify-center font-semibold text-sm">
-            📋
-          </div>
+          <svg className="w-6 h-6 text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
         </div>
 
         <div className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs flex items-center justify-between">
@@ -672,9 +672,9 @@ function AdminPortalContent() {
             <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">PENDING / ON PROCESS</p>
             <p className="text-2xl font-semibold text-amber-700 mt-1 tracking-tight">{stats.pending}</p>
           </div>
-          <div className="w-9 h-9 rounded-md bg-amber-50 text-amber-800 border border-amber-200 flex items-center justify-center font-semibold text-sm">
-            ⏳
-          </div>
+          <svg className="w-6 h-6 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
         </div>
 
         <div className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs flex items-center justify-between">
@@ -682,9 +682,9 @@ function AdminPortalContent() {
             <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">APPROVED ORDERS</p>
             <p className="text-2xl font-semibold text-emerald-800 mt-1 tracking-tight">{stats.approved}</p>
           </div>
-          <div className="w-9 h-9 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center font-semibold text-sm">
-            ✓
-          </div>
+          <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
         </div>
 
         <div className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs flex items-center justify-between">
@@ -692,9 +692,9 @@ function AdminPortalContent() {
             <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">CANCELLED / RETURNED</p>
             <p className="text-2xl font-semibold text-rose-700 mt-1 tracking-tight">{stats.cancelled}</p>
           </div>
-          <div className="w-9 h-9 rounded-md bg-rose-50 text-rose-800 border border-rose-200 flex items-center justify-center font-semibold text-sm">
-            ✕
-          </div>
+          <svg className="w-6 h-6 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
         </div>
       </div>
 
@@ -817,7 +817,9 @@ function AdminPortalContent() {
       {/* Bottom Alert Banner */}
       <div className="p-3.5 bg-amber-50/90 border border-amber-200 rounded-lg flex items-center justify-between text-xs text-amber-900">
         <div className="flex items-center gap-2">
-          <span>⚠️</span>
+          <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
           <span><strong>{stats.cancelled} Travel Authority request(s) returned</strong> for revision by reviewing officials.</span>
         </div>
         <button
@@ -1347,7 +1349,12 @@ function AdminPortalContent() {
 
       {/* Overdue Warning */}
       <div className="p-3.5 bg-rose-50/80 border border-rose-200 rounded-lg text-xs text-rose-900 space-y-0.5">
-        <p className="font-semibold">⚠️ 3 Overdue Approvals Detected</p>
+        <p className="font-semibold flex items-center gap-1.5">
+          <svg className="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          3 Overdue Approvals Detected
+        </p>
         <p className="text-rose-800 text-[11px]">
           TA-2025-0003, TA-2025-0008, TA-2025-0015 — waiting 5+ days at current verification stage.
         </p>

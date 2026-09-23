@@ -365,13 +365,50 @@ function AccountManagerContent() {
   const [employeeList, setEmployeeList] = useState<Array<{ id: string; name: string; position: string | null }>>([]);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
 
+  // Helper to render Activity Log Outline Icons
+  const renderActivityIcon = (type: string) => {
+    switch (type) {
+      case 'user':
+        return (
+          <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        );
+      case 'key':
+        return (
+          <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+          </svg>
+        );
+      case 'check':
+        return (
+          <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
+      case 'ban':
+        return (
+          <svg className="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+          </svg>
+        );
+      case 'building':
+      default:
+        return (
+          <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        );
+    }
+  };
+
   // Recent Activity Log state
   const [activityLogs] = useState([
-    { id: '1', action: 'Created account', target: 'Carlos Miguel Bautista', actor: 'Maria Clara Santos', time: '1 hour ago', icon: '👤' },
-    { id: '2', action: 'Reset password', target: 'Ramon Dela Cruz', actor: 'Maria Clara Santos', time: '3 hours ago', icon: '🔑' },
-    { id: '3', action: 'Activated account', target: 'Mark Anthony Go', actor: 'Maria Clara Santos', time: '1 day ago', icon: '✅' },
-    { id: '4', action: 'Deactivated account', target: 'Diana Rose Fernando', actor: 'System Administrator', time: '2 days ago', icon: '🚫' },
-    { id: '5', action: 'Updated section assignment', target: 'Analyn Cruz', actor: 'System Administrator', time: '3 days ago', icon: '🏢' },
+    { id: '1', action: 'Created account', target: 'Carlos Miguel Bautista', actor: 'Maria Clara Santos', time: '1 hour ago', type: 'user' },
+    { id: '2', action: 'Reset password', target: 'Ramon Dela Cruz', actor: 'Maria Clara Santos', time: '3 hours ago', type: 'key' },
+    { id: '3', action: 'Activated account', target: 'Mark Anthony Go', actor: 'Maria Clara Santos', time: '1 day ago', type: 'check' },
+    { id: '4', action: 'Deactivated account', target: 'Diana Rose Fernando', actor: 'System Administrator', time: '2 days ago', type: 'ban' },
+    { id: '5', action: 'Updated section assignment', target: 'Analyn Cruz', actor: 'System Administrator', time: '3 days ago', type: 'building' },
   ]);
 
   const showToast = (text: string, type: 'success' | 'error' = 'success') => {
@@ -738,7 +775,15 @@ function AccountManagerContent() {
               : 'bg-rose-900 text-rose-100 border-rose-500'
           }`}
         >
-          <span>{toastMessage.type === 'success' ? '✅' : '⚠️'}</span>
+          {toastMessage.type === 'success' ? (
+            <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4 text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          )}
           <span>{toastMessage.text}</span>
         </div>
       )}
@@ -763,7 +808,9 @@ function AccountManagerContent() {
                 onClick={() => router.push('/account-manager?tab=create-travel')}
                 className="px-4 py-2.5 bg-emerald-100 text-[#0F4C2E] hover:bg-emerald-200 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border border-emerald-300"
               >
-                <span>✈️</span>
+                <svg className="w-4 h-4 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
                 <span>File Travel Authority</span>
               </button>
             </div>
@@ -774,60 +821,52 @@ function AccountManagerContent() {
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Accounts</p>
                 <p className="text-2xl font-black text-slate-900 mt-1">{counts.total || users.length || 12}</p>
-                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full inline-block mt-1">
+                <span className="text-[10px] font-bold text-emerald-700 mt-1 inline-block">
                   +2 this month
                 </span>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              </div>
+              <svg className="w-7 h-7 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Active Users</p>
                 <p className="text-2xl font-black text-slate-900 mt-1">{counts.active || 8}</p>
-                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full inline-block mt-1">
+                <span className="text-[10px] font-bold text-emerald-700 mt-1 inline-block">
                   {counts.total > 0 ? Math.round((counts.active / counts.total) * 100) : 67}% of total
                 </span>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
+              <svg className="w-7 h-7 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Staff Accounts</p>
                 <p className="text-2xl font-black text-slate-900 mt-1">{counts.staff || 5}</p>
-                <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full inline-block mt-1">
+                <span className="text-[10px] font-bold text-slate-500 mt-1 inline-block">
                   With elevated access
                 </span>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
+              <svg className="w-7 h-7 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
             </div>
 
             <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Employee Accounts</p>
                 <p className="text-2xl font-black text-slate-900 mt-1">{counts.employee || 4}</p>
-                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full inline-block mt-1">
+                <span className="text-[10px] font-bold text-amber-700 mt-1 inline-block">
                   +{counts.pending} pending review
                 </span>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
+              <svg className="w-7 h-7 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
           </div>
 
@@ -851,8 +890,8 @@ function AccountManagerContent() {
                 {activityLogs.map((log) => (
                   <div key={log.id} className="flex items-start justify-between p-3.5 rounded-xl hover:bg-slate-50 transition-colors border border-slate-100/60">
                     <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-sm shrink-0 mt-0.5">
-                        {log.icon}
+                      <div className="mt-0.5 shrink-0">
+                        {renderActivityIcon(log.type)}
                       </div>
                       <div>
                         <p className="text-xs font-bold text-slate-900">
@@ -882,14 +921,23 @@ function AccountManagerContent() {
                     </div>
                     <div className="text-right">
                       <span
-                        className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full inline-block ${
+                        className={`text-xs font-bold uppercase inline-flex items-center gap-1.5 ${
                           u.status === 'ACTIVE'
-                            ? 'bg-emerald-100 text-emerald-800'
+                            ? 'text-emerald-700'
                             : u.status === 'PENDING_REVIEW'
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-rose-100 text-rose-800'
+                            ? 'text-amber-700'
+                            : 'text-rose-700'
                         }`}
                       >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                            u.status === 'ACTIVE'
+                              ? 'bg-emerald-600'
+                              : u.status === 'PENDING_REVIEW'
+                              ? 'bg-amber-500'
+                              : 'bg-rose-600'
+                          }`}
+                        />
                         {u.status === 'PENDING_REVIEW' ? 'Pending' : u.status}
                       </span>
                     </div>
@@ -1036,28 +1084,29 @@ function AccountManagerContent() {
                           {u.position && <p className="text-[10px] text-slate-500 font-normal">{u.position}</p>}
                         </td>
                         <td className="py-3.5 px-4">
-                          <span
-                            className={`px-2.5 py-0.5 text-[10px] font-extrabold rounded-full ${
-                              ['SECTION_CHIEF', 'DIVISION_CHIEF', 'HEAD_PENRO'].includes(u.role)
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : u.role === 'ACCOUNT_MANAGER' || u.role === 'ADMIN'
-                                ? 'bg-purple-100 text-purple-800'
-                                : 'bg-slate-100 text-slate-700'
-                            }`}
-                          >
+                          <span className="text-xs font-semibold text-slate-700">
                             {u.role}
                           </span>
                         </td>
                         <td className="py-3.5 px-4">
                           <span
-                            className={`px-2.5 py-0.5 text-[10px] font-extrabold rounded-full ${
+                            className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider ${
                               u.status === 'ACTIVE'
-                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                ? 'text-emerald-700'
                                 : u.status === 'PENDING_REVIEW'
-                                ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                                : 'bg-rose-100 text-rose-800 border border-rose-300'
+                                ? 'text-amber-700'
+                                : 'text-rose-700'
                             }`}
                           >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                u.status === 'ACTIVE'
+                                  ? 'bg-emerald-600'
+                                  : u.status === 'PENDING_REVIEW'
+                                  ? 'bg-amber-500'
+                                  : 'bg-rose-600'
+                              }`}
+                            />
                             {u.status === 'PENDING_REVIEW' ? 'PENDING' : u.status}
                           </span>
                         </td>
@@ -1114,9 +1163,9 @@ function AccountManagerContent() {
         <div className="space-y-6 max-w-4xl mx-auto">
           <div className="bg-white rounded-2xl border border-slate-200/80 shadow-md p-6 sm:p-8 space-y-6">
             <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#0F4C2E] flex items-center justify-center font-bold text-lg">
-                👤
-              </div>
+              <svg className="w-6 h-6 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
               <div>
                 <h2 className="text-lg font-black text-slate-900">Create New Account</h2>
                 <p className="text-xs text-slate-500">Fill in the details to register a new ETAPS user in the system.</p>
@@ -1311,10 +1360,15 @@ function AccountManagerContent() {
                       <td className="py-3.5 px-4 text-slate-700">{u.role}</td>
                       <td className="py-3.5 px-4">
                         <span
-                          className={`px-2.5 py-0.5 text-[10px] font-extrabold rounded-full ${
-                            u.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                          className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider ${
+                            u.status === 'ACTIVE' ? 'text-emerald-700' : 'text-amber-700'
                           }`}
                         >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                              u.status === 'ACTIVE' ? 'bg-emerald-600' : 'bg-amber-500'
+                            }`}
+                          />
                           {u.status}
                         </span>
                       </td>
@@ -1340,9 +1394,10 @@ function AccountManagerContent() {
         <div className="space-y-6 max-w-4xl mx-auto">
           <div className="bg-white rounded-2xl border border-slate-200/80 shadow-md p-6 sm:p-8 space-y-6">
             <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#0F4C2E] flex items-center justify-center font-bold text-lg">
-                ⚙️
-              </div>
+              <svg className="w-6 h-6 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
               <div>
                 <h2 className="text-lg font-black text-slate-900">Account Manager System Configuration</h2>
                 <p className="text-xs text-slate-500">Configure global account management policies, notification triggers, and station parameters.</p>

@@ -221,12 +221,9 @@ export default function LandingPage() {
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
                 href="/register"
-                className="px-7 py-3.5 bg-[#1B5E20] hover:bg-[#2E7D32] text-white font-semibold text-sm rounded-full shadow-lg transition-all flex items-center gap-2 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[#4ADE80]"
+                className="px-7 py-3.5 bg-[#1B5E20] hover:bg-[#2E7D32] text-white font-semibold text-sm rounded-full shadow-lg transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[#4ADE80]"
               >
-                <span>Get Started</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M13 6l6 6-6 6" />
-                </svg>
+                Get Started
               </Link>
 
               <Link
@@ -564,12 +561,9 @@ export default function LandingPage() {
           </p>
           <Link
             href="/register"
-            className="inline-flex items-center gap-2 px-9 py-4 bg-[#9FFAC2] hover:bg-[#57B178] text-[#051E0F] font-bold text-sm rounded-full shadow-lg transition-all hover:scale-105"
+            className="inline-block px-9 py-4 bg-[#9FFAC2] hover:bg-[#57B178] text-[#051E0F] font-bold text-sm rounded-full shadow-lg transition-all hover:scale-105"
           >
-            <span>Create Account</span>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
+            Create Account
           </Link>
         </div>
       </section>
