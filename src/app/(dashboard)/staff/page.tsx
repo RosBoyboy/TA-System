@@ -150,8 +150,21 @@ function StaffDashboardContent() {
   useEffect(() => {
     fetchRequests();
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 15000);
-    return () => clearInterval(interval);
+    // Reduced from 15s to 60s — Supabase Realtime handles instant delivery via layout hook,
+    // this is now a safety-net fallback only
+    const interval = setInterval(fetchNotifications, 60000);
+
+    // Listen for realtime push-based notification refresh events
+    const handleRealtimeRefresh = () => {
+      fetchNotifications();
+      fetchRequests(); // Also refresh pending requests when a new notification arrives
+    };
+    window.addEventListener('taps:refresh-notifications', handleRealtimeRefresh);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('taps:refresh-notifications', handleRealtimeRefresh);
+    };
   }, []);
 
 

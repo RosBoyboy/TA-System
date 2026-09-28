@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { notifyUser } from '@/lib/sms';
+import { logAuditEvent } from '@/lib/auditLog';
 import { TARequestStatus } from '@prisma/client';
 import { createClient } from '@supabase/supabase-js';
 
@@ -119,6 +120,27 @@ export async function GET(req: Request) {
         channel: 'BOTH',
         taDetails: overdueTaDetails,
         actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,
+      });
+    }
+
+    // Audit Log: Record each auto-rejection event
+    for (const reqItem of overdueRequests) {
+      await logAuditEvent({
+        actorId: null,
+        actorName: 'System (Cron)',
+        actorRole: 'SYSTEM',
+        ipAddress: null,
+        action: 'AUTO_REJECTED',
+        target: 'TARequest',
+        targetId: reqItem.id,
+        trackingNumber: reqItem.trackingNumber,
+        requestId: reqItem.id,
+        details: `Auto-rejected: travel start date (${new Date(reqItem.startDate).toLocaleDateString()}) passed before full approval was completed.`,
+        metadata: {
+          reason: 'OVERDUE',
+          startDate: reqItem.startDate,
+          destination: reqItem.destination,
+        },
       });
     }
 

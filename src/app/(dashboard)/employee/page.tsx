@@ -637,6 +637,16 @@ function EmployeeContent() {
       }
     };
     fetchEmployees();
+
+    // Listen for realtime push-based notification refresh events
+    const handleRealtimeRefresh = () => {
+      fetchNotifications();
+    };
+    window.addEventListener('taps:refresh-notifications', handleRealtimeRefresh);
+
+    return () => {
+      window.removeEventListener('taps:refresh-notifications', handleRealtimeRefresh);
+    };
   }, []);
 
   // Sync profile defaults when session user loads

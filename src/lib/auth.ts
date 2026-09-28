@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
 import { prisma, isDummyDbUrl } from './prisma';
+import { logAuditEvent } from './auditLog';
 import { Role, UserStatus } from '@prisma/client';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://rltypymiubbwdhbthsky.supabase.co';
@@ -98,6 +99,21 @@ export const authOptions: NextAuthOptions = {
         if (user.status === UserStatus.DEACTIVATED || user.status === 'DEACTIVATED') {
           throw new Error('ACCOUNT_DEACTIVATED: Your account has been deactivated. Please contact the administrator.');
         }
+
+        // Audit Log: Record successful login
+        logAuditEvent({
+          actorId: user.id,
+          actorName: user.name,
+          actorRole: user.role as string,
+          ipAddress: null, // NextAuth authorize() doesn't expose request headers; IP captured in API routes
+          action: 'LOGIN',
+          target: 'Session',
+          targetId: user.id,
+          details: `User logged in via ${cleanIdentifier.includes('@') ? 'email' : 'username'}.`,
+          metadata: {
+            loginMethod: cleanIdentifier.includes('@') ? 'email' : 'username',
+          },
+        }).catch(() => {}); // Fire-and-forget; never block login
 
         return {
           id: user.id,

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { notifyUser, notifyRole } from '@/lib/sms';
+import { logAuditEvent, extractIpAddress } from '@/lib/auditLog';
 import { createClient } from '@supabase/supabase-js';
 import { TARequestStatus, Role, ApprovalAction } from '@prisma/client';
 
@@ -232,6 +233,29 @@ export async function POST(req: Request) {
         });
       }
 
+      // Audit Log: Record approval event
+      const approverName = (session.user as any)?.name || 'Approving Official';
+      const roleLabels: Record<number, string> = { 1: 'Section Chief', 2: 'Division Chief', 3: 'Head of PENRO' };
+      await logAuditEvent({
+        actorId: userId,
+        actorName: approverName,
+        actorRole: userRole,
+        ipAddress: extractIpAddress(req),
+        action: 'APPROVED',
+        target: 'TARequest',
+        targetId: requestId,
+        trackingNumber: request.trackingNumber,
+        requestId: requestId,
+        details: `Step ${currentStepOrder} (${roleLabels[currentStepOrder]}) approved. Status → ${nextStatus}.`,
+        metadata: {
+          stepOrder: currentStepOrder,
+          stepRole: requiredRoleForStep[currentStepOrder],
+          previousStatus: request.status,
+          newStatus: nextStatus,
+          remarks: remarks?.trim() || null,
+        },
+      });
+
       return NextResponse.json({
         success: true,
         message: `Step ${currentStepOrder} approved successfully. Request status updated to ${nextStatus}.`,
@@ -303,6 +327,29 @@ export async function POST(req: Request) {
         channel: 'BOTH',
         taDetails: rejectTaDetails,
         actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,
+      });
+
+      // Audit Log: Record rejection event
+      const rejecterName = (session.user as any)?.name || 'Approving Official';
+      const roleLabelsReject: Record<number, string> = { 1: 'Section Chief', 2: 'Division Chief', 3: 'Head of PENRO' };
+      await logAuditEvent({
+        actorId: userId,
+        actorName: rejecterName,
+        actorRole: userRole,
+        ipAddress: extractIpAddress(req),
+        action: 'REJECTED',
+        target: 'TARequest',
+        targetId: requestId,
+        trackingNumber: request.trackingNumber,
+        requestId: requestId,
+        details: `Rejected at step ${currentStepOrder} (${roleLabelsReject[currentStepOrder]}). Reason: "${remarks.trim()}"`,
+        metadata: {
+          stepOrder: currentStepOrder,
+          stepRole: requiredRoleForStep[currentStepOrder],
+          previousStatus: request.status,
+          newStatus: 'REJECTED_MANUAL',
+          remarks: remarks.trim(),
+        },
       });
 
       return NextResponse.json({

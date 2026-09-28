@@ -98,6 +98,7 @@ model TARequest {
   teamMembers   TARequestMember[]
   approvalSteps ApprovalStep[]
   notifications Notification[]
+  auditLogs     AuditLog[]
 }
 
 model TARequestMember {
@@ -140,4 +141,43 @@ model Notification {
   channel   NotificationChannel @default(BOTH)
   smsStatus SMSStatus           @default(PENDING)
   createdAt DateTime            @default(now())
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Audit Log — Immutable, append-only event log for data lineage tracking.
+// Every status-changing action writes a row here. Records are never updated
+// or deleted, ensuring a tamper-evident history of all system activity.
+// ──────────────────────────────────────────────────────────────────────────────
+model AuditLog {
+  id             String    @id @default(cuid())
+  timestamp      DateTime  @default(now())
+
+  // WHO performed the action
+  actorId        String?                     // User ID (null = system/cron)
+  actorName      String                      // Denormalized for fast reads
+  actorRole      String                      // Role at time of action (string to avoid enum coupling)
+
+  // WHERE the action originated
+  ipAddress      String?                     // Captured from request headers
+
+  // WHAT happened
+  action         String                      // SUBMITTED, APPROVED, REJECTED, RESUBMITTED,
+                                             // AUTO_REJECTED, LOGIN, ACCOUNT_ACTIVATED, etc.
+  target         String                      // "TARequest", "User", "Session"
+  targetId       String?                     // The record ID affected
+  trackingNumber String?                     // Denormalized for TA-related events
+
+  // DETAILS
+  details        String?                     // Human-readable description
+  metadata       Json?                       // Structured data: old values, new values, remarks
+
+  // Optional relation for TA-related events
+  requestId      String?
+  request        TARequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+
+  @@index([timestamp])
+  @@index([actorId])
+  @@index([targetId])
+  @@index([action])
+  @@index([trackingNumber])
 }

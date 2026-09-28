@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { notifyUser, notifyRole } from '@/lib/sms';
+import { logAuditEvent, extractIpAddress } from '@/lib/auditLog';
 import { createClient } from '@supabase/supabase-js';
 import { TARequestStatus, ApprovalAction, Role } from '@prisma/client';
 
@@ -177,6 +178,38 @@ export async function PATCH(
       channel: 'BOTH',
       taDetails,
       actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+    });
+
+    // Audit Log: Record resubmission with old→new dates preserved
+    await logAuditEvent({
+      actorId: userId,
+      actorName: userName,
+      actorRole: (session.user as any).role || 'EMPLOYEE',
+      ipAddress: extractIpAddress(req),
+      action: 'RESUBMITTED',
+      target: 'TARequest',
+      targetId: requestId,
+      trackingNumber: trackingNum,
+      requestId: requestId,
+      details: `Resubmitted TA with updated travel dates. Approval chain restarted at Section Chief.`,
+      metadata: {
+        previousStatus: request.status,
+        newStatus: 'PENDING_SECTION_CHIEF',
+        resubmitCount: (request.resubmitCount || 0) + 1,
+        oldStartDate: request.startDate,
+        oldEndDate: request.endDate,
+        newStartDate: startDate,
+        newEndDate: endDate,
+        // Capture the approval history that is about to be wiped
+        previousApprovalSteps: (request.approvalSteps || []).map((s: any) => ({
+          order: s.order,
+          role: s.approverRole,
+          action: s.action,
+          approverId: s.approverId,
+          remarks: s.remarks,
+          actionDate: s.actionDate,
+        })),
+      },
     });
 
     return NextResponse.json({

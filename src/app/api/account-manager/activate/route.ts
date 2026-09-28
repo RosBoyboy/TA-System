@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma, isDummyDbUrl } from '@/lib/prisma';
 import { createClient } from '@supabase/supabase-js';
 import { notifyUser } from '@/lib/sms';
+import { logAuditEvent, extractIpAddress } from '@/lib/auditLog';
 import { UserStatus, Role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
@@ -159,6 +160,28 @@ export async function PATCH(req: Request) {
     } catch (notifErr) {
       console.warn('[Activate User] Non-fatal notification dispatch error:', notifErr);
     }
+
+    // Audit Log: Record account activation event
+    const adminName = (session.user as any)?.name || 'Account Manager';
+    const adminRole = (session.user as any)?.role || 'ACCOUNT_MANAGER';
+    await logAuditEvent({
+      actorId: (session.user as any)?.id,
+      actorName: adminName,
+      actorRole: adminRole,
+      ipAddress: extractIpAddress(req),
+      action: 'ACCOUNT_ACTIVATED',
+      target: 'User',
+      targetId: updatedUser.id,
+      details: `Activated account for ${updatedUser.name} (${updatedUser.email}). Assigned role: ${updatedUser.role}.`,
+      metadata: {
+        targetUserName: updatedUser.name,
+        targetUserEmail: updatedUser.email,
+        assignedRole: updatedUser.role,
+        assignedSection: updatedUser.section,
+        assignedPosition: updatedUser.position,
+        generatedUsername: finalUsername,
+      },
+    });
 
     return NextResponse.json({
       success: true,

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { notifyUser, notifyRole } from '@/lib/sms';
+import { logAuditEvent, extractIpAddress } from '@/lib/auditLog';
 import { createClient } from '@supabase/supabase-js';
 import { TARequestStatus, Role, ApprovalAction } from '@prisma/client';
 
@@ -262,6 +263,30 @@ export async function POST(req: Request) {
         channel: 'BOTH',
         taDetails,
         actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+      });
+    }
+
+    // Audit Log: Record TA creation/submission event
+    if (request) {
+      await logAuditEvent({
+        actorId: userId,
+        actorName: userName,
+        actorRole: (session.user as any).role || 'EMPLOYEE',
+        ipAddress: extractIpAddress(req),
+        action: submitImmediately ? 'SUBMITTED' : 'DRAFT_CREATED',
+        target: 'TARequest',
+        targetId: request.id,
+        trackingNumber: request.trackingNumber,
+        requestId: request.id,
+        details: submitImmediately
+          ? `Submitted TA request to ${destination} for Section Chief approval.`
+          : `Created TA request draft to ${destination}.`,
+        metadata: {
+          destination: destination.trim(),
+          startDate,
+          endDate,
+          teamMembersCount: teamMembers.length,
+        },
       });
     }
 

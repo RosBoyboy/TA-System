@@ -16,7 +16,17 @@ interface NotificationBellDropdownProps {
 }
 
 function formatRelativeTime(dateInput: string | Date): string {
-  const date = new Date(dateInput);
+  let input = dateInput;
+  // Supabase may return timestamps without timezone info (e.g. "2026-09-26 16:15:30")
+  // which JavaScript interprets as local time instead of UTC. Normalize to ensure UTC parsing.
+  if (typeof input === 'string') {
+    const trimmed = input.trim();
+    const hasTimezone = /Z$|[+-]\d{2}(:\d{2})?$/.test(trimmed);
+    if (!hasTimezone && trimmed.length >= 19) {
+      input = trimmed.replace(' ', 'T') + 'Z';
+    }
+  }
+  const date = new Date(input);
   if (isNaN(date.getTime())) return 'Just now';
   const now = new Date();
   const diffSec = Math.floor((now.getTime() - date.getTime()) / 1000);

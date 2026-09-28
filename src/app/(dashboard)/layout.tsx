@@ -7,6 +7,7 @@ import Link from 'next/link';
 import ProfileDropdown from '@/components/profile/ProfileDropdown';
 import NotificationBellDropdown from '@/components/notifications/NotificationBellDropdown';
 import NotificationToastStack, { NotificationPopupItem } from '@/components/notifications/NotificationToastStack';
+import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 
 function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
@@ -23,6 +24,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const [sessionTimedOut, setSessionTimedOut] = useState(false);
 
   const user = session?.user as any;
+  const userId = user?.id || null;
   const role = user?.role || 'EMPLOYEE';
   const name = user?.name || 'Juan Dela Cruz';
   const position = user?.position || 'Environmental Specialist';
@@ -35,6 +37,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     .join('')
     .substring(0, 2)
     .toUpperCase();
+
+  // Supabase Realtime push-based notification subscription
+  useRealtimeNotifications(userId);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -91,7 +96,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (session?.user) {
       fetchNotifications(true);
-      const interval = setInterval(() => fetchNotifications(true), 12000);
+      // Reduced from 12s to 60s — Supabase Realtime handles instant delivery,
+      // this is now a safety-net fallback only
+      const interval = setInterval(() => fetchNotifications(true), 60000);
 
       // Listen for custom immediate notification dispatch events from user actions
       const handleManualNotification = (e: any) => {
