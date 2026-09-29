@@ -722,11 +722,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                       {link.icon}
                       <span>{link.label}</span>
                     </div>
-                    {link.badge !== undefined && link.badge > 0 && (
-                      <span className="w-5 h-5 rounded-full bg-[#E63946] text-white text-[10px] font-bold flex items-center justify-center shadow-sm">
-                        {link.badge}
-                      </span>
-                    )}
                   </Link>
                 );
               })}
