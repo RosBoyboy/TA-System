@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ProfileDropdown from '@/components/profile/ProfileDropdown';
@@ -184,10 +184,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   };
 
   // Sidebar links based on role using clean vector SVG outline icons matching PDF
-  const isEmployee = role === 'EMPLOYEE';
+  const isEmployee = role === 'EMPLOYEE' || pathname.startsWith('/employee');
   const isStaffPage = pathname.startsWith('/staff');
-
-  const [viewRole, setViewRole] = useState('Verifier');
 
   const employeeNavLinks = [
     {
@@ -230,17 +228,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         </svg>
       ),
     },
-    {
-      id: 'notifications',
-      href: '/employee?tab=notifications',
-      label: 'Notifications',
-      icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
-      ),
-      badge: unreadNotifications,
-    },
   ];
 
   const staffNavLinks = [
@@ -273,17 +260,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-    },
-    {
-      id: 'notifications',
-      href: '/staff?tab=notifications',
-      label: 'Notifications',
-      icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
-      ),
-      badge: unreadNotifications,
     },
   ];
 
@@ -551,6 +527,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         case 'pending': return 'Pending Approvals';
         case 'history': return 'Approval History';
         case 'review': return 'Review TA Request';
+        case 'notifications': return 'Notification Center';
         default: return 'Dashboard';
       }
     }
@@ -575,9 +552,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F6F8] flex font-sans text-slate-800">
+    <div className="min-h-screen bg-[#F4F6F8] flex font-sans text-slate-800 md:h-screen md:overflow-hidden">
       {/* Sidebar - Matching ETAPS PDF Reference */}
-      <aside className="w-64 bg-[#0F4C2E] text-white flex flex-col shadow-xl z-20 shrink-0">
+      <aside className="w-64 bg-[#0F4C2E] text-white flex flex-col shadow-xl z-20 shrink-0 md:fixed md:inset-y-0 md:left-0 md:h-screen">
         {/* Brand Header */}
         <div className="p-5 flex items-center gap-3 border-b border-emerald-900/40">
           <img
@@ -783,48 +760,17 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
               })}
         </nav>
 
-        {/* User Card & Sign Out (Matching PDF Bottom Sidebar) */}
-        <div className="p-4 border-t border-emerald-900/40 bg-[#0B3B24]">
-          <button
-            onClick={() => signOut({ callbackUrl: '/login' })}
-            className="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-emerald-950/80 hover:bg-rose-900/80 text-emerald-100 hover:text-rose-100 text-xs font-bold transition-all border border-emerald-800/60 shadow-xs"
-          >
-            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            <span>Sign Out</span>
-          </button>
-        </div>
       </aside>
 
       {/* Main Right Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Top Header Bar (High z-index to cleanly overlay all page elements) */}
-        <header className="h-16 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between shadow-xs sticky top-0 z-50 shrink-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden md:ml-64 md:h-screen">
+        {/* Top Header Bar */}
+        <header className="h-16 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between shadow-xs sticky top-0 z-10 shrink-0">
           <div>
             <h2 className="text-base font-bold text-slate-800">{getPageTitle()}</h2>
           </div>
 
-          <div className="flex items-center gap-4 sm:gap-6">
-            {/* VIEW AS Role Selector Dropdown (Matching PDF Header) */}
-            {isStaffPage && (
-              <div className="flex items-center gap-2 bg-slate-100/90 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700">
-                <span className="text-[10px] uppercase font-bold text-slate-400">VIEW AS:</span>
-                <select
-                  value={viewRole}
-                  onChange={(e) => setViewRole(e.target.value)}
-                  aria-label="View as Role"
-                  className="bg-transparent font-bold text-slate-800 outline-none cursor-pointer"
-                >
-                  <option value="Verifier">Verifier</option>
-                  <option value="Approver">Approver</option>
-                  <option value="Section Chief">Section Chief</option>
-                  <option value="Division Chief">Division Chief</option>
-                  <option value="Head of PENRO">Head of PENRO</option>
-                </select>
-              </div>
-            )}
-
+          <div className="flex items-center gap-3 sm:gap-4">
             {/* Revised Interactive Notification Bell Dropdown (Matching Reference) */}
             <NotificationBellDropdown
               unreadCount={unreadNotifications}
@@ -855,7 +801,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
             {/* Top User Badge with Google Account-style Profile Management Dropdown */}
             <div className="pl-2 sm:pl-3 border-l border-slate-200">
-              <ProfileDropdown viewRole={isStaffPage ? viewRole : undefined} />
+              <ProfileDropdown />
             </div>
           </div>
         </header>

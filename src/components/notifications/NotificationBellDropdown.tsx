@@ -197,14 +197,27 @@ export default function NotificationBellDropdown({
             </div>
 
             <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push(notificationCenterHref);
+                }}
+                className="text-[11px] font-bold text-[#0B5A3A] hover:underline cursor-pointer"
+              >
+                See All
+              </button>
               {unreadCount > 0 && (
-                <button
-                  type="button"
-                  onClick={handleMarkAll}
-                  className="text-[11px] font-bold text-[#0B5A3A] hover:underline cursor-pointer"
-                >
-                  Mark all read
-                </button>
+                <>
+                  <span className="w-px h-3 bg-slate-300"></span>
+                  <button
+                    type="button"
+                    onClick={handleMarkAll}
+                    className="text-[11px] font-bold text-[#0B5A3A] hover:underline cursor-pointer"
+                  >
+                    Mark all read
+                  </button>
+                </>
               )}
               <button
                 type="button"

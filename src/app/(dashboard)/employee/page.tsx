@@ -1963,18 +1963,17 @@ function EmployeeContent() {
                   {/* 5. Supporting Documents */}
                   <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#0F4C2E] flex items-center justify-center shrink-0 border border-emerald-100">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                        </svg>
-                      </div>
+                      <svg className="w-6 h-6 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                      </svg>
                       <div>
                         <h4 className="text-xs font-extrabold text-slate-900">Supporting Documents</h4>
                         <p className="text-[11px] text-slate-500 mt-0.5">Invitation Letter, Memorandum, Program of Activities attached</p>
                       </div>
                     </div>
 
-                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-[#0F4C2E] text-[11px] font-extrabold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 uppercase tracking-wider">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span>
                       Attached & Ready
                     </span>
                   </div>

@@ -147,7 +147,7 @@ function LoginForm() {
               </div>
               <div>
                 <h4 className="text-xs font-bold text-white uppercase tracking-wider">Sequential three-level approval</h4>
-                <p className="text-[11px] text-emerald-200/80 mt-0.5">Section Chief → Division Chief → Head of PENRO</p>
+                <p className="text-[11px] text-emerald-200/80 mt-0.5">Section Chief, Division Chief, and Head of PENRO</p>
               </div>
             </div>
 
@@ -304,10 +304,7 @@ function LoginForm() {
                   <span>Signing in...</span>
                 </>
               ) : (
-                <>
-                  <span>→</span>
-                  <span>Sign In</span>
-                </>
+                <span>Sign In</span>
               )}
             </button>
           </form>
