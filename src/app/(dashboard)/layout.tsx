@@ -274,7 +274,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen bg-slate-100 flex items-center justify-center font-sans">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-[#0F4C2E] border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-sm font-semibold text-[#0F4C2E]">Loading ETAPS Portal...</span>
+          <span className="text-sm font-semibold text-[#0F4C2E]">Loading TOPS Portal...</span>
         </div>
       </div>
     );
@@ -553,17 +553,17 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#F4F6F8] flex font-sans text-slate-800 md:h-screen md:overflow-hidden">
-      {/* Sidebar - Matching ETAPS PDF Reference */}
+      {/* Sidebar - Matching TOPS PDF Reference */}
       <aside className="w-64 bg-[#0F4C2E] text-white flex flex-col shadow-xl z-20 shrink-0 md:fixed md:inset-y-0 md:left-0 md:h-screen">
         {/* Brand Header */}
         <div className="p-5 flex items-center gap-3 border-b border-emerald-900/40">
           <img
-            src="/taps-logo.png"
-            alt="TAPS Logo"
+            src="/Tops-golo.png"
+            alt="TOPS Logo"
             className="w-10 h-10 object-contain drop-shadow-md shrink-0"
           />
           <div>
-            <h1 className="font-black text-base tracking-wider text-white leading-none">ETAPS</h1>
+            <h1 className="font-black text-base tracking-wider text-white leading-none">TOPS</h1>
             <p className="text-[9px] font-bold text-emerald-300 tracking-wider uppercase mt-1">DENR-PENRO</p>
           </div>
         </div>
@@ -820,7 +820,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-100 flex items-center justify-center text-xs text-slate-500">Loading ETAPS Portal...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-slate-100 flex items-center justify-center text-xs text-slate-500">Loading TOPS Portal...</div>}>
       <DashboardLayoutContent>{children}</DashboardLayoutContent>
     </Suspense>
   );

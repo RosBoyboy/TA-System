@@ -13,6 +13,7 @@ interface UserRecord {
   phoneNumber: string;
   role: string;
   status: string;
+  division?: string | null;
   section?: string | null;
   position?: string | null;
   birthday?: string | null;
@@ -797,7 +798,7 @@ function AccountManagerContent() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80">
             <div>
               <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Dashboard</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Overview of ETAPS account management and user administration</p>
+              <p className="text-xs text-slate-500 mt-0.5">Overview of TOPS account management and user administration</p>
             </div>
             <div className="flex gap-2">
               <button
@@ -959,7 +960,7 @@ function AccountManagerContent() {
             <div>
               <h2 className="text-xl font-extrabold text-white">View Accounts</h2>
               <p className="text-xs text-emerald-200/90 mt-1">
-                Manage all ETAPS users — employees, staff, reviewers, and signatories — from one place.
+                Manage all TOPS users — employees, staff, reviewers, and signatories — from one place.
               </p>
             </div>
             <div className="text-right hidden sm:block">
@@ -1083,8 +1084,9 @@ function AccountManagerContent() {
                           </div>
                         </td>
                         <td className="py-3.5 px-4">
-                          <p className="font-medium text-slate-800">{u.section || 'General Office'}</p>
-                          {u.position && <p className="text-[10px] text-slate-500 font-normal">{u.position}</p>}
+                          <p className="font-medium text-slate-800">{u.division || 'General Office'}</p>
+                          {u.section && <p className="text-[10px] text-slate-500 font-normal">{u.section}</p>}
+                          {u.position && <p className="text-[10px] text-slate-400 font-normal italic">{u.position}</p>}
                         </td>
                         <td className="py-3.5 px-4">
                           <span className="text-xs font-semibold text-slate-700">
@@ -1119,7 +1121,7 @@ function AccountManagerContent() {
                             <button
                               onClick={() => {
                                 setSelectedUserForActivation(u);
-                                setActivationSection(u.section || 'Planning Section');
+                                setActivationSection(u.section || '');
                                 setActivationPosition(u.position || '');
                                 setActivationRole(u.role || 'EMPLOYEE');
                               }}
@@ -1171,7 +1173,7 @@ function AccountManagerContent() {
               </svg>
               <div>
                 <h2 className="text-lg font-black text-slate-900">Create New Account</h2>
-                <p className="text-xs text-slate-500">Fill in the details to register a new ETAPS user in the system.</p>
+                <p className="text-xs text-slate-500">Fill in the details to register a new TOPS user in the system.</p>
               </div>
             </div>
 
@@ -2064,10 +2066,22 @@ function AccountManagerContent() {
                   <span className="font-semibold text-slate-800 font-mono">{selectedUserForActivation.phoneNumber}</span>
                 </div>
                 <div>
+                  <span className="text-slate-400 block">Division (Self-Reported):</span>
+                  <span className="font-semibold text-emerald-800">{selectedUserForActivation.division || 'Not specified'}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">Section (Self-Reported):</span>
+                  <span className="font-medium text-slate-700">{selectedUserForActivation.section || 'N/A'}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">Position (Self-Reported):</span>
+                  <span className="font-medium text-slate-700">{selectedUserForActivation.position || 'Not specified'}</span>
+                </div>
+                <div>
                   <span className="text-slate-400 block">Birthday:</span>
                   <span className="font-medium text-slate-700">{selectedUserForActivation.birthday || 'Not specified'}</span>
                 </div>
-                <div>
+                <div className="col-span-2">
                   <span className="text-slate-400 block">Home Address:</span>
                   <span className="font-medium text-slate-700 truncate block">{selectedUserForActivation.address || 'Not specified'}</span>
                 </div>
@@ -2180,7 +2194,7 @@ function AccountManagerContent() {
                 Account Successfully Activated!
               </h3>
               <p className="text-xs text-slate-500 mt-1">
-                Official ETAPS login credentials have been generated and dispatched.
+                Official TOPS login credentials have been generated and dispatched.
               </p>
             </div>
 
@@ -2238,7 +2252,7 @@ function AccountManagerContent() {
               <button
                 type="button"
                 onClick={() => {
-                  const credText = `DENR ETAPS Account Activated\nEmployee: ${generatedCredentialsModal.user.name}\nUsername: ${generatedCredentialsModal.credentials.username}\nPassword: ${generatedCredentialsModal.credentials.tempPassword}\nPosition: ${generatedCredentialsModal.user.position || 'Employee'}\nSection: ${generatedCredentialsModal.user.section || 'General'}`;
+                  const credText = `DENR TOPS Account Activated\nEmployee: ${generatedCredentialsModal.user.name}\nUsername: ${generatedCredentialsModal.credentials.username}\nPassword: ${generatedCredentialsModal.credentials.tempPassword}\nPosition: ${generatedCredentialsModal.user.position || 'Employee'}\nSection: ${generatedCredentialsModal.user.section || 'General'}`;
                   navigator.clipboard.writeText(credText);
                   setCopiedCredentials(true);
                   setTimeout(() => setCopiedCredentials(false), 3000);

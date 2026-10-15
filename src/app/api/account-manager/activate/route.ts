@@ -50,7 +50,7 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
-    const { userId, section, position, role, customUsername, customPassword } = body;
+    const { userId, section, division, position, role, customUsername, customPassword } = body;
 
     if (!userId) {
       return NextResponse.json(
@@ -92,6 +92,7 @@ export async function PATCH(req: Request) {
       updatedAt: new Date().toISOString(),
     };
 
+    if (division && division.trim()) updateData.division = division.trim();
     if (section && section.trim()) updateData.section = section.trim();
     if (position && position.trim()) updateData.position = position.trim();
     if (role) updateData.role = role;
@@ -106,6 +107,7 @@ export async function PATCH(req: Request) {
             username: finalUsername,
             password: hashedPassword,
             status: UserStatus.ACTIVE,
+            division: updateData.division || targetUser.division,
             section: updateData.section || targetUser.section,
             position: updateData.position || targetUser.position,
             role: (updateData.role as Role) || targetUser.role,
@@ -116,6 +118,7 @@ export async function PATCH(req: Request) {
             username: true,
             email: true,
             phoneNumber: true,
+            division: true,
             position: true,
             section: true,
             role: true,
@@ -132,7 +135,7 @@ export async function PATCH(req: Request) {
         .from('User')
         .update(updateData)
         .eq('id', userId)
-        .select('id, name, username, email, phoneNumber, position, section, role, status')
+        .select('id, name, username, email, phoneNumber, division, position, section, role, status')
         .single();
 
       if (!sbErr && sbUser) {
@@ -152,8 +155,8 @@ export async function PATCH(req: Request) {
     try {
       await notifyUser({
         userId: updatedUser.id,
-        title: 'DENR ETAPS Account Activated',
-        message: `Welcome to DENR ETAPS! Your official account has been activated.\nUsername: ${finalUsername}\nTemporary Password: ${tempPassword}\nPosition: ${updatedUser.position || 'Employee'}\nSection: ${updatedUser.section || 'General'}\nLog in here: ${loginUrl}`,
+        title: 'DENR TOPS Account Activated',
+        message: `Welcome to DENR TOPS! Your official account has been activated.\nUsername: ${finalUsername}\nTemporary Password: ${tempPassword}\nPosition: ${updatedUser.position || 'Employee'}\nSection: ${updatedUser.section || 'General'}\nLog in here: ${loginUrl}`,
         channel: 'BOTH',
         actionUrl: loginUrl,
       });

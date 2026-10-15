@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DENR-PENRO TAPS | Travel Authority Processing System",
-  description: "Travel Authority Processing System for DENR-PENRO",
+  title: "DENR-PENRO TOPS | Travel Order Processing System",
+  description: "Travel Order Processing System for DENR-PENRO",
 };
 
 export default function RootLayout({

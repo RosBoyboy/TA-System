@@ -61,14 +61,14 @@ export default function LandingPage() {
           {/* Brand Logo Lockup */}
           <Link href="/" className="flex items-center gap-3 group">
             <img
-              src="/taps-logo.png"
-              alt="TAPS Logo"
+              src="/Tops-golo.png"
+              alt="TOPS Logo"
               className="w-11 h-11 object-contain drop-shadow-md group-hover:scale-105 transition-transform"
             />
             <div>
-              <h1 className="text-xl font-extrabold tracking-tight text-white leading-none">TAPS</h1>
+              <h1 className="text-xl font-extrabold tracking-tight text-white leading-none">TOPS</h1>
               <p className="text-[9px] font-bold tracking-widest text-white/80 uppercase mt-0.5">
-                Travel Authority Processing System
+                Travel Order Processing System
               </p>
             </div>
           </Link>
@@ -495,7 +495,7 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           {/* Left Visual Badge Card matching reference CSS */}
           <div className="bg-white rounded-2xl p-10 border border-[#DDE5DD] shadow-sm text-center max-w-sm mx-auto w-full space-y-4">
-            <img src="/taps-logo.png" alt="TAPS Logo" className="w-16 h-16 object-contain mx-auto" />
+            <img src="/Tops-golo.png" alt="TOPS Logo" className="w-16 h-16 object-contain mx-auto" />
             <div>
               <h3 className="text-lg font-black text-[#1E293B]">DENR-PENRO</h3>
               <p className="text-xs text-[#64748B] mt-0.5">Official Digital Service</p>
@@ -517,13 +517,13 @@ export default function LandingPage() {
           {/* Right Narrative */}
           <div className="space-y-4">
             <span className="inline-block px-4 py-1.5 bg-[#1B5E20]/10 border border-[#1B5E20]/25 text-[#1B5E20] rounded-full text-xs font-semibold uppercase tracking-wider">
-              About TAPS
+              About TOPS
             </span>
             <h2 className="text-3xl font-extrabold text-[#1E293B] tracking-tight leading-tight">
               Built for transparency, accountability, and compliance
             </h2>
             <p className="text-sm text-[#64748B] leading-relaxed">
-              TAPS is a secure digital platform developed for DENR-PENRO to simplify travel authority processing while maintaining transparency, accountability, and full compliance with government procedures.
+              TOPS is a secure digital platform developed for DENR-PENRO to simplify travel order processing while maintaining transparency, accountability, and full compliance with government procedures.
             </p>
             <p className="text-sm text-[#64748B] leading-relaxed">
               It replaces manual, paper-based routing with a structured, auditable digital workflow accessible to every authorized user role, in full compliance with the <strong>Data Privacy Act of 2012 (RA 10173)</strong>.
@@ -557,7 +557,7 @@ export default function LandingPage() {
             Ready to submit your Travel Authority online?
           </h2>
           <p className="text-base text-white/70">
-            Join DENR-PENRO staff already using TAPS to streamline their travel approvals.
+            Join DENR-PENRO staff already using TOPS to streamline their travel approvals.
           </p>
           <Link
             href="/register"
@@ -573,10 +573,10 @@ export default function LandingPage() {
         <div className="max-w-[1400px] mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 pb-10 border-b border-white/10">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <img src="/taps-logo.png" alt="TAPS Logo" className="w-11 h-11 object-contain" />
-              <span className="font-extrabold text-xl text-white tracking-wider">TAPS</span>
+              <img src="/Tops-golo.png" alt="TOPS Logo" className="w-11 h-11 object-contain" />
+              <span className="font-extrabold text-xl text-white tracking-wider">TOPS</span>
             </div>
-            <p className="text-white/60 font-medium">Travel Authority Processing System</p>
+            <p className="text-white/60 font-medium">Travel Order Processing System</p>
             <p className="text-[#9FFAC2] font-semibold">DENR-PENRO</p>
             <span className="inline-block px-3.5 py-1 bg-white/10 rounded-full text-[11px] text-[#A5D6A7] border border-white/20">
               Republic of the Philippines • DENR-PENRO
@@ -633,7 +633,7 @@ export default function LandingPage() {
         </div>
 
         <div className="max-w-[1240px] mx-auto pt-6 text-center text-[12px] text-white/50">
-          <p>© 2026 TAPS — Travel Authority Processing System. DENR-PENRO. All rights reserved.</p>
+          <p>© 2026 TOPS — Travel Order Processing System. DENR-PENRO. All rights reserved.</p>
         </div>
       </footer>
     </div>

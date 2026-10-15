@@ -52,6 +52,7 @@ export async function GET(req: Request) {
             phoneNumber: true,
             role: true,
             status: true,
+            division: true,
             section: true,
             position: true,
             birthday: true,
@@ -69,7 +70,7 @@ export async function GET(req: Request) {
     if ((!users || users.length === 0) && supabaseUrl && supabaseKey) {
       const { data, error } = await supabase
         .from('User')
-        .select('id, name, username, email, phoneNumber, role, status, section, position, birthday, address, createdAt, updatedAt')
+        .select('id, name, username, email, phoneNumber, role, status, division, section, position, birthday, address, createdAt, updatedAt')
         .order('createdAt', { ascending: false });
 
       if (data && !error) {
@@ -94,6 +95,7 @@ export async function GET(req: Request) {
           u.name.toLowerCase().includes(q) ||
           (u.username && u.username.toLowerCase().includes(q)) ||
           u.email.toLowerCase().includes(q) ||
+          (u.division && u.division.toLowerCase().includes(q)) ||
           (u.section && u.section.toLowerCase().includes(q)) ||
           (u.position && u.position.toLowerCase().includes(q)) ||
           u.role.toLowerCase().includes(q)
@@ -146,7 +148,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, email, phoneNumber, role, section, position, birthday, address, status } = body;
+    const { name, email, phoneNumber, role, section, division, position, birthday, address, status } = body;
 
     if (!name || !email) {
       return NextResponse.json(
@@ -179,7 +181,8 @@ export async function POST(req: Request) {
             password: hashedPassword,
             phoneNumber: phoneNumber ? phoneNumber.trim() : '09170000000',
             role: role ? (role as Role) : Role.EMPLOYEE,
-            section: section ? section.trim() : 'Planning Section',
+            division: division ? division.trim() : null,
+            section: section ? section.trim() : null,
             position: position ? position.trim() : null,
             birthday: birthday ? birthday.trim() : null,
             address: address ? address.trim() : null,
@@ -193,6 +196,7 @@ export async function POST(req: Request) {
             phoneNumber: true,
             role: true,
             status: true,
+            division: true,
             section: true,
             position: true,
             createdAt: true,
@@ -219,7 +223,8 @@ export async function POST(req: Request) {
           password: hashedPassword,
           phoneNumber: phoneNumber ? phoneNumber.trim() : '09170000000',
           role: role || 'EMPLOYEE',
-          section: section ? section.trim() : 'Planning Section',
+          division: division ? division.trim() : null,
+          section: section ? section.trim() : null,
           position: position ? position.trim() : null,
           birthday: birthday ? birthday.trim() : null,
           address: address ? address.trim() : null,
@@ -227,7 +232,7 @@ export async function POST(req: Request) {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         })
-        .select('id, name, username, email, phoneNumber, role, status, section, position, createdAt')
+        .select('id, name, username, email, phoneNumber, role, status, division, section, position, createdAt')
         .single();
 
       if (!sbErr && created) {
@@ -267,7 +272,7 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
-    const { userId, action, status, role, section, position, password } = body;
+    const { userId, action, status, role, division, section, position, password } = body;
 
     if (!userId) {
       return NextResponse.json(
@@ -286,6 +291,7 @@ export async function PATCH(req: Request) {
     } else {
       if (status) updateData.status = status;
       if (role) updateData.role = role;
+      if (division !== undefined) updateData.division = division;
       if (section !== undefined) updateData.section = section;
       if (position !== undefined) updateData.position = position;
     }
@@ -305,6 +311,7 @@ export async function PATCH(req: Request) {
             phoneNumber: true,
             role: true,
             status: true,
+            division: true,
             section: true,
             position: true,
           },
@@ -323,7 +330,7 @@ export async function PATCH(req: Request) {
         .from('User')
         .update(sbPayload)
         .eq('id', userId)
-        .select('id, name, username, email, phoneNumber, role, status, section, position')
+        .select('id, name, username, email, phoneNumber, role, status, division, section, position')
         .single();
 
       if (!error && data) {

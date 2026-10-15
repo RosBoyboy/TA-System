@@ -1,5 +1,5 @@
 /**
- * Export and Reporting Utilities for ETAPS
+ * Export and Reporting Utilities for TOPS
  * Provides CSV/Excel and Printable Official PDF Reports for Travel Authorities
  */
 
@@ -79,7 +79,7 @@ export function exportApprovalHistoryToCSV(
   link.setAttribute('href', url);
   link.setAttribute(
     'download',
-    filename || `ETAPS_Approval_History_${userRole}_${dateStr}.csv`
+    filename || `TOPS_Approval_History_${userRole}_${dateStr}.csv`
   );
   document.body.appendChild(link);
   link.click();
@@ -132,7 +132,7 @@ export function printApprovalHistoryReport({
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ETAPS Approval History Report - ${userName}</title>
+  <title>TOPS Approval History Report - ${userName}</title>
   <style>
     @page { size: landscape; margin: 12mm; }
     * { box-sizing: border-box; }
@@ -260,7 +260,7 @@ export function printApprovalHistoryReport({
 </head>
 <body>
   <div class="no-print-bar">
-    <span style="font-weight: 600;">📄 ETAPS Official Travel Authority Report Preview</span>
+    <span style="font-weight: 600;">📄 TOPS Official Travel Order Report Preview</span>
     <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
   </div>
 
@@ -268,7 +268,7 @@ export function printApprovalHistoryReport({
     <p class="republic">Republic of the Philippines</p>
     <p class="agency">DEPARTMENT OF ENVIRONMENT AND NATURAL RESOURCES</p>
     <p class="office">Provincial Environment and Natural Resources Office (PENRO)</p>
-    <p class="system">Enhanced Travel Authority Processing System (ETAPS)</p>
+    <p class="system">Travel Order Processing System (TOPS)</p>
     <div class="title">Approval History & Travel Authority Activity Report</div>
   </div>
 
@@ -363,7 +363,7 @@ export function printApprovalHistoryReport({
       <div class="sig-box">
         <div class="sig-name">Office of the Provincial Environment and Natural Resources Officer</div>
         <div>DENR-PENRO Document Verification System</div>
-        <div style="color: #64748b; font-size: 9px; margin-top: 2px;">Official ETAPS Institutional Electronic Log</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 2px;">Official TOPS Institutional Electronic Log</div>
       </div>
     </div>
   </div>

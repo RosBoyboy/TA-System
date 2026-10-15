@@ -491,7 +491,7 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
 
             {/* 7. Electronic Notice Footer */}
             <div className="footer-notice border-t border-slate-300 pt-2 text-center text-[10px] italic text-slate-500">
-              This is an official travel order approved electronically and generated from the Enhanced Travel Authority Processing System (ETAPS). No original signature is required.
+              This is an official travel order approved electronically and generated from the Travel Order Processing System (TOPS). No original signature is required.
             </div>
           </div>
         </div>

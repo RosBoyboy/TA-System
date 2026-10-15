@@ -615,7 +615,7 @@ function AdminPortalContent() {
         <div>
           <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Admin Dashboard</h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Enhanced Travel Authority Processing System — DENR-PENRO La Union
+            Travel Order Processing System (TOPS) — DENR-PENRO La Union
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs font-medium text-slate-600 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200">
@@ -2138,7 +2138,7 @@ function AdminPortalContent() {
 
 export default function AdminDashboardPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading ETAPS Admin Portal...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading TOPS Admin Portal...</div>}>
       <AdminPortalContent />
     </Suspense>
   );

@@ -33,6 +33,7 @@ export async function GET() {
             username: true,
             email: true,
             phoneNumber: true,
+            division: true,
             position: true,
             section: true,
             birthday: true,
@@ -51,7 +52,7 @@ export async function GET() {
     if ((!pendingUsers || pendingUsers.length === 0) && supabaseUrl && supabaseKey) {
       const { data, error } = await supabase
         .from('User')
-        .select('id, name, username, email, phoneNumber, position, section, birthday, address, role, status, createdAt')
+        .select('id, name, username, email, phoneNumber, division, position, section, birthday, address, role, status, createdAt')
         .eq('status', 'PENDING_REVIEW')
         .order('createdAt', { ascending: false });
 

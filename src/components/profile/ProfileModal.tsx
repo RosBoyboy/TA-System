@@ -269,7 +269,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-black tracking-tight text-white flex items-center gap-2">
-                DENR-PENRO ETAPS Account
+                DENR-PENRO TOPS Account
               </h3>
               <p className="text-xs text-emerald-200/90 font-medium">Manage your profile, position, and contact details</p>
             </div>

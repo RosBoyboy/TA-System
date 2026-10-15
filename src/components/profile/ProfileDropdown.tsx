@@ -96,7 +96,7 @@ export default function ProfileDropdown() {
         aria-expanded={isOpen}
         aria-haspopup="true"
         className="flex items-center gap-2.5 pl-2 sm:pl-3 pr-1 py-1 rounded-2xl hover:bg-slate-100/90 transition-all border border-transparent hover:border-slate-200 cursor-pointer group select-none text-left"
-        title="Open ETAPS Account Profile Menu"
+        title="Open TOPS Account Profile Menu"
       >
         {/* Avatar */}
         <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden bg-[#C8E6C9] text-[#1B4332] font-black text-xs sm:text-sm flex items-center justify-center shadow-xs ring-2 ring-transparent group-hover:ring-emerald-500/30 transition-all shrink-0">
@@ -185,7 +185,7 @@ export default function ProfileDropdown() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <span>Manage ETAPS Profile</span>
+              <span>Manage TOPS Profile</span>
             </button>
           </div>
 
@@ -232,7 +232,7 @@ export default function ProfileDropdown() {
 
           <div className="text-center pt-2">
             <span className="text-[10px] text-slate-400">
-              DENR-PENRO ETAPS Security
+              DENR-PENRO TOPS Security
             </span>
           </div>
         </div>

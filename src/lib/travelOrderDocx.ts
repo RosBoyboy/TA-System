@@ -113,7 +113,7 @@ export async function generatePopulatedTravelOrderDocx(req: TARequestDTO): Promi
 
   // Authorization Section Employee Name (single source of truth)
   docXml = docXml.replace(/\[EMPLOYEE FULL NAME\]/g, escapeXml(employeeName.toUpperCase()));
-  docXml = docXml.replace(/\[SYSTEM NAME\]/g, 'Enhanced Travel Authority Processing System (ETAPS)');
+  docXml = docXml.replace(/\[SYSTEM NAME\]/g, 'Travel Order Processing System (TOPS)');
 
   zip.file('word/document.xml', docXml);
 

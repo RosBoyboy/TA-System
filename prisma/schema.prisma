@@ -64,6 +64,7 @@ model User {
   image        String?
   role         Role       @default(EMPLOYEE)
   status       UserStatus @default(PENDING_REVIEW)
+  division     String?
   section      String?
   position     String?
   birthday     String?

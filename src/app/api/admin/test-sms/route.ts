@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
     const textMessage =
       message ||
-      `[ETAPS] Live SMS test from DENR-PENRO ETAPS System. Timestamp: ${new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Manila' })}`;
+      `[TOPS] Live SMS test from DENR-PENRO TOPS System. Timestamp: ${new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Manila' })}`;
 
     const sent = await sendSms({
       to: phoneNumber,

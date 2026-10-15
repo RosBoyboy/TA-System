@@ -1,5 +1,5 @@
 /**
- * Resend Email Dispatch Engine for ETAPS (Enhanced Travel Authority Processing System)
+ * Resend Email Dispatch Engine for TOPS (Travel Order Processing System)
  * Department of Environment and Natural Resources - PENRO
  */
 
@@ -285,7 +285,7 @@ export function generateTransactionalEmailHtml({
                       Provincial Environment and Natural Resources Office (PENRO)
                     </p>
                     <p style="margin: 6px 0 0 0; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #86EFAC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                      Enhanced Travel Authority Processing System (ETAPS)
+                      Travel Order Processing System (TOPS)
                     </p>
                   </td>
                 </tr>
@@ -341,7 +341,7 @@ export function generateTransactionalEmailHtml({
           <tr>
             <td class="footer-cell" style="background-color: #F8FAFC; padding: 20px 32px; border-top: 1px solid #E2E8F0; text-align: center;">
               <p style="margin: 0; font-size: 11px; color: #64748B; line-height: 1.5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                This is an automated message from ETAPS.<br/>
+                This is an automated message from TOPS.<br/>
                 Please do not reply to this email.
               </p>
             </td>

@@ -251,7 +251,7 @@ export async function notifyUser({
       try {
         const smsSuccess = await sendSms({
           to: phoneNumber,
-          message: `[ETAPS] ${title}: ${message}`,
+          message: `[TOPS] ${title}: ${message}`,
         });
 
         if (notification?.id) {
@@ -350,7 +350,7 @@ export async function notifyUser({
             hasLogoAttachment,
           });
 
-          let plainText = `[DENR ETAPS] ${title}\n\nDear ${userName || 'Personnel'},\n\n${message}\n`;
+          let plainText = `[DENR TOPS] ${title}\n\nDear ${userName || 'Personnel'},\n\n${message}\n`;
           if (enhancedTaDetails) {
             plainText += `\n--- Travel Authority Details ---\n`;
             if (enhancedTaDetails.trackingNumber) plainText += `Reference No: ${enhancedTaDetails.trackingNumber}\n`;
@@ -368,7 +368,7 @@ export async function notifyUser({
 
           await sendEmail({
             to: email,
-            subject: `[DENR ETAPS] ${title}`,
+            subject: `[DENR TOPS] ${title}`,
             html: emailHtml,
             text: plainText,
             attachments,

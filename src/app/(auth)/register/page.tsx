@@ -3,11 +3,34 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 
+// ─── DENR-PENRO Agusan del Norte Organizational Structure ──────────────────────
+const DIVISIONS = [
+  'Office of the PENRO',
+  'Management Services Division',
+  'Technical Services Division',
+] as const;
+
+type Division = (typeof DIVISIONS)[number];
+
+const SECTIONS_BY_DIVISION: Record<Division, string[]> = {
+  'Office of the PENRO': [], // No sections — PENRO Executive Office only
+  'Management Services Division': [
+    'Planning Section',
+    'Admin & Finance Section',
+  ],
+  'Technical Services Division': [
+    'Conservation and Development Section',
+    'Regulation and Permitting Section',
+    'Monitoring and Enforcement Section',
+  ],
+};
+
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
+    division: '' as Division | '',
     position: '',
-    section: 'Planning Section',
+    section: '',
     birthday: '',
     address: '',
     email: '',
@@ -18,22 +41,32 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const sectionsList = [
-    'Planning Section',
-    'Plans & Program Unit',
-    'Monitoring & Evaluation Unit',
-    'Information & Communications Technology Unit',
-    'Conservation Section',
-    'Forest Management Section',
-    'Technical Services Division',
-    'Management Services Division',
-    'Human Resources Section',
-    'PENRO Executive Office',
-    'Other / Field Office',
-  ];
+  // Derived state
+  const selectedDivision = formData.division as Division | '';
+  const availableSections =
+    selectedDivision && selectedDivision in SECTIONS_BY_DIVISION
+      ? SECTIONS_BY_DIVISION[selectedDivision as Division]
+      : [];
+  const requiresSection = availableSections.length > 0;
+  const showDynamicFields = !!selectedDivision;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  // ── Handlers ──────────────────────────────────────────────────────────────────
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleDivisionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newDivision = e.target.value as Division | '';
+    // Clear dependent fields when division changes
+    setFormData((prev) => ({
+      ...prev,
+      division: newDivision,
+      section: '',
+      position: '',
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,18 +74,32 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
 
+    // Client-side validation
     if (!formData.name.trim()) {
       setError('Please provide your Full Name.');
       setLoading(false);
       return;
     }
-
+    if (!formData.division) {
+      setError('Please select your Division.');
+      setLoading(false);
+      return;
+    }
+    if (!formData.position.trim()) {
+      setError('Please enter your Position / Designation.');
+      setLoading(false);
+      return;
+    }
+    if (requiresSection && !formData.section) {
+      setError('Please select your Section.');
+      setLoading(false);
+      return;
+    }
     if (!formData.email.trim()) {
       setError('Please provide your Email Address for notifications.');
       setLoading(false);
       return;
     }
-
     if (!formData.phoneNumber.trim()) {
       setError('Please provide your Mobile Number for SMS approval alerts.');
       setLoading(false);
@@ -60,10 +107,21 @@ export default function RegisterPage() {
     }
 
     try {
+      const payload = {
+        name: formData.name.trim(),
+        division: formData.division,
+        position: formData.position.trim(),
+        section: requiresSection ? formData.section : null,
+        birthday: formData.birthday || null,
+        address: formData.address.trim() || null,
+        email: formData.email.trim(),
+        phoneNumber: formData.phoneNumber.trim(),
+      };
+
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -82,6 +140,7 @@ export default function RegisterPage() {
     }
   };
 
+  // ── Success Screen ─────────────────────────────────────────────────────────
   if (success) {
     return (
       <div className="min-h-screen bg-[#F4F6F5] flex items-center justify-center p-6 font-sans text-slate-800">
@@ -96,10 +155,37 @@ export default function RegisterPage() {
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
             Status: PENDING_REVIEW
           </div>
+
+          {/* Summary of submitted info */}
+          <div className="text-left bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-5 space-y-2 text-xs">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Submitted Details</p>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+              <div>
+                <span className="text-slate-400 block">Division:</span>
+                <span className="font-semibold text-slate-800">{formData.division}</span>
+              </div>
+              {formData.section && (
+                <div>
+                  <span className="text-slate-400 block">Section:</span>
+                  <span className="font-semibold text-slate-800">{formData.section}</span>
+                </div>
+              )}
+              <div>
+                <span className="text-slate-400 block">Position:</span>
+                <span className="font-semibold text-slate-800">{formData.position}</span>
+              </div>
+            </div>
+          </div>
+
           <p className="text-xs text-slate-600 mb-6 leading-relaxed">
-            Your employee credentials have been received and sent to the <strong>Account Manager (HRMO)</strong> for review.
-            <br /><br />
-            Once verified, the Account Manager will <strong>generate your official Username & Temporary Password</strong> and send them to your mobile number (<strong>{formData.phoneNumber}</strong>) and email (<strong>{formData.email}</strong>).
+            Your employee credentials have been received and sent to the{' '}
+            <strong>Account Manager (HRMO)</strong> for review.
+            <br />
+            <br />
+            Once verified, the Account Manager will{' '}
+            <strong>generate your official Username &amp; Temporary Password</strong> and send them
+            to your mobile number (<strong>{formData.phoneNumber}</strong>) and email (
+            <strong>{formData.email}</strong>).
           </p>
 
           <Link
@@ -113,6 +199,7 @@ export default function RegisterPage() {
     );
   }
 
+  // ── Main Registration Form ─────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-[#F4F6F5] flex flex-col lg:flex-row font-sans text-slate-800">
       {/* Left Split Hero Panel */}
@@ -148,11 +235,11 @@ export default function RegisterPage() {
           className="relative z-10 flex items-center gap-3 group w-fit transition-transform hover:scale-[1.02]"
           title="Return to Landing Page"
         >
-          <img src="/taps-logo.png" alt="TAPS Logo" className="w-11 h-11 object-contain drop-shadow-md group-hover:brightness-110 transition-all" />
+          <img src="/Tops-golo.png" alt="TOPS Logo" className="w-11 h-11 object-contain drop-shadow-md group-hover:brightness-110 transition-all" />
           <div>
-            <h1 className="text-xl font-black tracking-tight text-white leading-none">TAPS</h1>
+            <h1 className="text-xl font-black tracking-tight text-white leading-none">TOPS</h1>
             <p className="text-[9px] font-bold tracking-widest text-emerald-300 uppercase mt-0.5">
-              TRAVEL AUTHORITY PROCESSING SYSTEM
+              TRAVEL ORDER PROCESSING SYSTEM
             </p>
           </div>
         </Link>
@@ -166,11 +253,12 @@ export default function RegisterPage() {
 
           <h2 className="text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
             Centralized Personnel <br />
-            <span className="text-emerald-400">Onboarding & Registration</span>
+            <span className="text-emerald-400">Onboarding &amp; Registration</span>
           </h2>
 
           <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed font-normal">
-            Register your employee credentials to start requesting, endorsing, and processing official Travel Authorities online.
+            Register your employee credentials to start requesting, endorsing, and processing
+            official Travel Authorities online.
           </p>
 
           <div className="space-y-4 pt-3">
@@ -193,7 +281,7 @@ export default function RegisterPage() {
                 </svg>
               </div>
               <div>
-                <h4 className="text-xs font-bold text-white uppercase tracking-wider">SMS & Email Credentials Delivery</h4>
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider">SMS &amp; Email Credentials Delivery</h4>
                 <p className="text-[11px] text-emerald-200/80 mt-0.5">Login credentials are sent directly to your verified phone and inbox.</p>
               </div>
             </div>
@@ -231,10 +319,10 @@ export default function RegisterPage() {
               className="inline-block group transition-transform hover:scale-[1.02]"
               title="Return to Landing Page"
             >
-              <img src="/taps-logo.png" alt="TAPS Logo" className="w-14 h-14 object-contain mx-auto mb-2 drop-shadow-sm group-hover:brightness-105 transition-all" />
-              <h1 className="text-xl font-black text-[#0F4C2E] tracking-tight group-hover:text-emerald-700 transition-colors">TAPS</h1>
+              <img src="/Tops-golo.png" alt="TOPS Logo" className="w-14 h-14 object-contain mx-auto mb-2 drop-shadow-sm group-hover:brightness-105 transition-all" />
+              <h1 className="text-xl font-black text-[#0F4C2E] tracking-tight group-hover:text-emerald-700 transition-colors">TOPS</h1>
               <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
-                TRAVEL AUTHORITY PROCESSING SYSTEM
+                TRAVEL ORDER PROCESSING SYSTEM
               </p>
             </Link>
             <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight mt-3">Employee Registration</h2>
@@ -253,7 +341,8 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Full Name */}
+
+            {/* 1. Full Name */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                 Full Name <span className="text-rose-500">*</span>
@@ -269,43 +358,115 @@ export default function RegisterPage() {
               />
             </div>
 
-            {/* Position & Unit/Section in 2 Columns */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Position / Designation <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="position"
-                  required
-                  value={formData.position}
-                  onChange={handleChange}
-                  placeholder="e.g., Planning Officer II"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#0F4C2E] outline-none text-xs font-medium"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Unit / Section <span className="text-rose-500">*</span>
-                </label>
+            {/* 2. Division */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Division <span className="text-rose-500">*</span>
+              </label>
+              <div className="relative">
                 <select
-                  name="section"
-                  value={formData.section}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#0F4C2E] outline-none text-xs font-medium"
+                  name="division"
+                  value={formData.division}
+                  onChange={handleDivisionChange}
+                  required
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#0F4C2E] outline-none text-xs font-medium appearance-none pr-8"
                 >
-                  {sectionsList.map((sec) => (
-                    <option key={sec} value={sec}>
-                      {sec}
+                  <option value="">— Select Division —</option>
+                  {DIVISIONS.map((div) => (
+                    <option key={div} value={div}>
+                      {div}
                     </option>
                   ))}
                 </select>
+                <svg
+                  className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              {formData.division && (
+                <p className="text-[10px] text-emerald-700 font-semibold mt-1 flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>
+                    {formData.division === 'Office of the PENRO'
+                      ? 'No section required for this division.'
+                      : `${availableSections.length} section${availableSections.length !== 1 ? 's' : ''} available.`}
+                  </span>
+                </p>
+              )}
+            </div>
+
+            {/* 3 & 4. Dynamic Fields: Position / Designation + Section */}
+            {/* Animated reveal container */}
+            <div
+              style={{
+                maxHeight: showDynamicFields ? '400px' : '0px',
+                opacity: showDynamicFields ? 1 : 0,
+                overflow: 'hidden',
+                transition: 'max-height 0.35s ease, opacity 0.3s ease',
+              }}
+            >
+              <div className="space-y-4 pt-1">
+                {/* 3. Section — only shown if division has sections */}
+                {requiresSection && (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Section <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <select
+                        name="section"
+                        value={formData.section}
+                        onChange={handleChange}
+                        required={requiresSection}
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#0F4C2E] outline-none text-xs font-medium appearance-none pr-8"
+                      >
+                        <option value="">— Select Section —</option>
+                        {availableSections.map((sec) => (
+                          <option key={sec} value={sec}>
+                            {sec}
+                          </option>
+                        ))}
+                      </select>
+                      <svg
+                        className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. Position */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Position <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="position"
+                    value={formData.position}
+                    onChange={handleChange}
+                    placeholder="e.g., Planning Officer II, Forest Ranger, Development Management Officer"
+                    required={showDynamicFields}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#0F4C2E] outline-none text-xs font-medium"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-0.5 block">
+                    Enter your official government designation.
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Birthday & Address in 2 Columns */}
+            {/* 5 & 6. Birthday & Home Address in 2 Columns */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
@@ -338,7 +499,7 @@ export default function RegisterPage() {
             {/* Notification Channels: Email & Phone Number */}
             <div className="pt-2 border-t border-slate-100 space-y-3">
               <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Notification Channels (For Alerts & Generated Logins)
+                Notification Channels (For Alerts &amp; Generated Logins)
               </span>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -384,7 +545,9 @@ export default function RegisterPage() {
               <div>
                 <strong className="font-bold text-emerald-900">Official HR Account Creation:</strong>
                 <p className="mt-0.5 text-emerald-800">
-                  You do not need to set a password. The <strong>Account Manager</strong> will review your credentials and generate your official <strong>Username</strong> and <strong>Temporary Password</strong>.
+                  You do not need to set a password. The <strong>Account Manager</strong> will
+                  review your credentials and generate your official{' '}
+                  <strong>Username</strong> and <strong>Temporary Password</strong>.
                 </p>
               </div>
             </div>
