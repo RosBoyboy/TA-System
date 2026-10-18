@@ -855,7 +855,7 @@ function AdminPortalContent() {
         <div>
           <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Admin Dashboard</h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Enhanced Travel Order Processing System — DENR-PENRO Agusan del Norte
+            Travel Order Processing System (TOPS) — DENR-PENRO Agusan del Norte
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs font-medium text-slate-600 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200">

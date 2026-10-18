@@ -61,7 +61,7 @@ export default function LandingPage() {
           {/* Brand Logo Lockup */}
           <Link href="/" className="flex items-center gap-3 group">
             <img
-              src="/taps-logo.png"
+              src="/Tops-golo.png"
               alt="TOPS Logo"
               className="w-11 h-11 object-contain drop-shadow-md group-hover:scale-105 transition-transform"
             />
@@ -495,7 +495,7 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           {/* Left Visual Badge Card matching reference CSS */}
           <div className="bg-white rounded-2xl p-10 border border-[#DDE5DD] shadow-sm text-center max-w-sm mx-auto w-full space-y-4">
-            <img src="/taps-logo.png" alt="TOPS Logo" className="w-16 h-16 object-contain mx-auto" />
+            <img src="/Tops-golo.png" alt="TOPS Logo" className="w-16 h-16 object-contain mx-auto" />
             <div>
               <h3 className="text-lg font-black text-[#1E293B]">DENR-PENRO</h3>
               <p className="text-xs text-[#64748B] mt-0.5">Official Digital Service</p>
@@ -573,7 +573,7 @@ export default function LandingPage() {
         <div className="max-w-[1400px] mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 pb-10 border-b border-white/10">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <img src="/taps-logo.png" alt="TOPS Logo" className="w-11 h-11 object-contain" />
+              <img src="/Tops-golo.png" alt="TOPS Logo" className="w-11 h-11 object-contain" />
               <span className="font-extrabold text-xl text-white tracking-wider">TOPS</span>
             </div>
             <p className="text-white/60 font-medium">Travel Order Processing System</p>

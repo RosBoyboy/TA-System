@@ -693,7 +693,10 @@ function AccountManagerContent() {
       return;
     }
 
-    if (!newAccountData.section) {
+    const selectedDivisionObj = orgDivisions.find((d) => d.name === newAccountData.division);
+    const requiresSection = selectedDivisionObj && selectedDivisionObj.sections && selectedDivisionObj.sections.length > 0;
+
+    if (requiresSection && !newAccountData.section) {
       showToast('Please select a Section under the selected Division.', 'error');
       return;
     }
@@ -725,7 +728,7 @@ function AccountManagerContent() {
           phoneNumber: newAccountData.phoneNumber.trim(),
           role: newAccountData.role,
           division: newAccountData.division.trim(),
-          section: newAccountData.section.trim(),
+          section: requiresSection && newAccountData.section ? newAccountData.section.trim() : null,
           position: newAccountData.position.trim(),
           signatureData: newAccountData.signatureData,
           status: 'ACTIVE',
@@ -1149,9 +1152,9 @@ function AccountManagerContent() {
                           </div>
                         </td>
                         <td className="py-3.5 px-4">
-                          <p className="font-medium text-slate-800">{u.section || 'General Office'}</p>
-                          {u.division && <p className="text-[10px] text-slate-400 font-medium">{u.division}</p>}
-                          {u.position && <p className="text-[10px] text-slate-500 font-normal">{u.position}</p>}
+                          <p className="font-medium text-slate-800">{u.division || 'General Office'}</p>
+                          {u.section && <p className="text-[10px] text-slate-500 font-normal">{u.section}</p>}
+                          {u.position && <p className="text-[10px] text-slate-400 font-normal italic">{u.position}</p>}
                           <div className="mt-1">
                             {u.signatureUrl ? (
                               <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
@@ -1198,7 +1201,7 @@ function AccountManagerContent() {
                             <button
                               onClick={() => {
                                 setSelectedUserForActivation(u);
-                                setActivationSection(u.section || 'Planning Section');
+                                setActivationSection(u.section || '');
                                 setActivationPosition(u.position || '');
                                 setActivationRole(u.role || 'EMPLOYEE');
                               }}
@@ -1402,8 +1405,12 @@ function AccountManagerContent() {
                             <span className="text-[9px] text-emerald-700 block font-medium">Receives SMS login credentials</span>
                           </div>
                           <div className="space-y-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Requested Division</span>
+                            <p className="font-semibold text-emerald-800 truncate">{u.division || 'Not specified'}</p>
+                          </div>
+                          <div className="space-y-0.5">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Requested Section</span>
-                            <p className="font-medium text-slate-700 truncate">{u.section || 'Planning Section'}</p>
+                            <p className="font-medium text-slate-700 truncate">{u.section || 'N/A'}</p>
                           </div>
                           <div className="space-y-0.5">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Registered Date</span>
@@ -1439,7 +1446,7 @@ function AccountManagerContent() {
                           type="button"
                           onClick={() => {
                             setSelectedUserForActivation(u);
-                            setActivationSection(u.section || 'Planning Section');
+                            setActivationSection(u.section || '');
                             setActivationPosition(u.position || '');
                             setActivationRole(u.role || 'EMPLOYEE');
                           }}
@@ -1568,24 +1575,39 @@ function AccountManagerContent() {
 
                         <div>
                           <label className="block text-xs font-bold text-slate-700 mb-1">
-                            Section * {!newAccountData.division && <span className="text-slate-400 font-normal">(Select Division first)</span>}
+                            Section {(() => {
+                              const selDiv = orgDivisions.find((d) => d.name === newAccountData.division);
+                              if (!newAccountData.division) return <span className="text-slate-400 font-normal">(Select Division first)</span>;
+                              if (selDiv && (!selDiv.sections || selDiv.sections.length === 0)) return <span className="text-emerald-700 font-normal">(No section required)</span>;
+                              return <span className="text-rose-500">*</span>;
+                            })()}
                           </label>
-                          <select
-                            required
-                            disabled={!newAccountData.division}
-                            value={newAccountData.section}
-                            onChange={(e) => setNewAccountData({ ...newAccountData, section: e.target.value })}
-                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#0F4C2E] disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <option value="">
-                              {newAccountData.division ? 'Select Dependent Section...' : 'Choose a Division above'}
-                            </option>
-                            {(orgDivisions.find((d) => d.name === newAccountData.division)?.sections || []).map((sec) => (
-                              <option key={sec.id} value={sec.name}>
-                                {sec.name}
-                              </option>
-                            ))}
-                          </select>
+                          {(() => {
+                            const selDiv = orgDivisions.find((d) => d.name === newAccountData.division);
+                            const divHasSections = selDiv && selDiv.sections && selDiv.sections.length > 0;
+                            return (
+                              <select
+                                required={!!divHasSections}
+                                disabled={!newAccountData.division || !divHasSections}
+                                value={newAccountData.section}
+                                onChange={(e) => setNewAccountData({ ...newAccountData, section: e.target.value })}
+                                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#0F4C2E] disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                <option value="">
+                                  {!newAccountData.division
+                                    ? 'Choose a Division above'
+                                    : !divHasSections
+                                    ? 'No section required for this division'
+                                    : 'Select Dependent Section...'}
+                                </option>
+                                {(selDiv?.sections || []).map((sec) => (
+                                  <option key={sec.id} value={sec.name}>
+                                    {sec.name}
+                                  </option>
+                                ))}
+                              </select>
+                            );
+                          })()}
                         </div>
 
                         <div className="sm:col-span-2">
@@ -2452,10 +2474,22 @@ function AccountManagerContent() {
                   <span className="font-semibold text-slate-800 font-mono">{selectedUserForActivation.phoneNumber}</span>
                 </div>
                 <div>
+                  <span className="text-slate-400 block">Division (Self-Reported):</span>
+                  <span className="font-semibold text-emerald-800">{selectedUserForActivation.division || 'Not specified'}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">Section (Self-Reported):</span>
+                  <span className="font-medium text-slate-700">{selectedUserForActivation.section || 'N/A'}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">Position (Self-Reported):</span>
+                  <span className="font-medium text-slate-700">{selectedUserForActivation.position || 'Not specified'}</span>
+                </div>
+                <div>
                   <span className="text-slate-400 block">Birthday:</span>
                   <span className="font-medium text-slate-700">{selectedUserForActivation.birthday || 'Not specified'}</span>
                 </div>
-                <div>
+                <div className="col-span-2">
                   <span className="text-slate-400 block">Home Address:</span>
                   <span className="font-medium text-slate-700 truncate block">{selectedUserForActivation.address || 'Not specified'}</span>
                 </div>

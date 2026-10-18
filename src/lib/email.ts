@@ -1,5 +1,5 @@
 /**
- * Resend Email Dispatch Engine for ETAPS (Enhanced Travel Order Processing System)
+ * Resend Email Dispatch Engine for TOPS (Travel Order Processing System)
  * Department of Environment and Natural Resources - PENRO
  */
 
@@ -210,7 +210,7 @@ export function generateTransactionalEmailHtml({
 
   // Strip emojis from title for clean reference-accurate badge
   const cleanTitle = (title || 'TA Notification').replace(/^[🔔⚠️✅❌⏳📄\s]+/gu, '').trim();
-  const logoSrc = hasLogoAttachment ? 'cid:denr-logo' : `${baseUrl}/taps-logo.png`;
+  const logoSrc = hasLogoAttachment ? 'cid:denr-logo' : `${baseUrl}/Tops-golo.png`;
 
   return `
 <!DOCTYPE html>

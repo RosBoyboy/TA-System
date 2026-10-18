@@ -6,7 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 import { UserStatus, Role } from '@prisma/client';
 import { saveSignatureFile } from '@/lib/signatureStorage';
-import { isValidDivisionSection } from '@/lib/constants/organization';
+import { isValidDivisionSection, divisionRequiresSection } from '@/lib/constants/organization';
 import { logAuditEvent } from '@/lib/auditLog';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://rltypymiubbwdhbthsky.supabase.co';
@@ -182,19 +182,23 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!section || !section.trim()) {
+    const needsSection = divisionRequiresSection(division);
+    if (needsSection && (!section || !section.trim())) {
       return NextResponse.json(
         { success: false, error: 'Section is required.' },
         { status: 400 }
       );
     }
 
-    if (!isValidDivisionSection(division, section)) {
+    if (!isValidDivisionSection(division, needsSection ? section : null)) {
       return NextResponse.json(
-        { success: false, error: `Invalid Division and Section combination: '${section}' is not under '${division}'.` },
+        { success: false, error: needsSection
+            ? `Invalid Division and Section combination: '${section}' is not under '${division}'.`
+            : `Invalid Division: '${division}' is not an official division.` },
         { status: 400 }
       );
     }
+    const cleanSection: string | null = needsSection ? section.trim() : null;
 
     if (!position || !position.trim()) {
       return NextResponse.json(
@@ -249,7 +253,7 @@ export async function POST(req: Request) {
             phoneNumber: phoneNumber.trim(),
             role: role ? (role as Role) : Role.EMPLOYEE,
             division: division.trim(),
-            section: section.trim(),
+            section: cleanSection,
             position: position.trim(),
             signatureUrl: savedSignatureUrl,
             birthday: birthday ? birthday.trim() : null,
@@ -293,7 +297,7 @@ export async function POST(req: Request) {
           phoneNumber: phoneNumber.trim(),
           role: role || 'EMPLOYEE',
           division: division.trim(),
-          section: section.trim(),
+          section: cleanSection,
           position: position.trim(),
           signatureUrl: savedSignatureUrl,
           birthday: birthday ? birthday.trim() : null,
@@ -362,7 +366,7 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
-    const { userId, action, status, role, section, position, password } = body;
+    const { userId, action, status, role, division, section, position, password } = body;
 
     if (!userId) {
       return NextResponse.json(
@@ -381,6 +385,7 @@ export async function PATCH(req: Request) {
     } else {
       if (status) updateData.status = status;
       if (role) updateData.role = role;
+      if (division !== undefined) updateData.division = division;
       if (section !== undefined) updateData.section = section;
       if (position !== undefined) updateData.position = position;
     }
@@ -400,6 +405,7 @@ export async function PATCH(req: Request) {
             phoneNumber: true,
             role: true,
             status: true,
+            division: true,
             section: true,
             position: true,
           },
@@ -418,7 +424,7 @@ export async function PATCH(req: Request) {
         .from('User')
         .update(sbPayload)
         .eq('id', userId)
-        .select('id, name, username, email, phoneNumber, role, status, section, position')
+        .select('id, name, username, email, phoneNumber, role, status, division, section, position')
         .single();
 
       if (!error && data) {

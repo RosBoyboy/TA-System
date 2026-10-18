@@ -16,6 +16,11 @@ export interface OrganizationDivisionItem {
 
 export const OFFICIAL_DIVISIONS: OrganizationDivisionItem[] = [
   {
+    id: 'div_penro',
+    name: 'Office of the PENRO',
+    sections: [], // PENRO Executive Office only — no sections
+  },
+  {
     id: 'div_msd',
     name: 'Management Services Division',
     sections: [
@@ -38,8 +43,27 @@ export const OFFICIAL_DIVISIONS: OrganizationDivisionItem[] = [
  * Validates whether a given Division and Section pair is officially authorized.
  */
 export function isValidDivisionSection(divisionName?: string | null, sectionName?: string | null): boolean {
-  if (!divisionName || !sectionName) return false;
-  const division = OFFICIAL_DIVISIONS.find((d) => d.name.trim().toLowerCase() === divisionName.trim().toLowerCase());
+  if (!divisionName) return false;
+  const division = findOfficialDivision(divisionName);
   if (!division) return false;
+  // Divisions without sections (e.g. Office of the PENRO) must not carry a section
+  if (division.sections.length === 0) return !sectionName || !sectionName.trim();
+  if (!sectionName) return false;
   return division.sections.some((s) => s.name.trim().toLowerCase() === sectionName.trim().toLowerCase());
+}
+
+/**
+ * Finds an official division by name (case-insensitive).
+ */
+export function findOfficialDivision(divisionName?: string | null): OrganizationDivisionItem | undefined {
+  if (!divisionName) return undefined;
+  return OFFICIAL_DIVISIONS.find((d) => d.name.trim().toLowerCase() === divisionName.trim().toLowerCase());
+}
+
+/**
+ * Whether the given division requires a section to be selected.
+ */
+export function divisionRequiresSection(divisionName?: string | null): boolean {
+  const division = findOfficialDivision(divisionName);
+  return !!division && division.sections.length > 0;
 }

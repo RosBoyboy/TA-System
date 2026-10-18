@@ -300,12 +300,13 @@ export async function notifyUser({
           const attachments: EmailAttachment[] = [];
           let hasLogoAttachment = false;
           let hasMapAttachment = false;
-
           try {
-            const logoPath = path.join(process.cwd(), 'public', 'taps-logo.png');
+            const logoPath = fs.existsSync(path.join(process.cwd(), 'public', 'Tops-golo.png'))
+              ? path.join(process.cwd(), 'public', 'Tops-golo.png')
+              : path.join(process.cwd(), 'public', 'taps-logo.png');
             if (fs.existsSync(logoPath)) {
               attachments.push({
-                filename: 'taps-logo.png',
+                filename: 'Tops-golo.png',
                 path: logoPath,
                 cid: 'denr-logo',
                 contentType: 'image/png',

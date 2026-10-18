@@ -113,7 +113,7 @@ function LoginForm() {
           className="relative z-10 flex items-center gap-3 group w-fit transition-transform hover:scale-[1.02]"
           title="Return to Landing Page"
         >
-          <img src="/taps-logo.png" alt="TOPS Logo" className="w-11 h-11 object-contain drop-shadow-md group-hover:brightness-110 transition-all" />
+          <img src="/Tops-golo.png" alt="TOPS Logo" className="w-11 h-11 object-contain drop-shadow-md group-hover:brightness-110 transition-all" />
           <div>
             <h1 className="text-xl font-black tracking-tight text-white leading-none">TOPS</h1>
             <p className="text-[9px] font-bold tracking-widest text-emerald-300 uppercase mt-0.5">
@@ -196,7 +196,7 @@ function LoginForm() {
               className="inline-block group transition-transform hover:scale-[1.02]"
               title="Return to Landing Page"
             >
-              <img src="/taps-logo.png" alt="TOPS Logo" className="w-16 h-16 object-contain mx-auto mb-2 drop-shadow-sm group-hover:brightness-105 transition-all" />
+              <img src="/Tops-golo.png" alt="TOPS Logo" className="w-16 h-16 object-contain mx-auto mb-2 drop-shadow-sm group-hover:brightness-105 transition-all" />
               <h1 className="text-xl font-black text-[#0F4C2E] tracking-tight group-hover:text-emerald-700 transition-colors">TOPS</h1>
               <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
                 TRAVEL ORDER PROCESSING SYSTEM

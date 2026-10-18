@@ -11,10 +11,13 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, phoneNumber, position, section, birthday, address } = body;
+    const { name, email, phoneNumber, position, section, division, birthday, address } = body;
 
     if (!name || !name.trim()) {
       return NextResponse.json({ success: false, error: 'Full Name is required.' }, { status: 400 });
+    }
+    if (!division || !division.trim()) {
+      return NextResponse.json({ success: false, error: 'Division is required.' }, { status: 400 });
     }
     if (!email || !email.trim()) {
       return NextResponse.json({ success: false, error: 'Email Address is required for official notifications.' }, { status: 400 });
@@ -53,6 +56,7 @@ export async function POST(req: Request) {
             email: cleanEmail,
             password: initialPlaceholderHash,
             phoneNumber: cleanPhone,
+            division: division ? division.trim() : null,
             position: position ? position.trim() : null,
             section: section ? section.trim() : null,
             birthday: birthday ? birthday.trim() : null,
@@ -65,6 +69,7 @@ export async function POST(req: Request) {
             name: true,
             email: true,
             phoneNumber: true,
+            division: true,
             position: true,
             section: true,
             birthday: true,
@@ -101,6 +106,7 @@ export async function POST(req: Request) {
           email: cleanEmail,
           password: initialPlaceholderHash,
           phoneNumber: cleanPhone,
+          division: division ? division.trim() : null,
           position: position ? position.trim() : null,
           section: section ? section.trim() : null,
           birthday: birthday ? birthday.trim() : null,
@@ -110,7 +116,7 @@ export async function POST(req: Request) {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         })
-        .select('id, name, email, phoneNumber, position, section, birthday, address, role, status, createdAt')
+        .select('id, name, email, phoneNumber, division, position, section, birthday, address, role, status, createdAt')
         .single();
 
       if (createErr || !newUser) {
