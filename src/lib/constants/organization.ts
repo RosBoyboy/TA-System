@@ -16,11 +16,6 @@ export interface OrganizationDivisionItem {
 
 export const OFFICIAL_DIVISIONS: OrganizationDivisionItem[] = [
   {
-    id: 'div_penro',
-    name: 'Office of the PENRO',
-    sections: [], // PENRO Executive Office only — no sections
-  },
-  {
     id: 'div_msd',
     name: 'Management Services Division',
     sections: [
@@ -46,7 +41,7 @@ export function isValidDivisionSection(divisionName?: string | null, sectionName
   if (!divisionName) return false;
   const division = findOfficialDivision(divisionName);
   if (!division) return false;
-  // Divisions without sections (e.g. Office of the PENRO) must not carry a section
+  // Divisions without sections must not carry a section
   if (division.sections.length === 0) return !sectionName || !sectionName.trim();
   if (!sectionName) return false;
   return division.sections.some((s) => s.name.trim().toLowerCase() === sectionName.trim().toLowerCase());

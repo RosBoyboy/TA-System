@@ -382,9 +382,7 @@ export default function RegisterPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
                   <span>
-                    {!requiresSection
-                      ? 'No section required for this division.'
-                      : `${availableSections.length} section${availableSections.length !== 1 ? 's' : ''} available.`}
+                    {availableSections.length} section{availableSections.length !== 1 ? 's' : ''} available.
                   </span>
                 </p>
               )}
