@@ -274,7 +274,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen bg-slate-100 flex items-center justify-center font-sans">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-[#0F4C2E] border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-sm font-semibold text-[#0F4C2E]">Loading ETAPS Portal...</span>
+          <span className="text-sm font-semibold text-[#0F4C2E]">Loading TOPS Portal...</span>
         </div>
       </div>
     );
@@ -304,12 +304,12 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       ),
     },
     {
-      id: 'create-account',
-      href: '/account-manager?tab=create-account',
-      label: 'Create Account',
+      id: 'pending-accounts',
+      href: '/account-manager?tab=pending-accounts',
+      label: 'Pending Accounts',
       icon: (
         <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
         </svg>
       ),
     },
@@ -495,15 +495,15 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         case 'dashboard':
           return 'Admin Dashboard';
         case 'data':
-          return 'Travel Authority Data';
+          return 'Travel Order Data';
         case 'tables':
-          return 'Travel Authority Records';
+          return 'Travel Order Records';
         case 'cancelled':
-          return 'Cancelled Travel Authorities';
+          return 'Cancelled Travel Orders';
         case 'search':
           return 'Search by ID';
         case 'edit':
-          return 'Edit Travel Authority';
+          return 'Edit Travel Order';
         case 'approval-monitoring':
           return 'Approval Monitoring';
         case 'travel-analytics':
@@ -534,17 +534,18 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     if (pathname.startsWith('/account-manager')) {
       switch (currentTab) {
         case 'accounts': return 'View Accounts';
-        case 'create-account': return 'Create Account';
+        case 'pending-accounts':
+        case 'create-account': return 'Pending Accounts';
         case 'password-management': return 'Password Management';
         case 'configuration': return 'Configuration';
-        case 'create-travel': return 'Create Travel Authority';
+        case 'create-travel': return 'Create Travel Order';
         default: return 'Dashboard';
       }
     }
     
     switch (currentTab) {
-      case 'create': return 'Create Travel Authority';
-      case 'requests': return 'My Travel Authorities';
+      case 'create': return 'Create Travel Order';
+      case 'requests': return 'My Travel Orders';
       case 'schedule': return 'Travel Schedule';
       case 'notifications': return 'Notification Center';
       default: return 'Dashboard';
@@ -559,11 +560,11 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         <div className="p-5 flex items-center gap-3 border-b border-emerald-900/40">
           <img
             src="/taps-logo.png"
-            alt="TAPS Logo"
+            alt="TOPS Logo"
             className="w-10 h-10 object-contain drop-shadow-md shrink-0"
           />
           <div>
-            <h1 className="font-black text-base tracking-wider text-white leading-none">ETAPS</h1>
+            <h1 className="font-black text-base tracking-wider text-white leading-none">TOPS</h1>
             <p className="text-[9px] font-bold text-emerald-300 tracking-wider uppercase mt-1">DENR-PENRO</p>
           </div>
         </div>
@@ -649,7 +650,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
               <p className="px-4 text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 mb-2">ACCOUNT MANAGEMENT</p>
               <div className="space-y-1.5">
                 {accountManagerNavLinks.map((link) => {
-                  const isActive = currentTab === link.id || (currentTab === 'dashboard' && link.id === 'dashboard');
+                  const isActive =
+                    currentTab === link.id ||
+                    (currentTab === 'dashboard' && link.id === 'dashboard') ||
+                    (link.id === 'pending-accounts' && currentTab === 'create-account');
                   return (
                     <Link
                       key={link.id}
@@ -820,7 +824,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-100 flex items-center justify-center text-xs text-slate-500">Loading ETAPS Portal...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-slate-100 flex items-center justify-center text-xs text-slate-500">Loading TOPS Portal...</div>}>
       <DashboardLayoutContent>{children}</DashboardLayoutContent>
     </Suspense>
   );

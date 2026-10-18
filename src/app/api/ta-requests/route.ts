@@ -23,6 +23,8 @@ export async function GET(req: Request) {
 
     const url = new URL(req.url);
     const statusParam = url.searchParams.get('status');
+    const dateFromParam = url.searchParams.get('dateFrom') || url.searchParams.get('startDate');
+    const dateToParam = url.searchParams.get('dateTo') || url.searchParams.get('endDate');
 
     let requests: any[] = [];
 
@@ -31,6 +33,15 @@ export async function GET(req: Request) {
 
       if (statusParam) {
         whereClause.status = statusParam as TARequestStatus;
+      }
+
+      if (dateFromParam) {
+        const startDay = new Date(`${dateFromParam}T00:00:00Z`);
+        whereClause.startDate = { ...whereClause.startDate, gte: startDay };
+      }
+      if (dateToParam) {
+        const endDay = new Date(`${dateToParam}T23:59:59.999Z`);
+        whereClause.startDate = { ...whereClause.startDate, lte: endDay };
       }
 
       if (userRole === Role.EMPLOYEE) {
@@ -65,6 +76,12 @@ export async function GET(req: Request) {
       
       if (statusParam) {
         query = query.eq('status', statusParam);
+      }
+      if (dateFromParam) {
+        query = query.gte('startDate', `${dateFromParam}T00:00:00`);
+      }
+      if (dateToParam) {
+        query = query.lte('startDate', `${dateToParam}T23:59:59.999`);
       }
       if (userRole === Role.EMPLOYEE) {
         query = query.or(`createdById.eq.${userId}`);

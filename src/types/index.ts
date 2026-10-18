@@ -42,7 +42,10 @@ export interface TARequestDTO {
   createdBy?: {
     name: string;
     email: string;
+    division?: string | null;
     section?: string | null;
+    position?: string | null;
+    signatureUrl?: string | null;
   };
   purpose: string;
   destination: string;

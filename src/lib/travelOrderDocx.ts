@@ -113,7 +113,7 @@ export async function generatePopulatedTravelOrderDocx(req: TARequestDTO): Promi
 
   // Authorization Section Employee Name (single source of truth)
   docXml = docXml.replace(/\[EMPLOYEE FULL NAME\]/g, escapeXml(employeeName.toUpperCase()));
-  docXml = docXml.replace(/\[SYSTEM NAME\]/g, 'Enhanced Travel Authority Processing System (ETAPS)');
+  docXml = docXml.replace(/\[SYSTEM NAME\]/g, 'Travel Order Processing System (TOPS)');
 
   zip.file('word/document.xml', docXml);
 
@@ -130,11 +130,25 @@ export async function generatePopulatedTravelOrderDocx(req: TARequestDTO): Promi
   // Inject transparent signatures into docx media
   const sig1Path = path.join(process.cwd(), 'public', 'signatures', 'signature_div_chief.png');
   const sig2Path = path.join(process.cwd(), 'public', 'signatures', 'signature_penro.png');
-  const sig3Path = path.join(process.cwd(), 'public', 'signatures', 'signature_employee.png');
+  const defaultEmpSigPath = path.join(process.cwd(), 'public', 'signatures', 'signature_employee.png');
 
   if (fs.existsSync(sig1Path)) zip.file('word/media/image1.jpeg', fs.readFileSync(sig1Path));
   if (fs.existsSync(sig2Path)) zip.file('word/media/image2.jpg', fs.readFileSync(sig2Path));
-  if (fs.existsSync(sig3Path)) zip.file('word/media/image3.jpg', fs.readFileSync(sig3Path));
+
+  // Dynamically resolve employee signature: check secure storage first, fallback to default
+  let empSigBuffer: Buffer | null = null;
+  if (req.createdBy?.signatureUrl) {
+    const customSigPath = path.join(process.cwd(), 'storage', 'signatures', path.basename(req.createdBy.signatureUrl));
+    if (fs.existsSync(customSigPath)) {
+      empSigBuffer = fs.readFileSync(customSigPath);
+    }
+  }
+  if (!empSigBuffer && fs.existsSync(defaultEmpSigPath)) {
+    empSigBuffer = fs.readFileSync(defaultEmpSigPath);
+  }
+  if (empSigBuffer) {
+    zip.file('word/media/image3.jpg', empSigBuffer);
+  }
 
   // Generate output buffer
   const outputBuffer = await zip.generateAsync({

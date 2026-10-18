@@ -1046,7 +1046,7 @@ function StaffDashboardContent() {
                   {[
                     {
                       step: 'Step 1 – Employee',
-                      description: 'Submits Travel Authority request with attachments.',
+                      description: 'Submits Travel Order request with attachments.',
                     },
                     {
                       step: 'Step 2 – Verifier',
@@ -1285,7 +1285,7 @@ function StaffDashboardContent() {
           <div>
             <h2 className="text-xl font-extrabold text-slate-900">Approval History</h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Archive of all processed travel authority requests ({filteredRequests.length} record{filteredRequests.length === 1 ? '' : 's'})
+              Archive of all processed travel order requests ({filteredRequests.length} record{filteredRequests.length === 1 ? '' : 's'})
             </p>
           </div>
 
@@ -1603,7 +1603,7 @@ function StaffDashboardContent() {
                 ) : (
                   <tr>
                     <td colSpan={9} className="py-12 text-center text-slate-400 text-xs">
-                      No travel authority records found matching your filters.
+                      No travel order records found matching your filters.
                     </td>
                   </tr>
                 )}

@@ -116,7 +116,7 @@ async function runTestSuite() {
 
   // Institutional Branding & Content
   assert(html.includes('Department of Environment and Natural Resources'), 'Includes official DENR institutional agency header', 'Branding & Content');
-  assert(html.includes('Enhanced Travel Authority Processing System'), 'Includes ETAPS system identification', 'Branding & Content');
+  assert(html.includes('Travel Order Processing System (TOPS)'), 'Includes TOPS system identification', 'Branding & Content');
   assert(html.includes('TA-20260827-891011'), 'Renders TA Reference Number in structured details', 'Branding & Content');
   assert(html.includes('Brgy. Mahay, Butuan City'), 'Renders Destination in structured details', 'Branding & Content');
   assert(html.includes('Sep 1, 2026 – Sep 3, 2026'), 'Formats and renders clean date range', 'Branding & Content');

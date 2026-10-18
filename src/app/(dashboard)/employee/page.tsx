@@ -908,34 +908,18 @@ function EmployeeContent() {
     return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
   };
 
-  // Static/Fallback Mock data to match PDF screenshots if DB has zero requests
-  const mockRecentRequests = [
-    { ref: 'TA-2024-00123', dest: 'Makati City', dates: 'Feb 15 - Feb 17', status: 'APPROVED', progress: '3/3', current: 'PENRO Approved' },
-    { ref: 'TA-2024-00124', dest: 'Los Baños, Laguna', dates: 'Feb 25 - Feb 26', status: 'PENDING_DIVISION_CHIEF', progress: '1/3', current: 'Division Chief' },
-    { ref: 'TA-2024-00125', dest: 'Quezon City', dates: 'Mar 5 - Mar 7', status: 'REJECTED_MANUAL', progress: '0/3', current: 'Returned for Revision' },
-    { ref: 'TA-2024-00126', dest: 'Calamba, Laguna', dates: 'Jan 20 - Jan 22', status: 'APPROVED', progress: '3/3', current: 'PENRO Approved' },
-    { ref: 'TA-2024-00127', dest: 'San Pablo City', dates: 'Mar 15 - Mar 16', status: 'DRAFT', progress: '0/0', current: 'Draft' },
-  ];
-
   const renderTabContent = () => {
     /* -------------------------------------------------------------------------- */
     /* TAB 1: MAIN DASHBOARD VIEW (Matching PDF Page 1)                            */
     /* -------------------------------------------------------------------------- */
     if (currentTab === 'dashboard') {
-      // Dynamic metrics calculation from real DB requests (falling back to mock counts if DB has no requests yet)
-      const hasRealRequests = requests.length > 0;
-      const totalCount = hasRealRequests ? requests.length : mockRecentRequests.length;
-      const pendingCount = hasRealRequests
-        ? requests.filter((r) => r.status && r.status.startsWith('PENDING')).length
-        : 1;
-      const approvedCount = hasRealRequests
-        ? requests.filter((r) => r.status === 'APPROVED').length
-        : 2;
-      const returnedCount = hasRealRequests
-        ? requests.filter((r) => r.status === 'REJECTED_MANUAL' || r.status === 'REJECTED_OVERDUE').length
-        : 1;
+      // Dynamic metrics calculation strictly from real database requests
+      const totalCount = requests.length;
+      const pendingCount = requests.filter((r) => r.status && r.status.startsWith('PENDING')).length;
+      const approvedCount = requests.filter((r) => r.status === 'APPROVED').length;
+      const returnedCount = requests.filter((r) => r.status === 'REJECTED_MANUAL' || r.status === 'REJECTED_OVERDUE').length;
 
-      const displayTableRows = hasRealRequests ? requests.slice(0, 5) : mockRecentRequests;
+      const displayTableRows = requests.slice(0, 5);
 
       return (
         <div className="w-full max-w-[1600px] mx-auto space-y-6 flex flex-col animate-fade-in pb-8">
@@ -945,9 +929,13 @@ function EmployeeContent() {
             <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Requests</p>
-                <h3 className="text-2xl font-black text-slate-900 mt-1">{totalCount}</h3>
+                {loading ? (
+                  <div className="h-8 w-12 bg-slate-100 animate-pulse rounded-lg mt-1" />
+                ) : (
+                  <h3 className="text-2xl font-black text-slate-900 mt-1">{totalCount}</h3>
+                )}
                 <p className="text-[11px] font-semibold text-emerald-600 mt-1">
-                  {hasRealRequests ? 'Live database total' : '+12% this month'}
+                  {loading ? 'Fetching records...' : totalCount > 0 ? `${totalCount} submitted to date` : 'No requests filed'}
                 </p>
               </div>
               <div className="flex items-center justify-center bg-transparent">
@@ -961,7 +949,11 @@ function EmployeeContent() {
             <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending</p>
-                <h3 className="text-2xl font-black text-slate-900 mt-1">{pendingCount}</h3>
+                {loading ? (
+                  <div className="h-8 w-12 bg-slate-100 animate-pulse rounded-lg mt-1" />
+                ) : (
+                  <h3 className="text-2xl font-black text-slate-900 mt-1">{pendingCount}</h3>
+                )}
                 <p className="text-[11px] font-semibold text-[#D97706] mt-1">Awaiting approval</p>
               </div>
               <div className="flex items-center justify-center bg-transparent">
@@ -975,9 +967,13 @@ function EmployeeContent() {
             <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Approved</p>
-                <h3 className="text-2xl font-black text-slate-900 mt-1">{approvedCount}</h3>
+                {loading ? (
+                  <div className="h-8 w-12 bg-slate-100 animate-pulse rounded-lg mt-1" />
+                ) : (
+                  <h3 className="text-2xl font-black text-slate-900 mt-1">{approvedCount}</h3>
+                )}
                 <p className="text-[11px] font-semibold text-[#16835D] mt-1">
-                  {hasRealRequests ? 'Fully signed TA' : '+3 this week'}
+                  Fully signed TA
                 </p>
               </div>
               <div className="flex items-center justify-center bg-transparent">
@@ -991,7 +987,11 @@ function EmployeeContent() {
             <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Returned</p>
-                <h3 className="text-2xl font-black text-slate-900 mt-1">{returnedCount}</h3>
+                {loading ? (
+                  <div className="h-8 w-12 bg-slate-100 animate-pulse rounded-lg mt-1" />
+                ) : (
+                  <h3 className="text-2xl font-black text-slate-900 mt-1">{returnedCount}</h3>
+                )}
                 <p className="text-[11px] font-semibold text-[#DC3545] mt-1">Needs revision</p>
               </div>
               <div className="flex items-center justify-center bg-transparent">
@@ -1035,48 +1035,106 @@ function EmployeeContent() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-xs">
-                      {displayTableRows.map((req: any, idx: number) => {
-                        const ref = req.trackingNumber || req.ref;
-                        const dest = req.destination || req.dest;
-                        const dates = req.startDate && req.endDate ? formatDateRangeShort(req.startDate, req.endDate) : req.dates;
-                        const status = req.status;
-                        const progressInfo = req.progress
-                          ? { text: req.progress, width: req.progress === '3/3' ? '100%' : req.progress === '1/3' ? '33%' : '0%' }
-                          : getProgressFromStatus(status);
-
-                        return (
-                          <tr key={req.id || idx} className="hover:bg-slate-50/80 transition-colors">
-                            <td className="py-3.5 px-2 font-bold font-mono text-[#0B5A3A]">{ref}</td>
-                            <td className="py-3.5 px-2 text-slate-700 flex items-center gap-1.5">
-                              <svg className="w-3.5 h-3.5 text-[#64748B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
-                              <span className="font-semibold">{dest}</span>
+                      {loading ? (
+                        [1, 2, 3].map((skeletonIdx) => (
+                          <tr key={`skeleton-${skeletonIdx}`} className="animate-pulse">
+                            <td className="py-3.5 px-2">
+                              <div className="h-4 w-28 bg-slate-100 rounded"></div>
                             </td>
-                            <td className="py-3.5 px-2 text-slate-500 font-medium">{dates}</td>
-                            <td className="py-3.5 px-2 min-w-[170px]">{renderStatusBadge(status)}</td>
+                            <td className="py-3.5 px-2">
+                              <div className="h-4 w-36 bg-slate-100 rounded"></div>
+                            </td>
+                            <td className="py-3.5 px-2">
+                              <div className="h-4 w-24 bg-slate-100 rounded"></div>
+                            </td>
+                            <td className="py-3.5 px-2">
+                              <div className="h-5 w-28 bg-slate-100 rounded-full"></div>
+                            </td>
                             <td className="py-3.5 px-2 text-right">
-                              <div className="inline-flex items-center gap-2">
-                                <div className="w-16 bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                                  <div
-                                    className="bg-[#16835D] h-full rounded-full transition-all"
-                                    style={{ width: progressInfo.width }}
-                                  ></div>
-                                </div>
-                                <span className="font-mono text-[11px] font-semibold text-[#64748B]">{progressInfo.text}</span>
-                              </div>
+                              <div className="h-2 w-20 bg-slate-100 rounded-full inline-block"></div>
                             </td>
                           </tr>
-                        );
-                      })}
+                        ))
+                      ) : displayTableRows.length > 0 ? (
+                        displayTableRows.map((req: any, idx: number) => {
+                          const ref = req.trackingNumber || req.ref;
+                          const dest = req.destination || req.dest;
+                          const dates = req.startDate && req.endDate ? formatDateRangeShort(req.startDate, req.endDate) : req.dates;
+                          const status = req.status;
+                          const progressInfo = req.progress
+                            ? { text: req.progress, width: req.progress === '3/3' ? '100%' : req.progress === '1/3' ? '33%' : '0%' }
+                            : getProgressFromStatus(status);
+
+                          return (
+                            <tr
+                              key={req.id || idx}
+                              onClick={() => setSelectedRequest(req)}
+                              className="hover:bg-slate-50/80 transition-colors cursor-pointer"
+                              title="Click to view details"
+                            >
+                              <td className="py-3.5 px-2 font-bold font-mono text-[#0B5A3A]">{ref}</td>
+                              <td className="py-3.5 px-2 text-slate-700 flex items-center gap-1.5">
+                                <svg className="w-3.5 h-3.5 text-[#64748B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span className="font-semibold">{dest}</span>
+                              </td>
+                              <td className="py-3.5 px-2 text-slate-500 font-medium">{dates}</td>
+                              <td className="py-3.5 px-2 min-w-[170px]">{renderStatusBadge(status)}</td>
+                              <td className="py-3.5 px-2 text-right">
+                                <div className="inline-flex items-center gap-2">
+                                  <div className="w-16 bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                    <div
+                                      className="bg-[#16835D] h-full rounded-full transition-all"
+                                      style={{ width: progressInfo.width }}
+                                    ></div>
+                                  </div>
+                                  <span className="font-mono text-[11px] font-semibold text-[#64748B]">{progressInfo.text}</span>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-12 px-4 text-center">
+                            <div className="flex flex-col items-center justify-center max-w-sm mx-auto text-center space-y-2.5">
+                              <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-[#0B5A3A] flex items-center justify-center border border-emerald-100">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-bold text-slate-800">No Travel Authority Requests Yet</h4>
+                                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                                  You haven&apos;t filed any travel authority requests yet. Create a new request to start your travel authorization process.
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => router.push('/employee?tab=create')}
+                                className="px-3.5 py-1.5 bg-[#0B5A3A] hover:bg-[#06452F] text-white rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer mt-1"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                </svg>
+                                <span>Create Travel Request</span>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
               </div>
 
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs text-slate-400 font-medium">Showing {displayTableRows.length} recent requests</span>
+                <span className="text-xs text-slate-400 font-medium">
+                  {loading
+                    ? 'Loading requests...'
+                    : `Showing ${displayTableRows.length} recent ${displayTableRows.length === 1 ? 'request' : 'requests'}`}
+                </span>
                 <button
                   onClick={() => router.push('/employee?tab=requests')}
                   className="text-xs font-bold text-[#0B5A3A] hover:underline flex items-center gap-1 cursor-pointer"
@@ -1094,7 +1152,7 @@ function EmployeeContent() {
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-bold text-slate-900">Notifications</h3>
                     <span className="px-2 py-0.5 rounded-full bg-[#E63946] text-white text-[10px] font-bold">
-                      {unreadCount > 0 ? `${unreadCount} new` : `${notifications.length || 2} total`}
+                      {unreadCount > 0 ? `${unreadCount} new` : `${notifications.length} total`}
                     </span>
                   </div>
                   <button
@@ -1106,7 +1164,17 @@ function EmployeeContent() {
                 </div>
 
                 <div className="space-y-3">
-                  {notifications.length > 0 ? (
+                  {loading ? (
+                    [1, 2].map((skIdx) => (
+                      <div key={`notif-sk-${skIdx}`} className="p-3 rounded-xl bg-slate-50 border border-slate-100 animate-pulse flex items-start gap-3">
+                        <div className="w-5 h-5 bg-slate-200 rounded-full shrink-0 mt-0.5" />
+                        <div className="flex-1 space-y-1.5">
+                          <div className="h-3.5 bg-slate-200 rounded w-3/4" />
+                          <div className="h-3 bg-slate-100 rounded w-full" />
+                        </div>
+                      </div>
+                    ))
+                  ) : notifications.length > 0 ? (
                     notifications.slice(0, 3).map((notif: any, nIdx: number) => {
                       const isApproved = notif.title?.toLowerCase().includes('approved');
                       const isRejected = notif.title?.toLowerCase().includes('reject') || notif.title?.toLowerCase().includes('revision');
@@ -1146,37 +1214,15 @@ function EmployeeContent() {
                       );
                     })
                   ) : (
-                    <>
-                      <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                        <div className="shrink-0 mt-0.5">
-                          <svg className="w-5 h-5 text-[#16835D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-bold text-slate-900">Travel Authority Approved</h4>
-                          <p className="text-[11px] text-slate-600 mt-0.5 leading-snug">
-                            Your Travel Authority TA-20260816-1242991 has been fully signed by Head of PENRO.
-                          </p>
-                          <span className="text-[10px] font-semibold text-slate-400 mt-1 block">Aug 17</span>
-                        </div>
+                    <div className="py-10 flex flex-col items-center justify-center text-center space-y-2">
+                      <div className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center border border-slate-100">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
                       </div>
-
-                      <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                        <div className="shrink-0 mt-0.5">
-                          <svg className="w-5 h-5 text-[#2580B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-bold text-slate-900">TA Step Endorsement</h4>
-                          <p className="text-[11px] text-slate-600 mt-0.5 leading-snug">
-                            Division Chief approved and endorsed your travel authority request.
-                          </p>
-                          <span className="text-[10px] font-semibold text-slate-400 mt-1 block">Aug 16</span>
-                        </div>
-                      </div>
-                    </>
+                      <p className="text-xs font-bold text-slate-700">No notifications yet</p>
+                      <p className="text-[11px] text-slate-400 max-w-[220px]">You will be notified here about updates to your travel requests.</p>
+                    </div>
                   )}
                 </div>
               </div>

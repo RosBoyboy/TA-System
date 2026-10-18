@@ -64,8 +64,10 @@ model User {
   image        String?
   role         Role       @default(EMPLOYEE)
   status       UserStatus @default(PENDING_REVIEW)
+  division     String?
   section      String?
   position     String?
+  signatureUrl String?
   birthday     String?
   address      String?
   createdAt    DateTime   @default(now())
@@ -76,6 +78,25 @@ model User {
   teamMemberships   TARequestMember[]
   approvalSteps     ApprovalStep[]
   notifications     Notification[]
+}
+
+model Division {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  sections  Section[]
+}
+
+model Section {
+  id         String    @id @default(cuid())
+  name       String
+  divisionId String
+  division   Division  @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([divisionId, name])
 }
 
 model TARequest {

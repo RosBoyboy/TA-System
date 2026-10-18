@@ -152,8 +152,8 @@ export async function PATCH(req: Request) {
     try {
       await notifyUser({
         userId: updatedUser.id,
-        title: 'DENR ETAPS Account Activated',
-        message: `Welcome to DENR ETAPS! Your official account has been activated.\nUsername: ${finalUsername}\nTemporary Password: ${tempPassword}\nPosition: ${updatedUser.position || 'Employee'}\nSection: ${updatedUser.section || 'General'}\nLog in here: ${loginUrl}`,
+        title: 'DENR TOPS Account Activated',
+        message: `Welcome to DENR TOPS! Your official account has been activated.\nUsername: ${finalUsername}\nTemporary Password: ${tempPassword}\nPosition: ${updatedUser.position || 'Employee'}\nSection: ${updatedUser.section || 'General'}\nLog in here: ${loginUrl}`,
         channel: 'BOTH',
         actionUrl: loginUrl,
       });

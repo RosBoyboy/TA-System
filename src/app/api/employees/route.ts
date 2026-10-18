@@ -36,6 +36,7 @@ export async function GET() {
             position: true,
             email: true,
             role: true,
+            division: true,
             section: true,
           },
           orderBy: {
@@ -51,7 +52,7 @@ export async function GET() {
     if ((!rawEmployees || rawEmployees.length === 0) && supabaseUrl && supabaseKey) {
       const { data, error } = await supabase
         .from('User')
-        .select('id, name, position, email, role, section')
+        .select('id, name, position, email, role, division, section')
         .eq('status', 'ACTIVE')
         .order('name', { ascending: true });
 
@@ -76,6 +77,7 @@ export async function GET() {
         position: emp.position ? emp.position.trim() : 'Environmental Specialist',
         email: emp.email || '',
         role: emp.role || 'EMPLOYEE',
+        division: emp.division || null,
         section: emp.section || null,
       }));
 

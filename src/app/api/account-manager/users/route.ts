@@ -5,6 +5,9 @@ import { prisma, isDummyDbUrl } from '@/lib/prisma';
 import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 import { UserStatus, Role } from '@prisma/client';
+import { saveSignatureFile } from '@/lib/signatureStorage';
+import { isValidDivisionSection } from '@/lib/constants/organization';
+import { logAuditEvent } from '@/lib/auditLog';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://rltypymiubbwdhbthsky.supabase.co';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_0h-ghZuNv6gwbWXAAcUdqg_NXpuvBQ9';
@@ -52,8 +55,10 @@ export async function GET(req: Request) {
             phoneNumber: true,
             role: true,
             status: true,
+            division: true,
             section: true,
             position: true,
+            signatureUrl: true,
             birthday: true,
             address: true,
             createdAt: true,
@@ -69,7 +74,7 @@ export async function GET(req: Request) {
     if ((!users || users.length === 0) && supabaseUrl && supabaseKey) {
       const { data, error } = await supabase
         .from('User')
-        .select('id, name, username, email, phoneNumber, role, status, section, position, birthday, address, createdAt, updatedAt')
+        .select('id, name, username, email, phoneNumber, role, status, division, section, position, signatureUrl, birthday, address, createdAt, updatedAt')
         .order('createdAt', { ascending: false });
 
       if (data && !error) {
@@ -94,6 +99,7 @@ export async function GET(req: Request) {
           u.name.toLowerCase().includes(q) ||
           (u.username && u.username.toLowerCase().includes(q)) ||
           u.email.toLowerCase().includes(q) ||
+          (u.division && u.division.toLowerCase().includes(q)) ||
           (u.section && u.section.toLowerCase().includes(q)) ||
           (u.position && u.position.toLowerCase().includes(q)) ||
           u.role.toLowerCase().includes(q)
@@ -146,11 +152,60 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, email, phoneNumber, role, section, position, birthday, address, status } = body;
+    const { name, email, phoneNumber, role, division, section, position, signatureData, birthday, address, status } = body;
 
-    if (!name || !email) {
+    if (!name || !name.trim()) {
       return NextResponse.json(
-        { success: false, error: 'Name and email are required.' },
+        { success: false, error: 'Full Name is required.' },
+        { status: 400 }
+      );
+    }
+
+    if (!email || !email.trim()) {
+      return NextResponse.json(
+        { success: false, error: 'Email Address is required.' },
+        { status: 400 }
+      );
+    }
+
+    if (!phoneNumber || !phoneNumber.trim()) {
+      return NextResponse.json(
+        { success: false, error: 'Phone Number is required.' },
+        { status: 400 }
+      );
+    }
+
+    if (!division || !division.trim()) {
+      return NextResponse.json(
+        { success: false, error: 'Division is required.' },
+        { status: 400 }
+      );
+    }
+
+    if (!section || !section.trim()) {
+      return NextResponse.json(
+        { success: false, error: 'Section is required.' },
+        { status: 400 }
+      );
+    }
+
+    if (!isValidDivisionSection(division, section)) {
+      return NextResponse.json(
+        { success: false, error: `Invalid Division and Section combination: '${section}' is not under '${division}'.` },
+        { status: 400 }
+      );
+    }
+
+    if (!position || !position.trim()) {
+      return NextResponse.json(
+        { success: false, error: 'Position is required.' },
+        { status: 400 }
+      );
+    }
+
+    if (position.trim().length > 100) {
+      return NextResponse.json(
+        { success: false, error: 'Position description must not exceed 100 characters.' },
         { status: 400 }
       );
     }
@@ -160,6 +215,20 @@ export async function POST(req: Request) {
     const defaultPassword = 'password123';
     const hashedPassword = await bcrypt.hash(defaultPassword, 10);
     const userId = 'usr_' + Math.random().toString(36).substring(2, 11);
+
+    // Save signature file if provided
+    let savedSignatureUrl: string | null = null;
+    if (signatureData) {
+      try {
+        savedSignatureUrl = await saveSignatureFile(userId, signatureData);
+      } catch (sigErr) {
+        console.error('[Create User API] Error saving signature:', sigErr);
+        return NextResponse.json(
+          { success: false, error: 'Failed to process and store e-signature image.' },
+          { status: 400 }
+        );
+      }
+    }
 
     let newUser: any = null;
 
@@ -177,10 +246,12 @@ export async function POST(req: Request) {
             username,
             email: cleanEmail,
             password: hashedPassword,
-            phoneNumber: phoneNumber ? phoneNumber.trim() : '09170000000',
+            phoneNumber: phoneNumber.trim(),
             role: role ? (role as Role) : Role.EMPLOYEE,
-            section: section ? section.trim() : 'Planning Section',
-            position: position ? position.trim() : null,
+            division: division.trim(),
+            section: section.trim(),
+            position: position.trim(),
+            signatureUrl: savedSignatureUrl,
             birthday: birthday ? birthday.trim() : null,
             address: address ? address.trim() : null,
             status: status ? (status as UserStatus) : UserStatus.ACTIVE,
@@ -193,8 +264,10 @@ export async function POST(req: Request) {
             phoneNumber: true,
             role: true,
             status: true,
+            division: true,
             section: true,
             position: true,
+            signatureUrl: true,
             createdAt: true,
           },
         });
@@ -217,17 +290,19 @@ export async function POST(req: Request) {
           username,
           email: cleanEmail,
           password: hashedPassword,
-          phoneNumber: phoneNumber ? phoneNumber.trim() : '09170000000',
+          phoneNumber: phoneNumber.trim(),
           role: role || 'EMPLOYEE',
-          section: section ? section.trim() : 'Planning Section',
-          position: position ? position.trim() : null,
+          division: division.trim(),
+          section: section.trim(),
+          position: position.trim(),
+          signatureUrl: savedSignatureUrl,
           birthday: birthday ? birthday.trim() : null,
           address: address ? address.trim() : null,
           status: status || 'ACTIVE',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         })
-        .select('id, name, username, email, phoneNumber, role, status, section, position, createdAt')
+        .select('id, name, username, email, phoneNumber, role, status, division, section, position, signatureUrl, createdAt')
         .single();
 
       if (!sbErr && created) {
@@ -236,6 +311,26 @@ export async function POST(req: Request) {
         throw new Error(sbErr?.message || 'Failed to create user in database.');
       }
     }
+
+    // Record audit event
+    const actorId = (session.user as any).id;
+    const actorName = (session.user as any).name || 'Account Manager';
+    await logAuditEvent({
+      actorId,
+      actorName,
+      actorRole: userRole,
+      action: 'WALK_IN_EMPLOYEE_REGISTERED',
+      target: 'User',
+      targetId: newUser.id,
+      details: `Account Manager registered walk-in employee ${newUser.name} (${newUser.position}, ${newUser.section}, ${newUser.division}).`,
+      metadata: {
+        registeredEmail: newUser.email,
+        assignedRole: newUser.role,
+        division: newUser.division,
+        section: newUser.section,
+        hasSignature: !!savedSignatureUrl,
+      },
+    }).catch(() => {});
 
     return NextResponse.json(
       {

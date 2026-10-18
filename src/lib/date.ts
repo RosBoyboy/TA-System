@@ -121,3 +121,106 @@ export function formatDateRangeShort(
   });
   return `${startStr} – ${endStr}`;
 }
+
+/**
+ * Normalizes any Date or ISO date string into a local "YYYY-MM-DD" calendar string.
+ * Ensures consistent date-only comparison without timezone or timestamp offsets.
+ */
+export function toCalendarDateString(dateVal?: string | Date | null): string | null {
+  if (!dateVal) return null;
+  if (typeof dateVal === 'string') {
+    const trimmed = dateVal.trim();
+    const match = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+      return `${match[1]}-${match[2]}-${match[3]}`;
+    }
+  }
+  const d = parseUtcDate(dateVal);
+  if (!d) return null;
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Checks if a record date falls within [dateFrom, dateTo] (inclusive of start and end dates).
+ * Handles:
+ * - Empty dateFrom or dateTo (open-ended ranges)
+ * - Single-day ranges (dateFrom === dateTo)
+ * - Exact match on start date and end date
+ * - Safe against database timestamps after midnight and timezone differences
+ */
+export function isDateWithinRange(
+  recordDate?: string | Date | null,
+  dateFrom?: string | null,
+  dateTo?: string | null
+): boolean {
+  const target = toCalendarDateString(recordDate);
+  if (!target) return false;
+
+  const from = dateFrom ? toCalendarDateString(dateFrom) : null;
+  const to = dateTo ? toCalendarDateString(dateTo) : null;
+
+  if (from && target < from) return false;
+  if (to && target > to) return false;
+
+  return true;
+}
+
+/**
+ * Returns Monday through Sunday calendar range for a reference date.
+ */
+export function getWeekDateRange(refDate?: Date | string | null): {
+  startDate: string;
+  endDate: string;
+  label: string;
+} {
+  const d = refDate ? (typeof refDate === 'string' ? parseUtcDate(refDate) || new Date() : refDate) : new Date();
+  const day = d.getDay(); // 0 is Sunday, 1 is Monday, ...
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+
+  const monday = new Date(d);
+  monday.setDate(d.getDate() + diffToMonday);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  const startStr = toCalendarDateString(monday) || '';
+  const endStr = toCalendarDateString(sunday) || '';
+
+  const label = monday.getFullYear() === sunday.getFullYear()
+    ? `${monday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${sunday.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+    : `${monday.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} – ${sunday.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+
+  return {
+    startDate: startStr,
+    endDate: endStr,
+    label,
+  };
+}
+
+/**
+ * Checks whether a travel period [travelStart, travelEnd] overlaps with a filter period [periodStart, periodEnd].
+ * Handles single-day travels, open-ended ranges, and multi-day travels.
+ */
+export function isTravelOverlappingPeriod(
+  travelStart?: string | Date | null,
+  travelEnd?: string | Date | null,
+  periodStart?: string | Date | null,
+  periodEnd?: string | Date | null
+): boolean {
+  const tFrom = toCalendarDateString(travelStart);
+  if (!tFrom) return false;
+  const tTo = toCalendarDateString(travelEnd) || tFrom;
+
+  const pFrom = periodStart ? toCalendarDateString(periodStart) : null;
+  const pTo = periodEnd ? toCalendarDateString(periodEnd) : null;
+
+  if (pFrom && tTo < pFrom) return false;
+  if (pTo && tFrom > pTo) return false;
+
+  return true;
+}
+
+

@@ -2,7 +2,17 @@
 
 import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import DynamicAdminDestinationMap, { TAMapItem } from '@/components/map/DynamicAdminDestinationMap';
+import {
+  isDateWithinRange,
+  formatDateDisplay,
+  toCalendarDateString,
+  getWeekDateRange,
+  isTravelOverlappingPeriod,
+  parseUtcDate,
+} from '@/lib/date';
+import { exportApprovalHistoryToCSV, printApprovalHistoryReport } from '@/utils/export';
 
 interface ApprovalStepItem {
   id: string;
@@ -382,6 +392,7 @@ const seedUserAccounts: UserAccount[] = [
 function AdminPortalContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { data: session } = useSession();
   const currentTab = searchParams.get('tab') || 'home';
 
   // Live Data State
@@ -397,6 +408,27 @@ function AdminPortalContent() {
   const [filterAor, setFilterAor] = useState('ALL');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [selectedMonthPreset, setSelectedMonthPreset] = useState<string>('');
+  const [showExportMenu, setShowExportMenu] = useState(false);
+
+  // Admin Destination Map Filter State (Day, Week, Custom Range)
+  const [mapDateMode, setMapDateMode] = useState<'ALL' | 'DAY' | 'WEEK' | 'CUSTOM'>('ALL');
+  const [mapSelectedDay, setMapSelectedDay] = useState<string>(() => {
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  });
+  const [mapSelectedWeekRef, setMapSelectedWeekRef] = useState<string>(() => {
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  });
+  const [mapCustomFrom, setMapCustomFrom] = useState('');
+  const [mapCustomTo, setMapCustomTo] = useState('');
 
   // Selected item modals
   const [selectedRecord, setSelectedRecord] = useState<TARecord | null>(null);
@@ -470,8 +502,13 @@ function AdminPortalContent() {
     fetchData();
   }, []);
 
-  // Filtered TA Records
+  // Check if date range is invalid (Date From > Date To)
+  const isDateRangeInvalid = Boolean(dateFrom && dateTo && dateFrom > dateTo);
+
+  // Filtered TA Records based on active filters and travel date range
   const filteredRecords = useMemo(() => {
+    if (isDateRangeInvalid) return [];
+
     return taRecords.filter((r) => {
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
@@ -492,30 +529,45 @@ function AdminPortalContent() {
       if (filterAor !== 'ALL' && r.aorType !== filterAor) {
         return false;
       }
-      if (dateFrom && new Date(r.startDate) < new Date(dateFrom)) return false;
-      if (dateTo && new Date(r.endDate) > new Date(dateTo)) return false;
+      if (dateFrom || dateTo) {
+        if (!isDateWithinRange(r.startDate, dateFrom, dateTo)) return false;
+      }
       return true;
     });
-  }, [taRecords, searchQuery, filterStatus, filterOffice, filterAor, dateFrom, dateTo]);
+  }, [taRecords, searchQuery, filterStatus, filterOffice, filterAor, dateFrom, dateTo, isDateRangeInvalid]);
 
-  // Statistics & Metrics Calculations
+  // Reset pagination to first page when filtering changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredRecords.length, dateFrom, dateTo, searchQuery, filterStatus, filterOffice, filterAor]);
+
+  // Statistics & Metrics Calculations synchronized with filtered dataset
   const stats = useMemo(() => {
-    const total = taRecords.length;
-    const pending = taRecords.filter((r) => r.status.startsWith('PENDING')).length;
-    const approved = taRecords.filter((r) => r.status === 'APPROVED').length;
-    const cancelled = taRecords.filter((r) => r.status.startsWith('REJECTED')).length;
-    const withinAOR = taRecords.filter((r) => r.aorType === 'Within AOR').length;
-    const outsideAOR = taRecords.filter((r) => r.aorType === 'Outside AOR').length;
+    const total = filteredRecords.length;
+    const approved = filteredRecords.filter((r) => r.status === 'APPROVED').length;
+    const onProcess = filteredRecords.filter(
+      (r) => r.status === 'PENDING_DIVISION_CHIEF' || r.status === 'PENDING_HEAD_PENRO'
+    ).length;
+    const pendingOnly = filteredRecords.filter(
+      (r) => r.status === 'PENDING_SECTION_CHIEF' || r.status === 'PENDING'
+    ).length;
+    const pendingTotal = onProcess + pendingOnly;
+    const cancelled = filteredRecords.filter((r) => r.status.startsWith('REJECTED')).length;
 
-    const govVehicle = taRecords.filter((r) => r.transportation === 'Government Vehicle').length;
-    const pubTransport = taRecords.filter((r) => r.transportation === 'Public Transport').length;
-    const airline = taRecords.filter((r) => r.transportation === 'Airline').length;
+    const withinAOR = filteredRecords.filter((r) => r.aorType === 'Within AOR').length;
+    const outsideAOR = filteredRecords.filter((r) => r.aorType === 'Outside AOR').length;
 
-    const approvalRate = total > 0 ? ((approved / total) * 100).toFixed(1) : '38.5';
+    const govVehicle = filteredRecords.filter((r) => r.transportation === 'Government Vehicle').length;
+    const pubTransport = filteredRecords.filter((r) => r.transportation === 'Public Transport').length;
+    const airline = filteredRecords.filter((r) => r.transportation === 'Airline').length;
+
+    const approvalRate = total > 0 ? ((approved / total) * 100).toFixed(1) : '0.0';
 
     return {
       total,
-      pending,
+      pending: pendingTotal,
+      onProcess,
+      pendingOnly,
       approved,
       cancelled,
       withinAOR,
@@ -525,12 +577,190 @@ function AdminPortalContent() {
       airline,
       approvalRate,
     };
-  }, [taRecords]);
+  }, [filteredRecords]);
 
-  // Destination Map Items
+  // Donut chart percentages derived dynamically from filtered metrics
+  const donutPercentages = useMemo(() => {
+    const total = stats.total;
+    if (total === 0) {
+      return { approved: 0, onProcess: 0, pending: 0, cancelled: 0 };
+    }
+    return {
+      approved: (stats.approved / total) * 100,
+      onProcess: (stats.onProcess / total) * 100,
+      pending: (stats.pendingOnly / total) * 100,
+      cancelled: (stats.cancelled / total) * 100,
+    };
+  }, [stats]);
+
+  // Quick Month Preset Handler
+  const handleSelectMonthPreset = (monthVal: string) => {
+    setSelectedMonthPreset(monthVal);
+    if (!monthVal || monthVal === 'ALL') {
+      setDateFrom('');
+      setDateTo('');
+      return;
+    }
+    const [yStr, mStr] = monthVal.split('-');
+    const year = parseInt(yStr, 10);
+    const month = parseInt(mStr, 10);
+    const lastDay = new Date(year, month, 0).getDate();
+    setDateFrom(`${yStr}-${mStr}-01`);
+    setDateTo(`${yStr}-${mStr}-${String(lastDay).padStart(2, '0')}`);
+  };
+
+  const handleDateFromChange = (val: string) => {
+    setDateFrom(val);
+    setSelectedMonthPreset('');
+  };
+
+  const handleDateToChange = (val: string) => {
+    setDateTo(val);
+    setSelectedMonthPreset('');
+  };
+
+  const handleResetFilters = () => {
+    setDateFrom('');
+    setDateTo('');
+    setSelectedMonthPreset('');
+    setSearchQuery('');
+    setFilterStatus('ALL');
+    setFilterOffice('ALL');
+    setFilterAor('ALL');
+  };
+
+  // Print / Export Handlers for Monthly Reports & Filtered Records
+  const handlePrintReport = () => {
+    let dateLabel = 'All Recorded Travel Authorities';
+    if (dateFrom && dateTo) {
+      if (dateFrom === dateTo) {
+        dateLabel = formatDateDisplay(dateFrom);
+      } else {
+        dateLabel = `${formatDateDisplay(dateFrom)} – ${formatDateDisplay(dateTo)}`;
+      }
+    } else if (dateFrom) {
+      dateLabel = `From ${formatDateDisplay(dateFrom)}`;
+    } else if (dateTo) {
+      dateLabel = `Until ${formatDateDisplay(dateTo)}`;
+    }
+
+    printApprovalHistoryReport({
+      requests: filteredRecords as any,
+      userRole: 'ADMIN',
+      userName: (session?.user as any)?.name || 'System Admin',
+      userPosition: (session?.user as any)?.position || 'Information Technology Officer I',
+      statusFilter: filterStatus !== 'ALL' ? filterStatus : undefined,
+      searchQuery: searchQuery || undefined,
+      dateRangeLabel: dateLabel,
+      reportTitle: 'TOPS Official Monthly Travel Order Report',
+    });
+  };
+
+  const handleExportCSV = () => {
+    const dateStr = dateFrom ? `${dateFrom}_to_${dateTo || 'current'}` : new Date().toISOString().split('T')[0];
+    exportApprovalHistoryToCSV(
+      filteredRecords as any,
+      'ADMIN',
+      `TOPS_Monthly_Report_${dateStr}.csv`
+    );
+  };
+
+  // Destination Map Helpers & State Navigation
+  const mapWeekInfo = useMemo(() => {
+    return getWeekDateRange(mapSelectedWeekRef);
+  }, [mapSelectedWeekRef]);
+
+  const isMapCustomRangeInvalid = Boolean(mapDateMode === 'CUSTOM' && mapCustomFrom && mapCustomTo && mapCustomFrom > mapCustomTo);
+
+  const handlePrevDay = () => {
+    const cur = parseUtcDate(mapSelectedDay) || new Date();
+    cur.setDate(cur.getDate() - 1);
+    setMapSelectedDay(toCalendarDateString(cur) || '');
+  };
+
+  const handleNextDay = () => {
+    const cur = parseUtcDate(mapSelectedDay) || new Date();
+    cur.setDate(cur.getDate() + 1);
+    setMapSelectedDay(toCalendarDateString(cur) || '');
+  };
+
+  const handleTodayDay = () => {
+    setMapSelectedDay(toCalendarDateString(new Date()) || '');
+  };
+
+  const handlePrevWeek = () => {
+    const cur = parseUtcDate(mapSelectedWeekRef) || new Date();
+    cur.setDate(cur.getDate() - 7);
+    setMapSelectedWeekRef(toCalendarDateString(cur) || '');
+  };
+
+  const handleNextWeek = () => {
+    const cur = parseUtcDate(mapSelectedWeekRef) || new Date();
+    cur.setDate(cur.getDate() + 7);
+    setMapSelectedWeekRef(toCalendarDateString(cur) || '');
+  };
+
+  const handleThisWeek = () => {
+    setMapSelectedWeekRef(toCalendarDateString(new Date()) || '');
+  };
+
+  const handleResetMapFilters = () => {
+    setSearchQuery('');
+    setFilterStatus('ALL');
+    setFilterAor('ALL');
+    setMapDateMode('ALL');
+    setMapCustomFrom('');
+    setMapCustomTo('');
+    const todayStr = toCalendarDateString(new Date()) || '';
+    setMapSelectedDay(todayStr);
+    setMapSelectedWeekRef(todayStr);
+  };
+
+  // Destination Map Items filtered by destination search, status, AOR, and selected period (Day, Week, Custom Range)
   const mapItems: TAMapItem[] = useMemo(() => {
-    return filteredRecords
-      .filter((r) => r.destinationLat && r.destinationLng)
+    return taRecords
+      .filter((r) => {
+        if (!r.destinationLat || !r.destinationLng) return false;
+
+        // Destination / keyword search
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          const matchTracking = r.trackingNumber.toLowerCase().includes(q);
+          const matchDest = r.destination.toLowerCase().includes(q);
+          const matchEmp = r.createdBy?.name?.toLowerCase().includes(q);
+          const matchPurpose = r.purpose.toLowerCase().includes(q);
+          if (!matchTracking && !matchDest && !matchEmp && !matchPurpose) return false;
+        }
+
+        // Status Filter
+        if (filterStatus !== 'ALL') {
+          if (filterStatus === 'APPROVED' && r.status !== 'APPROVED') return false;
+          if (filterStatus === 'PENDING' && !r.status.startsWith('PENDING')) return false;
+          if (filterStatus === 'REJECTED' && !r.status.startsWith('REJECTED')) return false;
+        }
+
+        // AOR Filter
+        if (filterAor !== 'ALL' && r.aorType !== filterAor) {
+          return false;
+        }
+
+        // Period Filter (Day, Week, Custom Range)
+        if (mapDateMode === 'DAY') {
+          if (!mapSelectedDay) return true;
+          return isTravelOverlappingPeriod(r.startDate, r.endDate, mapSelectedDay, mapSelectedDay);
+        } else if (mapDateMode === 'WEEK') {
+          return isTravelOverlappingPeriod(r.startDate, r.endDate, mapWeekInfo.startDate, mapWeekInfo.endDate);
+        } else if (mapDateMode === 'CUSTOM') {
+          if (mapCustomFrom && mapCustomTo && mapCustomFrom > mapCustomTo) {
+            return false;
+          }
+          if (mapCustomFrom || mapCustomTo) {
+            return isTravelOverlappingPeriod(r.startDate, r.endDate, mapCustomFrom || null, mapCustomTo || null);
+          }
+        }
+
+        return true;
+      })
       .map((r) => ({
         id: r.id,
         trackingNumber: r.trackingNumber,
@@ -543,7 +773,17 @@ function AdminPortalContent() {
         lat: r.destinationLat as number,
         lng: r.destinationLng as number,
       }));
-  }, [filteredRecords]);
+  }, [
+    taRecords,
+    searchQuery,
+    filterStatus,
+    filterAor,
+    mapDateMode,
+    mapSelectedDay,
+    mapWeekInfo,
+    mapCustomFrom,
+    mapCustomTo,
+  ]);
 
   // Helper to render Status Badges (Clean, text-based semantic dot style)
   const renderStatusBadge = (status: string) => {
@@ -590,7 +830,7 @@ function AdminPortalContent() {
     setTaRecords((prev) =>
       prev.map((r) => (r.id === editingRecord.id ? { ...r, ...editingRecord, updatedAt: new Date().toISOString() } : r))
     );
-    setEditSuccessMsg(`Travel Authority ${editingRecord.trackingNumber} successfully updated.`);
+    setEditSuccessMsg(`Travel Order ${editingRecord.trackingNumber} successfully updated.`);
     setTimeout(() => setEditSuccessMsg(''), 4000);
     setEditingRecord(null);
   };
@@ -615,7 +855,7 @@ function AdminPortalContent() {
         <div>
           <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Admin Dashboard</h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Enhanced Travel Authority Processing System — DENR-PENRO La Union
+            Enhanced Travel Order Processing System — DENR-PENRO Agusan del Norte
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs font-medium text-slate-600 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200">
@@ -624,35 +864,139 @@ function AdminPortalContent() {
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white p-3.5 rounded-lg border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row items-center gap-3">
-        <div className="flex items-center gap-2 text-xs font-medium text-slate-600 shrink-0">
-          <span>Date From:</span>
-          <input
-            type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
-            className="h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600"
-          />
-          <span>To:</span>
-          <input
-            type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
-            className="h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600"
-          />
+      <div className="bg-white p-3.5 rounded-lg border border-slate-200/90 shadow-2xs space-y-2.5">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600 shrink-0">
+            <span>Date From:</span>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => handleDateFromChange(e.target.value)}
+              className={`h-8 px-2.5 bg-slate-50 border rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600 ${
+                isDateRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
+              }`}
+            />
+            <span>To:</span>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => handleDateToChange(e.target.value)}
+              className={`h-8 px-2.5 bg-slate-50 border rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600 ${
+                isDateRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
+              }`}
+            />
+
+            {/* Quick Month Filter Preset */}
+            <select
+              value={selectedMonthPreset}
+              onChange={(e) => handleSelectMonthPreset(e.target.value)}
+              className="h-8 px-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium text-slate-700 outline-none focus:border-emerald-600 cursor-pointer"
+            >
+              <option value="">Month Preset...</option>
+              <option value="ALL">All Dates (Clear)</option>
+              <option value="2026-10">October 2026</option>
+              <option value="2026-09">September 2026</option>
+              <option value="2026-08">August 2026</option>
+            </select>
+
+            {(dateFrom || dateTo || searchQuery) && (
+              <button
+                onClick={handleResetFilters}
+                className="h-8 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md text-xs font-medium transition-colors cursor-pointer"
+                title="Reset all filters"
+              >
+                Reset
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex-1 sm:w-64 relative">
+              <input
+                type="text"
+                placeholder="Search TA number, employee, or destination..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-8 px-3 pl-8 bg-slate-50 border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600"
+              />
+              <svg className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+
+            {/* Export / Print Monthly Report Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                className="h-8 px-3 bg-[#1B4332] hover:bg-[#143326] text-white rounded-md text-xs font-medium flex items-center gap-1.5 shadow-2xs transition-colors shrink-0 cursor-pointer"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                <span>Report</span>
+                <svg className={`w-3 h-3 transition-transform ${showExportMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {showExportMenu && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setShowExportMenu(false)} />
+                  <div className="absolute right-0 mt-1.5 w-56 bg-white rounded-lg shadow-xl border border-slate-200 p-1.5 z-40 text-xs animate-fade-in space-y-1">
+                    <button
+                      onClick={() => {
+                        setShowExportMenu(false);
+                        handlePrintReport();
+                      }}
+                      className="w-full px-3 py-2 text-left rounded-md hover:bg-emerald-50 text-slate-700 hover:text-[#1B4332] flex items-center gap-2.5 transition-colors cursor-pointer"
+                    >
+                      <svg className="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                      </svg>
+                      <div>
+                        <div className="font-semibold text-slate-800">Print / Save as PDF</div>
+                        <div className="text-[10px] text-slate-400">Official printable summary report</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowExportMenu(false);
+                        handleExportCSV();
+                      }}
+                      className="w-full px-3 py-2 text-left rounded-md hover:bg-emerald-50 text-slate-700 hover:text-[#1B4332] flex items-center gap-2.5 transition-colors cursor-pointer"
+                    >
+                      <svg className="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                      <div>
+                        <div className="font-semibold text-slate-800">Export to CSV / Excel</div>
+                        <div className="text-[10px] text-slate-400">Download spreadsheet file</div>
+                      </div>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="flex-1 w-full relative">
-          <input
-            type="text"
-            placeholder="Search TA number, employee, or destination..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-8 px-3 pl-8 bg-slate-50 border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600"
-          />
-          <svg className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
+
+        {/* Invalid Date Range Warning */}
+        {isDateRangeInvalid && (
+          <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-md flex items-center justify-between text-xs text-rose-800 animate-fade-in">
+            <div className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span><strong>Invalid Date Range:</strong> Date From cannot be later than To date.</span>
+            </div>
+            <button
+              onClick={() => { setDateFrom(''); setDateTo(''); }}
+              className="text-xs font-semibold text-rose-900 underline hover:text-rose-700 cursor-pointer"
+            >
+              Reset
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 4 Clean Metric Cards */}
@@ -710,10 +1054,62 @@ function AdminPortalContent() {
             <div className="h-44 flex items-center justify-center my-2 relative">
               <svg className="w-36 h-36 transform -rotate-90" viewBox="0 0 36 36">
                 <circle cx="18" cy="18" r="14" fill="transparent" stroke="#F1F5F9" strokeWidth="4" />
-                <circle cx="18" cy="18" r="14" fill="transparent" stroke="#10B981" strokeWidth="4" strokeDasharray="33 100" strokeDashoffset="0" />
-                <circle cx="18" cy="18" r="14" fill="transparent" stroke="#0284C7" strokeWidth="4" strokeDasharray="25 100" strokeDashoffset="-33" />
-                <circle cx="18" cy="18" r="14" fill="transparent" stroke="#F59E0B" strokeWidth="4" strokeDasharray="22 100" strokeDashoffset="-58" />
-                <circle cx="18" cy="18" r="14" fill="transparent" stroke="#EF4444" strokeWidth="4" strokeDasharray="20 100" strokeDashoffset="-80" />
+                {stats.total > 0 && (
+                  <>
+                    {donutPercentages.approved > 0 && (
+                      <circle
+                        cx="18"
+                        cy="18"
+                        r="14"
+                        fill="transparent"
+                        stroke="#10B981"
+                        strokeWidth="4"
+                        pathLength="100"
+                        strokeDasharray={`${donutPercentages.approved} 100`}
+                        strokeDashoffset="0"
+                      />
+                    )}
+                    {donutPercentages.onProcess > 0 && (
+                      <circle
+                        cx="18"
+                        cy="18"
+                        r="14"
+                        fill="transparent"
+                        stroke="#0284C7"
+                        strokeWidth="4"
+                        pathLength="100"
+                        strokeDasharray={`${donutPercentages.onProcess} 100`}
+                        strokeDashoffset={`${-donutPercentages.approved}`}
+                      />
+                    )}
+                    {donutPercentages.pending > 0 && (
+                      <circle
+                        cx="18"
+                        cy="18"
+                        r="14"
+                        fill="transparent"
+                        stroke="#F59E0B"
+                        strokeWidth="4"
+                        pathLength="100"
+                        strokeDasharray={`${donutPercentages.pending} 100`}
+                        strokeDashoffset={`${-(donutPercentages.approved + donutPercentages.onProcess)}`}
+                      />
+                    )}
+                    {donutPercentages.cancelled > 0 && (
+                      <circle
+                        cx="18"
+                        cy="18"
+                        r="14"
+                        fill="transparent"
+                        stroke="#EF4444"
+                        strokeWidth="4"
+                        pathLength="100"
+                        strokeDasharray={`${donutPercentages.cancelled} 100`}
+                        strokeDashoffset={`${-(donutPercentages.approved + donutPercentages.onProcess + donutPercentages.pending)}`}
+                      />
+                    )}
+                  </>
+                )}
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                 <span className="text-xl font-semibold text-slate-900 tracking-tight">{stats.total}</span>
@@ -723,8 +1119,8 @@ function AdminPortalContent() {
           </div>
           <div className="grid grid-cols-2 gap-2 pt-2.5 text-[11px] font-medium text-slate-600 border-t border-slate-100">
             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> Approved ({stats.approved})</span>
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-sky-600"></span> On Process (4)</span>
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500"></span> Pending (3)</span>
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-sky-600"></span> On Process ({stats.onProcess})</span>
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500"></span> Pending ({stats.pendingOnly})</span>
             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500"></span> Returned ({stats.cancelled})</span>
           </div>
         </div>
@@ -820,7 +1216,7 @@ function AdminPortalContent() {
           <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
-          <span><strong>{stats.cancelled} Travel Authority request(s) returned</strong> for revision by reviewing officials.</span>
+          <span><strong>{stats.cancelled} Travel Order request(s) returned</strong> for revision by reviewing officials.</span>
         </div>
         <button
           onClick={() => router.push('/admin?tab=cancelled')}
@@ -839,14 +1235,67 @@ function AdminPortalContent() {
     <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Travel Authority Data</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Card-based overview of active and archived Travel Authorities</p>
+          <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Travel Order Data</h2>
+          <p className="text-xs text-slate-500 mt-0.5">Card-based overview of active and archived Travel Orders</p>
         </div>
         <span className="text-xs text-slate-500 font-medium">Showing {filteredRecords.length} of {taRecords.length} records</span>
       </div>
 
       {/* Filters Bar */}
       <div className="bg-white p-3.5 rounded-lg border border-slate-200/90 shadow-2xs space-y-3">
+        {/* Date Filter Row */}
+        <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600">
+          <span>Date From:</span>
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => handleDateFromChange(e.target.value)}
+            className={`h-8 px-2.5 bg-slate-50 border rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600 ${
+              isDateRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
+            }`}
+          />
+          <span>To:</span>
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => handleDateToChange(e.target.value)}
+            className={`h-8 px-2.5 bg-slate-50 border rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600 ${
+              isDateRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
+            }`}
+          />
+          <select
+            value={selectedMonthPreset}
+            onChange={(e) => handleSelectMonthPreset(e.target.value)}
+            className="h-8 px-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium text-slate-700 outline-none focus:border-emerald-600 cursor-pointer"
+          >
+            <option value="">Month Preset...</option>
+            <option value="ALL">All Dates (Clear)</option>
+            <option value="2026-10">October 2026</option>
+            <option value="2026-09">September 2026</option>
+            <option value="2026-08">August 2026</option>
+          </select>
+          {(dateFrom || dateTo || searchQuery || filterStatus !== 'ALL' || filterOffice !== 'ALL' || filterAor !== 'ALL') && (
+            <button
+              onClick={handleResetFilters}
+              className="h-8 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md text-xs font-medium transition-colors cursor-pointer"
+              title="Reset all filters"
+            >
+              Reset
+            </button>
+          )}
+        </div>
+
+        {/* Invalid Date Range Warning */}
+        {isDateRangeInvalid && (
+          <div className="p-2 bg-rose-50 border border-rose-200 rounded-md text-xs text-rose-800 flex items-center gap-1.5">
+            <svg className="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <strong>Invalid date range</strong> — "Date From" is after "Date To". Please correct to see results.
+          </div>
+        )}
+
+        {/* Search + Status + Office + AOR Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
           <div className="lg:col-span-2 relative">
             <input
@@ -900,48 +1349,70 @@ function AdminPortalContent() {
 
       {/* 2-Column Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {filteredRecords.map((req) => (
-          <div
-            key={req.id}
-            onClick={() => setSelectedRecord(req)}
-            className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all cursor-pointer space-y-3"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="font-mono text-xs font-semibold text-[#1B4332] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                  {req.trackingNumber}
-                </span>
-                <h4 className="text-sm font-semibold text-slate-900 mt-1.5">{req.createdBy?.name || 'Juan Dela Cruz'}</h4>
-                <p className="text-[11px] text-slate-500">{req.employeePosition} — {req.office}</p>
-              </div>
-              <div>{renderStatusBadge(req.status)}</div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 pt-2.5 border-t border-slate-100 text-xs">
-              <div>
-                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Destination</span>
-                <span className="font-medium text-slate-800 line-clamp-1">{req.destination}</span>
-              </div>
-              <div>
-                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Travel Date</span>
-                <span className="font-medium text-slate-800">{new Date(req.startDate).toLocaleDateString()}</span>
-              </div>
-              <div>
-                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">AOR Scope</span>
-                <span className="font-medium text-slate-800">{req.aorType}</span>
-              </div>
-              <div>
-                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Transportation</span>
-                <span className="font-medium text-slate-800">{req.transportation}</span>
-              </div>
-            </div>
-
-            <div className="pt-1">
-              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Purpose</span>
-              <p className="text-xs text-slate-600 line-clamp-2 mt-0.5">{req.purpose}</p>
-            </div>
+        {filteredRecords.length === 0 ? (
+          <div className="col-span-full py-12 text-center bg-white rounded-lg border border-slate-200/90 shadow-2xs p-8">
+            <svg className="w-10 h-10 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p className="font-semibold text-slate-700 text-sm">No Travel Authorities match the selected criteria</p>
+            <p className="text-slate-400 text-xs mt-1">
+              {(dateFrom || dateTo)
+                ? `No travel records found within ${dateFrom && dateTo ? `${formatDateDisplay(dateFrom)} to ${formatDateDisplay(dateTo)}` : 'the selected date range'}.`
+                : 'Try adjusting your search query, status, office, or AOR filters.'}
+            </p>
+            {(dateFrom || dateTo || searchQuery || filterStatus !== 'ALL' || filterOffice !== 'ALL' || filterAor !== 'ALL') && (
+              <button
+                onClick={handleResetFilters}
+                className="mt-3 px-3 py-1.5 text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-md hover:bg-emerald-100 transition-colors"
+              >
+                Reset All Filters
+              </button>
+            )}
           </div>
-        ))}
+        ) : (
+          filteredRecords.map((req) => (
+            <div
+              key={req.id}
+              onClick={() => setSelectedRecord(req)}
+              className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all cursor-pointer space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="font-mono text-xs font-semibold text-[#1B4332] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    {req.trackingNumber}
+                  </span>
+                  <h4 className="text-sm font-semibold text-slate-900 mt-1.5">{req.createdBy?.name || 'Juan Dela Cruz'}</h4>
+                  <p className="text-[11px] text-slate-500">{req.employeePosition} — {req.office}</p>
+                </div>
+                <div>{renderStatusBadge(req.status)}</div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2.5 border-t border-slate-100 text-xs">
+                <div>
+                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Destination</span>
+                  <span className="font-medium text-slate-800 line-clamp-1">{req.destination}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Travel Date</span>
+                  <span className="font-medium text-slate-800">{formatDateDisplay(req.startDate)}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">AOR Scope</span>
+                  <span className="font-medium text-slate-800">{req.aorType}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Transportation</span>
+                  <span className="font-medium text-slate-800">{req.transportation}</span>
+                </div>
+              </div>
+
+              <div className="pt-1">
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Purpose</span>
+                <p className="text-xs text-slate-600 line-clamp-2 mt-0.5">{req.purpose}</p>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
@@ -957,21 +1428,99 @@ function AdminPortalContent() {
       <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Travel Authority Records</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Master tabular registry of all Travel Authorities</p>
+            <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Travel Order Records</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Master tabular registry of all Travel Orders</p>
           </div>
-          <div className="w-full sm:w-72 relative">
-            <input
-              type="text"
-              placeholder="Search records..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-8 px-3 pl-8 bg-white border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600 shadow-2xs"
-            />
-            <svg className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePrintReport}
+              className="h-8 px-3 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 hover:bg-slate-50 shadow-2xs flex items-center gap-1.5 shrink-0"
+              title="Print Monthly / Filtered Report"
+            >
+              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2z" />
+              </svg>
+              <span>Print Report</span>
+            </button>
+            <button
+              onClick={handleExportCSV}
+              className="h-8 px-3 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 hover:bg-slate-50 shadow-2xs flex items-center gap-1.5 shrink-0"
+              title="Export CSV / Excel"
+            >
+              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>Export CSV</span>
+            </button>
           </div>
+        </div>
+
+        {/* Date Filter Bar */}
+        <div className="bg-white p-3.5 rounded-lg border border-slate-200/90 shadow-2xs space-y-2.5">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600 shrink-0">
+              <span>Date From:</span>
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => handleDateFromChange(e.target.value)}
+                className={`h-8 px-2.5 bg-slate-50 border rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600 ${
+                  isDateRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
+                }`}
+              />
+              <span>To:</span>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => handleDateToChange(e.target.value)}
+                className={`h-8 px-2.5 bg-slate-50 border rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600 ${
+                  isDateRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
+                }`}
+              />
+              <select
+                value={selectedMonthPreset}
+                onChange={(e) => handleSelectMonthPreset(e.target.value)}
+                className="h-8 px-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium text-slate-700 outline-none focus:border-emerald-600 cursor-pointer"
+              >
+                <option value="">Month Preset...</option>
+                <option value="ALL">All Dates (Clear)</option>
+                <option value="2026-10">October 2026</option>
+                <option value="2026-09">September 2026</option>
+                <option value="2026-08">August 2026</option>
+              </select>
+              {(dateFrom || dateTo || searchQuery) && (
+                <button
+                  onClick={handleResetFilters}
+                  className="h-8 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md text-xs font-medium transition-colors cursor-pointer"
+                  title="Reset all filters"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+            <div className="w-full sm:w-72 relative">
+              <input
+                type="text"
+                placeholder="Search records..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-8 px-3 pl-8 bg-slate-50 border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600"
+              />
+              <svg className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Invalid Date Range Warning */}
+          {isDateRangeInvalid && (
+            <div className="p-2 bg-rose-50 border border-rose-200 rounded-md text-xs text-rose-800 flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <strong>Invalid date range</strong> — "Date From" is after "Date To". Please correct to see results.
+            </div>
+          )}
         </div>
 
         {/* Tabular Registry */}
@@ -990,37 +1539,63 @@ function AdminPortalContent() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
-                {paginated.map((req) => (
-                  <tr key={req.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="py-3 px-4 font-mono font-medium text-[#1B4332]">{req.trackingNumber}</td>
-                    <td className="py-3 px-4">
-                      <p className="font-semibold text-slate-900">{req.createdBy?.name || 'Juan Dela Cruz'}</p>
-                      <p className="text-[11px] text-slate-500">{req.employeePosition}</p>
-                    </td>
-                    <td className="py-3 px-4 text-slate-700">{req.destination}</td>
-                    <td className="py-3 px-4 text-slate-600">
-                      {new Date(req.startDate).toLocaleDateString()}
-                    </td>
-                    <td className="py-3 px-4">{renderStatusBadge(req.status)}</td>
-                    <td className="py-3 px-4 text-slate-500">{new Date(req.createdAt).toLocaleDateString()}</td>
-                    <td className="py-3 px-4 text-right space-x-1.5">
-                      <button
-                        onClick={() => setSelectedRecord(req)}
-                        className="px-2 py-1 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium text-[11px] transition-colors"
-                        title="View Details"
-                      >
-                        View
-                      </button>
-                      <button
-                        onClick={() => setEditingRecord(req)}
-                        className="px-2 py-1 rounded border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-[#1B4332] font-medium text-[11px] transition-colors"
-                        title="Edit TA"
-                      >
-                        Edit
-                      </button>
+                {paginated.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-12 text-center text-slate-500">
+                      <div className="flex flex-col items-center justify-center gap-1.5">
+                        <svg className="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p className="font-semibold text-slate-700 text-sm">No Travel Order records found</p>
+                        <p className="text-slate-400 text-xs">
+                          {dateFrom || dateTo || searchQuery || filterStatus !== 'ALL'
+                            ? 'No records match the current date range or search criteria.'
+                            : 'No records exist in the database.'}
+                        </p>
+                        {(dateFrom || dateTo || searchQuery) && (
+                          <button
+                            onClick={handleResetFilters}
+                            className="mt-2 px-3 py-1 text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-md hover:bg-emerald-100"
+                          >
+                            Clear Filters
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  paginated.map((req) => (
+                    <tr key={req.id} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="py-3 px-4 font-mono font-medium text-[#1B4332]">{req.trackingNumber}</td>
+                      <td className="py-3 px-4">
+                        <p className="font-semibold text-slate-900">{req.createdBy?.name || 'Juan Dela Cruz'}</p>
+                        <p className="text-[11px] text-slate-500">{req.employeePosition}</p>
+                      </td>
+                      <td className="py-3 px-4 text-slate-700">{req.destination}</td>
+                      <td className="py-3 px-4 text-slate-600">
+                        {formatDateDisplay(req.startDate)}
+                      </td>
+                      <td className="py-3 px-4">{renderStatusBadge(req.status)}</td>
+                      <td className="py-3 px-4 text-slate-500">{formatDateDisplay(req.createdAt)}</td>
+                      <td className="py-3 px-4 text-right space-x-1.5">
+                        <button
+                          onClick={() => setSelectedRecord(req)}
+                          className="px-2 py-1 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium text-[11px] transition-colors"
+                          title="View Details"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => setEditingRecord(req)}
+                          className="px-2 py-1 rounded border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-[#1B4332] font-medium text-[11px] transition-colors"
+                          title="Edit TA"
+                        >
+                          Edit
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -1028,11 +1603,11 @@ function AdminPortalContent() {
           {/* Table Footer */}
           <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50">
             <span>
-              Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredRecords.length)} to {Math.min(currentPage * itemsPerPage, filteredRecords.length)} of {filteredRecords.length} entries
+              Showing {filteredRecords.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredRecords.length)} of {filteredRecords.length} entries
             </span>
             <div className="flex items-center gap-1">
               <button
-                disabled={currentPage === 1}
+                disabled={currentPage === 1 || filteredRecords.length === 0}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 className="px-2 py-1 rounded border border-slate-200 bg-white text-slate-600 disabled:opacity-40 text-xs"
               >
@@ -1050,7 +1625,7 @@ function AdminPortalContent() {
                 </button>
               ))}
               <button
-                disabled={currentPage === totalPages}
+                disabled={currentPage === totalPages || filteredRecords.length === 0}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 className="px-2 py-1 rounded border border-slate-200 bg-white text-slate-600 disabled:opacity-40 text-xs"
               >
@@ -1145,7 +1720,7 @@ function AdminPortalContent() {
     <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
       <div>
         <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Search by ID</h2>
-        <p className="text-xs text-slate-500 mt-0.5">Find a specific Travel Authority by its unique reference tracking number</p>
+        <p className="text-xs text-slate-500 mt-0.5">Find a specific Travel Order by its unique reference tracking number</p>
       </div>
 
       <form onSubmit={handleSearchById} className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs space-y-3">
@@ -1217,8 +1792,8 @@ function AdminPortalContent() {
   const renderEditTab = () => (
     <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
       <div>
-        <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Edit Travel Authority</h2>
-        <p className="text-xs text-slate-500 mt-0.5">Search and modify permitted Travel Authority records</p>
+        <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Edit Travel Order</h2>
+        <p className="text-xs text-slate-500 mt-0.5">Search and modify permitted Travel Order records</p>
       </div>
 
       {editSuccessMsg && (
@@ -1458,64 +2033,257 @@ function AdminPortalContent() {
   /* TAB 9: DESTINATION MAP — Matching PDF Page 10                              */
   /* -------------------------------------------------------------------------- */
   const renderDestinationMapTab = () => (
-    <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
+    <div className="space-y-4 animate-fade-in w-full max-w-[1600px] mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Destination Map</h2>
           <p className="text-xs text-slate-500 mt-0.5">Geographic distribution of travel destinations based on real Travel Authorities</p>
         </div>
-        <span className="px-2.5 py-1 bg-emerald-50 text-[#1B4332] border border-emerald-200 rounded text-xs font-semibold">
-          {mapItems.length} Destinations on map
-        </span>
+        <div className="flex items-center gap-2">
+          {mapDateMode !== 'ALL' && (
+            <span className="px-2 py-0.5 bg-slate-100 text-slate-600 border border-slate-200 rounded text-xs font-medium">
+              Filter: {mapDateMode === 'DAY' ? 'Single Day' : mapDateMode === 'WEEK' ? 'Week' : 'Custom Range'}
+            </span>
+          )}
+          <span className="px-2.5 py-1 bg-emerald-50 text-[#1B4332] border border-emerald-200 rounded text-xs font-semibold">
+            {mapItems.length} {mapItems.length === 1 ? 'Destination' : 'Destinations'} on map
+          </span>
+        </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white p-3 rounded-lg border border-slate-200/90 shadow-2xs flex flex-wrap items-center gap-2.5">
-        <div className="flex-1 min-w-[200px] relative">
-          <input
-            type="text"
-            placeholder="Search destination name..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-8 px-3 pl-8 bg-slate-50 border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600"
-          />
-          <svg className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+      <div className="bg-white p-3 rounded-lg border border-slate-200/90 shadow-2xs space-y-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex-1 min-w-[200px] relative">
+            <input
+              type="text"
+              placeholder="Search destination name, tracking #, employee..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-8 px-3 pl-8 bg-slate-50 border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600 focus:bg-white transition-colors"
+            />
+            <svg className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium outline-none text-slate-700 focus:border-emerald-600 focus:bg-white"
+          >
+            <option value="ALL">All Status</option>
+            <option value="APPROVED">Approved</option>
+            <option value="PENDING">Active / Pending</option>
+            <option value="REJECTED">Cancelled / Overdue</option>
+          </select>
+
+          <select
+            value={filterAor}
+            onChange={(e) => setFilterAor(e.target.value)}
+            className="h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium outline-none text-slate-700 focus:border-emerald-600 focus:bg-white"
+          >
+            <option value="ALL">All AOR</option>
+            <option value="Within AOR">Within AOR</option>
+            <option value="Outside AOR">Outside AOR</option>
+          </select>
+
+          {/* Period Selector Tabs (All Dates, Day, Week, Custom Range) */}
+          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-md border border-slate-200">
+            <button
+              type="button"
+              onClick={() => setMapDateMode('ALL')}
+              className={`h-7 px-2.5 rounded text-xs font-semibold transition-all ${
+                mapDateMode === 'ALL'
+                  ? 'bg-emerald-700 text-white shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
+              }`}
+            >
+              All Dates
+            </button>
+            <button
+              type="button"
+              onClick={() => setMapDateMode('DAY')}
+              className={`h-7 px-2.5 rounded text-xs font-semibold transition-all ${
+                mapDateMode === 'DAY'
+                  ? 'bg-emerald-700 text-white shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
+              }`}
+            >
+              Day
+            </button>
+            <button
+              type="button"
+              onClick={() => setMapDateMode('WEEK')}
+              className={`h-7 px-2.5 rounded text-xs font-semibold transition-all ${
+                mapDateMode === 'WEEK'
+                  ? 'bg-emerald-700 text-white shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
+              }`}
+            >
+              Week
+            </button>
+            <button
+              type="button"
+              onClick={() => setMapDateMode('CUSTOM')}
+              className={`h-7 px-2.5 rounded text-xs font-semibold transition-all ${
+                mapDateMode === 'CUSTOM'
+                  ? 'bg-emerald-700 text-white shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
+              }`}
+            >
+              Custom Range
+            </button>
+          </div>
+
+          <button
+            onClick={handleResetMapFilters}
+            className="h-8 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-medium transition-colors"
+          >
+            Reset
+          </button>
         </div>
 
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium outline-none"
-        >
-          <option value="ALL">All Status</option>
-          <option value="APPROVED">Approved</option>
-          <option value="PENDING">Active / Pending</option>
-          <option value="REJECTED">Cancelled / Overdue</option>
-        </select>
+        {/* Dynamic Controls based on selected Period */}
+        {mapDateMode !== 'ALL' && (
+          <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+            {mapDateMode === 'DAY' && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-slate-700">Selected Day:</span>
+                <button
+                  type="button"
+                  title="Previous Day"
+                  onClick={handlePrevDay}
+                  className="h-7 w-7 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs"
+                >
+                  ◀
+                </button>
+                <input
+                  type="date"
+                  value={mapSelectedDay}
+                  onChange={(e) => setMapSelectedDay(e.target.value)}
+                  className="h-7 px-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium outline-none focus:border-emerald-600 focus:bg-white"
+                />
+                <button
+                  type="button"
+                  title="Next Day"
+                  onClick={handleNextDay}
+                  className="h-7 w-7 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs"
+                >
+                  ▶
+                </button>
+                <button
+                  type="button"
+                  onClick={handleTodayDay}
+                  className="h-7 px-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded font-semibold text-xs transition-colors"
+                >
+                  Today
+                </button>
+                <span className="text-[11px] text-slate-500 ml-1">
+                  Showing destinations active on <strong className="text-slate-700">{formatDateDisplay(mapSelectedDay)}</strong>
+                </span>
+              </div>
+            )}
 
-        <select
-          value={filterAor}
-          onChange={(e) => setFilterAor(e.target.value)}
-          className="h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium outline-none"
-        >
-          <option value="ALL">All AOR</option>
-          <option value="Within AOR">Within AOR</option>
-          <option value="Outside AOR">Outside AOR</option>
-        </select>
+            {mapDateMode === 'WEEK' && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-slate-700">Selected Week:</span>
+                <button
+                  type="button"
+                  title="Previous Week"
+                  onClick={handlePrevWeek}
+                  className="h-7 w-7 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs"
+                >
+                  ◀
+                </button>
+                <span className="h-7 px-2.5 bg-emerald-50 text-[#1B4332] border border-emerald-200 rounded font-semibold text-xs flex items-center">
+                  📅 {mapWeekInfo.label}
+                </span>
+                <button
+                  type="button"
+                  title="Next Week"
+                  onClick={handleNextWeek}
+                  className="h-7 w-7 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs"
+                >
+                  ▶
+                </button>
+                <button
+                  type="button"
+                  onClick={handleThisWeek}
+                  className="h-7 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-medium text-xs transition-colors"
+                >
+                  This Week
+                </button>
+                <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200">
+                  <span className="text-[11px] text-slate-500">Jump to date:</span>
+                  <input
+                    type="date"
+                    value={mapSelectedWeekRef}
+                    onChange={(e) => setMapSelectedWeekRef(e.target.value)}
+                    className="h-7 px-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium outline-none focus:border-emerald-600 focus:bg-white"
+                  />
+                </div>
+              </div>
+            )}
 
-        <button
-          onClick={() => {
-            setSearchQuery('');
-            setFilterStatus('ALL');
-            setFilterAor('ALL');
-          }}
-          className="h-8 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-medium"
-        >
-          Reset
-        </button>
+            {mapDateMode === 'CUSTOM' && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-slate-700">Custom Date Range:</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] text-slate-500">From</span>
+                  <input
+                    type="date"
+                    value={mapCustomFrom}
+                    onChange={(e) => setMapCustomFrom(e.target.value)}
+                    className={`h-7 px-2 bg-slate-50 border rounded text-xs font-medium outline-none focus:border-emerald-600 focus:bg-white ${
+                      isMapCustomRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
+                    }`}
+                  />
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] text-slate-500">To</span>
+                  <input
+                    type="date"
+                    value={mapCustomTo}
+                    onChange={(e) => setMapCustomTo(e.target.value)}
+                    className={`h-7 px-2 bg-slate-50 border rounded text-xs font-medium outline-none focus:border-emerald-600 focus:bg-white ${
+                      isMapCustomRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
+                    }`}
+                  />
+                </div>
+                {isMapCustomRangeInvalid ? (
+                  <span className="text-[11px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                    ⚠️ Date From cannot be after Date To
+                  </span>
+                ) : (
+                  (mapCustomFrom || mapCustomTo) && (
+                    <span className="text-[11px] text-slate-500">
+                      Showing destinations active within selected window
+                    </span>
+                  )
+                )}
+              </div>
+            )}
+
+            <div className="text-[11px] text-slate-500">
+              {mapItems.length === 1 ? '1 destination found' : `${mapItems.length} destinations found`}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* No destinations matching notice */}
+      {mapItems.length === 0 && (
+        <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-center justify-between animate-fade-in">
+          <span>No travel destinations found matching your selected period and criteria.</span>
+          <button
+            onClick={handleResetMapFilters}
+            className="font-semibold underline hover:text-amber-900"
+          >
+            Reset Filters
+          </button>
+        </div>
+      )}
 
       {/* Map Container */}
       <div className="relative rounded-lg overflow-hidden border border-slate-200">
@@ -2138,7 +2906,7 @@ function AdminPortalContent() {
 
 export default function AdminDashboardPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading ETAPS Admin Portal...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading TOPS Admin Portal...</div>}>
       <AdminPortalContent />
     </Suspense>
   );

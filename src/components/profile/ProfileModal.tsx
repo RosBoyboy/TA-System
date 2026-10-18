@@ -269,7 +269,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-black tracking-tight text-white flex items-center gap-2">
-                DENR-PENRO ETAPS Account
+                DENR-PENRO TOPS Account
               </h3>
               <p className="text-xs text-emerald-200/90 font-medium">Manage your profile, position, and contact details</p>
             </div>
@@ -473,7 +473,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                     required
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
                   />
-                  <p className="text-[10px] text-emerald-700 font-medium mt-1">Used for Resend Travel Authority email alerts.</p>
+                  <p className="text-[10px] text-emerald-700 font-medium mt-1">Used for Resend Travel Order email alerts.</p>
                 </div>
 
                 <div>

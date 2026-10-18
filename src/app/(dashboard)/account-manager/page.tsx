@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import DynamicMapPicker from '@/components/map/DynamicMapPicker';
 import { formatNominatimAddress } from '@/utils/address';
+import SignaturePad from '@/components/signature/SignaturePad';
 
 interface UserRecord {
   id: string;
@@ -13,8 +14,10 @@ interface UserRecord {
   phoneNumber: string;
   role: string;
   status: string;
+  division?: string | null;
   section?: string | null;
   position?: string | null;
+  signatureUrl?: string | null;
   birthday?: string | null;
   address?: string | null;
   createdAt: string;
@@ -302,13 +305,22 @@ function AccountManagerContent() {
   const [newAccountData, setNewAccountData] = useState({
     name: '',
     email: '',
-    phoneNumber: '09170000000',
+    phoneNumber: '',
     role: 'EMPLOYEE',
-    position: 'Environmental Specialist',
-    section: 'PENRO Laguna',
-    division: 'Forest Management Division',
+    division: '',
+    section: '',
+    position: '',
+    signatureData: null as string | null,
+    consent: false,
   });
   const [createAccountLoading, setCreateAccountLoading] = useState(false);
+  const [orgDivisions, setOrgDivisions] = useState<
+    Array<{ id: string; name: string; sections: Array<{ id: string; name: string }> }>
+  >([]);
+
+  // Pending Accounts Review Tab State
+  const [pendingSearch, setPendingSearch] = useState('');
+  const [showManualCreate, setShowManualCreate] = useState(false);
 
   // Configuration Form State
   const [configSettings, setConfigSettings] = useState({
@@ -501,6 +513,21 @@ function AccountManagerContent() {
     fetchUsers();
     fetchMyTaRequests();
 
+    const fetchOrgStructure = async () => {
+      try {
+        const res = await fetch('/api/organization/divisions');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            setOrgDivisions(json.data);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load organizational structure:', err);
+      }
+    };
+    fetchOrgStructure();
+
     const fetchEmployees = async () => {
       setLoadingEmployees(true);
       try {
@@ -660,6 +687,32 @@ function AccountManagerContent() {
   // Handle Create Account Submit
   const handleCreateAccountSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!newAccountData.division) {
+      showToast('Please select an official Division.', 'error');
+      return;
+    }
+
+    if (!newAccountData.section) {
+      showToast('Please select a Section under the selected Division.', 'error');
+      return;
+    }
+
+    if (!newAccountData.position.trim()) {
+      showToast('Please enter the employee position description.', 'error');
+      return;
+    }
+
+    if (!newAccountData.signatureData) {
+      showToast('An employee e-signature is required for walk-in registration.', 'error');
+      return;
+    }
+
+    if (!newAccountData.consent) {
+      showToast('Please confirm the employee signature authorization consent.', 'error');
+      return;
+    }
+
     setCreateAccountLoading(true);
 
     try {
@@ -667,11 +720,14 @@ function AccountManagerContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: newAccountData.name,
-          email: newAccountData.email,
-          phoneNumber: newAccountData.phoneNumber,
+          name: newAccountData.name.trim(),
+          email: newAccountData.email.trim(),
+          phoneNumber: newAccountData.phoneNumber.trim(),
           role: newAccountData.role,
-          section: newAccountData.section,
+          division: newAccountData.division.trim(),
+          section: newAccountData.section.trim(),
+          position: newAccountData.position.trim(),
+          signatureData: newAccountData.signatureData,
           status: 'ACTIVE',
         }),
       });
@@ -687,12 +743,15 @@ function AccountManagerContent() {
       setNewAccountData({
         name: '',
         email: '',
-        phoneNumber: '09170000000',
+        phoneNumber: '',
         role: 'EMPLOYEE',
-        position: 'Environmental Specialist',
-        section: 'PENRO Laguna',
-        division: 'Forest Management Division',
+        division: '',
+        section: '',
+        position: '',
+        signatureData: null,
+        consent: false,
       });
+      setShowManualCreate(false);
       fetchUsers();
       router.push('/account-manager?tab=accounts');
     } catch (err: any) {
@@ -729,13 +788,13 @@ function AccountManagerContent() {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setFormError(data.error || 'Failed to create Travel Authority request.');
-        showToast(data.error || 'Failed to create Travel Authority request.', 'error');
+        setFormError(data.error || 'Failed to create Travel Order request.');
+        showToast(data.error || 'Failed to create Travel Order request.', 'error');
         setTaSubmitting(false);
         return;
       }
 
-      showToast(`Travel Authority request ${data.data.trackingNumber} submitted successfully!`, 'success');
+      showToast(`Travel Order request ${data.data.trackingNumber} submitted successfully!`, 'success');
       setWizardStep(1);
       setCreateForm(getInitialCreateForm());
       setTaSubTab('list');
@@ -797,15 +856,22 @@ function AccountManagerContent() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80">
             <div>
               <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Dashboard</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Overview of ETAPS account management and user administration</p>
+              <p className="text-xs text-slate-500 mt-0.5">Overview of TOPS account management and user administration</p>
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => router.push('/account-manager?tab=create-account')}
-                className="px-4 py-2.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-2"
+                onClick={() => router.push('/account-manager?tab=pending-accounts')}
+                className="px-4 py-2.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-2 cursor-pointer"
               >
-                <span>+</span>
-                <span>Create New Account</span>
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <span>Pending Accounts</span>
+                {counts.pending > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-900 text-[10px] font-black">
+                    {counts.pending}
+                  </span>
+                )}
               </button>
               <button
                 onClick={() => router.push('/account-manager?tab=create-travel')}
@@ -814,7 +880,7 @@ function AccountManagerContent() {
                 <svg className="w-4 h-4 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
-                <span>File Travel Authority</span>
+                <span>File Travel Order</span>
               </button>
             </div>
           </div>
@@ -959,7 +1025,7 @@ function AccountManagerContent() {
             <div>
               <h2 className="text-xl font-extrabold text-white">View Accounts</h2>
               <p className="text-xs text-emerald-200/90 mt-1">
-                Manage all ETAPS users — employees, staff, reviewers, and signatories — from one place.
+                Manage all TOPS users — employees, staff, reviewers, and signatories — from one place.
               </p>
             </div>
             <div className="text-right hidden sm:block">
@@ -1084,7 +1150,20 @@ function AccountManagerContent() {
                         </td>
                         <td className="py-3.5 px-4">
                           <p className="font-medium text-slate-800">{u.section || 'General Office'}</p>
+                          {u.division && <p className="text-[10px] text-slate-400 font-medium">{u.division}</p>}
                           {u.position && <p className="text-[10px] text-slate-500 font-normal">{u.position}</p>}
+                          <div className="mt-1">
+                            {u.signatureUrl ? (
+                              <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                Signature on file
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">
+                                No signature
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="py-3.5 px-4">
                           <span className="text-xs font-semibold text-slate-700">
@@ -1161,132 +1240,441 @@ function AccountManagerContent() {
         </div>
       )}
 
-      {/* TAB 3: CREATE ACCOUNT */}
-      {activeTab === 'create-account' && (
-        <div className="space-y-6 max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-md p-6 sm:p-8 space-y-6">
-            <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-              <svg className="w-6 h-6 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              <div>
-                <h2 className="text-lg font-black text-slate-900">Create New Account</h2>
-                <p className="text-xs text-slate-500">Fill in the details to register a new ETAPS user in the system.</p>
-              </div>
-            </div>
+      {/* TAB 3: PENDING ACCOUNTS (Registration Review & Activation) */}
+      {(activeTab === 'pending-accounts' || activeTab === 'create-account') && (() => {
+        const pendingUsersList = users.filter((u) => u.status === 'PENDING_REVIEW');
+        const filteredPendingUsers = pendingUsersList.filter((u) => {
+          if (!pendingSearch.trim()) return true;
+          const q = pendingSearch.toLowerCase().trim();
+          return (
+            u.name.toLowerCase().includes(q) ||
+            u.email.toLowerCase().includes(q) ||
+            u.phoneNumber.toLowerCase().includes(q) ||
+            (u.position && u.position.toLowerCase().includes(q)) ||
+            (u.section && u.section.toLowerCase().includes(q))
+          );
+        });
 
-            <form onSubmit={handleCreateAccountSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={newAccountData.name}
-                    onChange={(e) => setNewAccountData({ ...newAccountData, name: e.target.value })}
-                    placeholder="e.g. Maria Clara Santos"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
-                  />
+        return (
+          <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-12">
+            {/* Header Box */}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 sm:p-7 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200/80 flex items-center justify-center shrink-0 shadow-2xs">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
                 </div>
-
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Email Address *</label>
-                  <input
-                    type="email"
-                    required
-                    value={newAccountData.email}
-                    onChange={(e) => setNewAccountData({ ...newAccountData, email: e.target.value })}
-                    placeholder="name@denr.gov.ph"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number *</label>
-                  <input
-                    type="text"
-                    required
-                    value={newAccountData.phoneNumber}
-                    onChange={(e) => setNewAccountData({ ...newAccountData, phoneNumber: e.target.value })}
-                    placeholder="09170000000"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Role *</label>
-                  <select
-                    value={newAccountData.role}
-                    onChange={(e) => setNewAccountData({ ...newAccountData, role: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#0F4C2E]"
-                  >
-                    <option value="EMPLOYEE">Employee</option>
-                    <option value="SECTION_CHIEF">Section Chief (Signatory)</option>
-                    <option value="DIVISION_CHIEF">Division Chief (Signatory)</option>
-                    <option value="HEAD_PENRO">Head of PENRO (Signatory)</option>
-                    <option value="ACCOUNT_MANAGER">Account Manager</option>
-                    <option value="ADMIN">System Administrator</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Position *</label>
-                  <input
-                    type="text"
-                    required
-                    value={newAccountData.position}
-                    onChange={(e) => setNewAccountData({ ...newAccountData, position: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Section / Division *</label>
-                  <input
-                    type="text"
-                    required
-                    value={newAccountData.section}
-                    onChange={(e) => setNewAccountData({ ...newAccountData, section: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
-                  />
+                  <div className="flex items-center gap-2.5">
+                    <h2 className="text-lg font-black text-slate-900">Pending Accounts for Review</h2>
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-black">
+                      {pendingUsersList.length} Awaiting Activation
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Review employee accounts submitted through portal registration. Verify position and section assignment to activate and generate login credentials.
+                  </p>
                 </div>
               </div>
 
-              <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="relative w-full sm:w-64">
+                  <input
+                    type="text"
+                    value={pendingSearch}
+                    onChange={(e) => setPendingSearch(e.target.value)}
+                    placeholder="Search applicant name, email..."
+                    className="w-full pl-9 pr-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E] transition-all"
+                  />
+                  <svg className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
                 <button
                   type="button"
-                  onClick={() => router.push('/account-manager?tab=accounts')}
-                  className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold"
+                  onClick={fetchUsers}
+                  className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer border border-slate-200"
+                  title="Refresh pending list"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={createAccountLoading}
-                  className="px-6 py-2.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold shadow-md disabled:opacity-50"
-                >
-                  {createAccountLoading ? 'Creating Account...' : 'Create Account'}
+                  <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
                 </button>
               </div>
-            </form>
-          </div>
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-1">
-              <h4 className="text-xs font-bold text-slate-900">Pending Review</h4>
-              <p className="text-[11px] text-slate-500">New accounts require admin review before activation.</p>
+            {/* List of Pending Applicants */}
+            {loading ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                {[1, 2, 3, 4].map((sk) => (
+                  <div key={`sk-${sk}`} className="bg-white rounded-2xl border border-slate-200/80 p-6 space-y-4 animate-pulse">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 bg-slate-200 rounded-2xl" />
+                      <div className="space-y-1 flex-1">
+                        <div className="h-4 bg-slate-200 rounded w-1/3" />
+                        <div className="h-3 bg-slate-100 rounded w-1/4" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 pt-2">
+                      <div className="h-3 bg-slate-100 rounded" />
+                      <div className="h-3 bg-slate-100 rounded" />
+                      <div className="h-3 bg-slate-100 rounded" />
+                      <div className="h-3 bg-slate-100 rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredPendingUsers.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-12 text-center max-w-xl mx-auto space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-[#0F4C2E] border border-emerald-100 flex items-center justify-center mx-auto">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-base font-bold text-slate-900">
+                    {pendingSearch ? 'No matching pending accounts found' : 'All Caught Up! No Pending Accounts'}
+                  </h3>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                    {pendingSearch
+                      ? `No pending applicant records match "${pendingSearch}". Try clearing your search filter.`
+                      : 'There are currently no employee registrations waiting for review. When new employees submit an account registration via the portal, their records will appear here.'}
+                  </p>
+                </div>
+                <div className="flex items-center justify-center gap-3 pt-2">
+                  <button
+                    onClick={() => router.push('/account-manager?tab=accounts')}
+                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+                  >
+                    View All Accounts
+                  </button>
+                  <button
+                    onClick={() => setShowManualCreate(!showManualCreate)}
+                    className="px-4 py-2 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
+                  >
+                    {showManualCreate ? 'Hide Form' : '+ Manual Registration'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                {filteredPendingUsers.map((u) => {
+                  const initials = u.name
+                    .split(' ')
+                    .map((p) => p[0])
+                    .join('')
+                    .slice(0, 2)
+                    .toUpperCase();
+
+                  return (
+                    <div
+                      key={u.id}
+                      className="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all p-5 sm:p-6 flex flex-col justify-between space-y-4"
+                    >
+                      <div>
+                        {/* Header: Avatar, Name, Status Badge */}
+                        <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-2xl bg-emerald-100 text-[#0F4C2E] font-black text-sm flex items-center justify-center shrink-0 shadow-2xs">
+                              {initials}
+                            </div>
+                            <div>
+                              <h3 className="text-sm font-bold text-slate-900">{u.name}</h3>
+                              <p className="text-xs text-slate-500 font-medium">{u.position || 'Employee Applicant'}</p>
+                            </div>
+                          </div>
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold shrink-0">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                            PENDING REVIEW
+                          </span>
+                        </div>
+
+                        {/* Submitted Information Details */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-3.5 text-xs">
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Email Address</span>
+                            <p className="font-semibold text-slate-800 font-mono text-[11px] truncate">{u.email}</p>
+                          </div>
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Mobile Number</span>
+                            <p className="font-semibold text-slate-800 font-mono text-[11px]">{u.phoneNumber}</p>
+                            <span className="text-[9px] text-emerald-700 block font-medium">Receives SMS login credentials</span>
+                          </div>
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Requested Section</span>
+                            <p className="font-medium text-slate-700 truncate">{u.section || 'Planning Section'}</p>
+                          </div>
+                          <div className="space-y-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Registered Date</span>
+                            <p className="font-medium text-slate-700">
+                              {new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </p>
+                          </div>
+                          {u.birthday && (
+                            <div className="space-y-0.5">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Birthday</span>
+                              <p className="font-medium text-slate-700">{u.birthday}</p>
+                            </div>
+                          )}
+                          {u.address && (
+                            <div className="space-y-0.5 sm:col-span-2">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Home Address</span>
+                              <p className="font-medium text-slate-700 truncate">{u.address}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Card Footer: Action Buttons */}
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleStatus(u, 'DEACTIVATED')}
+                          className="px-3 py-2 bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-600 rounded-xl text-xs font-semibold transition-all border border-slate-200 cursor-pointer"
+                        >
+                          Decline
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedUserForActivation(u);
+                            setActivationSection(u.section || 'Planning Section');
+                            setActivationPosition(u.position || '');
+                            setActivationRole(u.role || 'EMPLOYEE');
+                          }}
+                          className="px-4 py-2 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>Review & Activate Account</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Optional Manual Registration Accordion */}
+            <div className="mt-8 pt-6 border-t border-slate-200/80">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800">Need to directly register an employee?</h4>
+                  <p className="text-[11px] text-slate-500">Add an employee directly who cannot submit registration online.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowManualCreate(!showManualCreate)}
+                  className="px-3.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+                >
+                  {showManualCreate ? 'Hide Form' : '+ Manual Registration Form'}
+                </button>
+              </div>
+
+              {showManualCreate && (
+                <div className="mt-4 bg-white rounded-2xl border border-slate-200/80 shadow-md p-6 sm:p-7 space-y-4 animate-fade-in">
+                  <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <h3 className="text-sm font-bold text-slate-900">Manual Employee Registration</h3>
+                  </div>
+
+                  <form onSubmit={handleCreateAccountSubmit} className="space-y-5">
+                    {/* Section 1: Employee Information */}
+                    <div>
+                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">1. Employee Information</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
+                          <input
+                            type="text"
+                            required
+                            value={newAccountData.name}
+                            onChange={(e) => setNewAccountData({ ...newAccountData, name: e.target.value })}
+                            placeholder="e.g. Maria Clara Santos"
+                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">Email Address *</label>
+                          <input
+                            type="email"
+                            required
+                            value={newAccountData.email}
+                            onChange={(e) => setNewAccountData({ ...newAccountData, email: e.target.value })}
+                            placeholder="name@denr.gov.ph"
+                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number *</label>
+                          <input
+                            type="text"
+                            required
+                            value={newAccountData.phoneNumber}
+                            onChange={(e) => setNewAccountData({ ...newAccountData, phoneNumber: e.target.value })}
+                            placeholder="09170000000"
+                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">Role *</label>
+                          <select
+                            value={newAccountData.role}
+                            onChange={(e) => setNewAccountData({ ...newAccountData, role: e.target.value })}
+                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          >
+                            <option value="EMPLOYEE">Employee</option>
+                            <option value="SECTION_CHIEF">Section Chief (Signatory)</option>
+                            <option value="DIVISION_CHIEF">Division Chief (Signatory)</option>
+                            <option value="HEAD_PENRO">Head of PENRO (Signatory)</option>
+                            <option value="ACCOUNT_MANAGER">Account Manager</option>
+                            <option value="ADMIN">System Administrator</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Section 2: Organizational Assignment */}
+                    <div className="pt-2 border-t border-slate-100">
+                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">2. Organizational Assignment</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">Division *</label>
+                          <select
+                            required
+                            value={newAccountData.division}
+                            onChange={(e) => {
+                              const newDiv = e.target.value;
+                              setNewAccountData((prev) => ({
+                                ...prev,
+                                division: newDiv,
+                                section: '', // Clear dependent section on division switch
+                              }));
+                            }}
+                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          >
+                            <option value="">Select Division...</option>
+                            {orgDivisions.map((div) => (
+                              <option key={div.id} value={div.name}>
+                                {div.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">
+                            Section * {!newAccountData.division && <span className="text-slate-400 font-normal">(Select Division first)</span>}
+                          </label>
+                          <select
+                            required
+                            disabled={!newAccountData.division}
+                            value={newAccountData.section}
+                            onChange={(e) => setNewAccountData({ ...newAccountData, section: e.target.value })}
+                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#0F4C2E] disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <option value="">
+                              {newAccountData.division ? 'Select Dependent Section...' : 'Choose a Division above'}
+                            </option>
+                            {(orgDivisions.find((d) => d.name === newAccountData.division)?.sections || []).map((sec) => (
+                              <option key={sec.id} value={sec.name}>
+                                {sec.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label className="block text-xs font-bold text-slate-700 mb-1">
+                            Position * <span className="text-slate-400 font-normal">(Manually entered)</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={newAccountData.position}
+                            onChange={(e) => setNewAccountData({ ...newAccountData, position: e.target.value })}
+                            placeholder="e.g. Environmental Specialist / Forest Ranger / Administrative Officer"
+                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Section 3: E-Signature Capture */}
+                    <div className="pt-2 border-t border-slate-100">
+                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">3. E-Signature Authorization</h4>
+                      <SignaturePad
+                        onChange={(sig) => setNewAccountData((prev) => ({ ...prev, signatureData: sig }))}
+                      />
+
+                      <div className="mt-3 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                        <label className="flex items-start gap-2.5 text-xs text-slate-700 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={newAccountData.consent}
+                            onChange={(e) => setNewAccountData((prev) => ({ ...prev, consent: e.target.checked }))}
+                            className="mt-0.5 rounded border-slate-300 text-[#0F4C2E] focus:ring-[#0F4C2E]"
+                          />
+                          <span className="leading-relaxed">
+                            I verify that the employee is physically present for walk-in registration, and authorizes the recording of this electronic signature for use on official <strong>DENR Travel Orders</strong> pursuant to the Electronic Commerce Act (RA 8792).
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex justify-end gap-3 border-t border-slate-100">
+                      <button
+                        type="button"
+                        onClick={() => setShowManualCreate(false)}
+                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={createAccountLoading}
+                        className="px-5 py-2 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold shadow-xs disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+                      >
+                        {createAccountLoading ? (
+                          <>
+                            <svg className="w-3.5 h-3.5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                            </svg>
+                            <span>Registering Employee...</span>
+                          </>
+                        ) : (
+                          'Create Account'
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
             </div>
-            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-1">
-              <h4 className="text-xs font-bold text-slate-900">Role Assignment</h4>
-              <p className="text-[11px] text-slate-500">Assign appropriate roles based on position and responsibilities.</p>
-            </div>
-            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-1">
-              <h4 className="text-xs font-bold text-slate-900">SMS Notification</h4>
-              <p className="text-[11px] text-slate-500">Users receive SMS login instructions upon activation.</p>
+
+            {/* Bottom Guideline Info Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-1">
+                <h4 className="text-xs font-bold text-slate-900">Registration Review</h4>
+                <p className="text-[11px] text-slate-500">Applicant credentials require HRMO review and approval before system activation.</p>
+              </div>
+              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-1">
+                <h4 className="text-xs font-bold text-slate-900">Role & Unit Assignment</h4>
+                <p className="text-[11px] text-slate-500">Confirm or adjust position, section, and signatory scope during the review step.</p>
+              </div>
+              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-1">
+                <h4 className="text-xs font-bold text-slate-900">Automated SMS Credentials</h4>
+                <p className="text-[11px] text-slate-500">Approved users receive immediate SMS login instructions with generated credentials.</p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* TAB 4: PASSWORD MANAGEMENT */}
       {activeTab === 'password-management' && (
@@ -1523,7 +1911,7 @@ function AccountManagerContent() {
                 taSubTab === 'create' ? 'bg-[#0F4C2E] text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200'
               }`}
             >
-              + File New Travel Authority
+              + File New Travel Order
             </button>
             <button
               onClick={() => setTaSubTab('list')}
@@ -1925,7 +2313,7 @@ function AccountManagerContent() {
                   <div className="space-y-6">
                     <div className="bg-emerald-950 text-white rounded-2xl p-5 shadow-sm flex items-center justify-between">
                       <div>
-                        <h3 className="text-base font-bold">Travel Authority Request Summary</h3>
+                        <h3 className="text-base font-bold">Travel Order Request Summary</h3>
                         <p className="text-xs text-emerald-200/80 mt-0.5">Please review all submitted information before final submission.</p>
                       </div>
                       <span className="px-3 py-1 rounded-full bg-emerald-800 text-emerald-200 text-xs font-bold uppercase">Ready</span>
@@ -1978,7 +2366,7 @@ function AccountManagerContent() {
                         onClick={handleCreateTaSubmit}
                         className="px-6 py-2.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold shadow-md disabled:opacity-50"
                       >
-                        {taSubmitting ? 'Submitting...' : 'Submit Travel Authority'}
+                        {taSubmitting ? 'Submitting...' : 'Submit Travel Order'}
                       </button>
                     )}
                   </div>
@@ -1987,9 +2375,9 @@ function AccountManagerContent() {
             </div>
           ) : (
             <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 space-y-4">
-              <h3 className="text-sm font-bold text-slate-900">My Travel Authority Requests</h3>
+              <h3 className="text-sm font-bold text-slate-900">My Travel Order Requests</h3>
               {myTaRequests.length === 0 ? (
-                <div className="p-8 text-center text-xs text-slate-500">No travel authority requests submitted yet.</div>
+                <div className="p-8 text-center text-xs text-slate-500">No travel order requests submitted yet.</div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs">
@@ -2180,7 +2568,7 @@ function AccountManagerContent() {
                 Account Successfully Activated!
               </h3>
               <p className="text-xs text-slate-500 mt-1">
-                Official ETAPS login credentials have been generated and dispatched.
+                Official TOPS login credentials have been generated and dispatched.
               </p>
             </div>
 
@@ -2238,7 +2626,7 @@ function AccountManagerContent() {
               <button
                 type="button"
                 onClick={() => {
-                  const credText = `DENR ETAPS Account Activated\nEmployee: ${generatedCredentialsModal.user.name}\nUsername: ${generatedCredentialsModal.credentials.username}\nPassword: ${generatedCredentialsModal.credentials.tempPassword}\nPosition: ${generatedCredentialsModal.user.position || 'Employee'}\nSection: ${generatedCredentialsModal.user.section || 'General'}`;
+                  const credText = `DENR TOPS Account Activated\nEmployee: ${generatedCredentialsModal.user.name}\nUsername: ${generatedCredentialsModal.credentials.username}\nPassword: ${generatedCredentialsModal.credentials.tempPassword}\nPosition: ${generatedCredentialsModal.user.position || 'Employee'}\nSection: ${generatedCredentialsModal.user.section || 'General'}`;
                   navigator.clipboard.writeText(credText);
                   setCopiedCredentials(true);
                   setTimeout(() => setCopiedCredentials(false), 3000);

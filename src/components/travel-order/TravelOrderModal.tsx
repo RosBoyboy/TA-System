@@ -20,6 +20,9 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
   const employeePosition = (request.createdBy as any)?.position || 'Administrative Officer V';
   const employeeSection = request.createdBy?.section || 'Technical Services Division';
   const trackingNo = request.trackingNumber ? request.trackingNumber.replace('TA-', 'TO-') : 'TO-2026-0001';
+  const employeeSignatureSrc = (request.createdBy as any)?.signatureUrl
+    ? `/api/signatures/${request.createdById}`
+    : '/signatures/signature_employee.png';
 
   const formatDocDate = (d?: string | Date | null) => {
     const obj = parseUtcDate(d);
@@ -476,8 +479,11 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
               <div className="emp-auth-box text-center max-w-xs mx-auto">
                 <div className="sig-container flex flex-col items-center justify-end min-h-[64px] max-w-[260px] mx-auto">
                   <img
-                    src="/signatures/signature_employee.png"
+                    src={employeeSignatureSrc}
                     alt="Employee Signature"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/signatures/signature_employee.png';
+                    }}
                     className="sig-img h-14 max-w-[190px] object-contain -mb-5 relative z-10 pointer-events-none"
                     style={{ mixBlendMode: 'multiply', background: 'transparent' }}
                   />
@@ -491,7 +497,7 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
 
             {/* 7. Electronic Notice Footer */}
             <div className="footer-notice border-t border-slate-300 pt-2 text-center text-[10px] italic text-slate-500">
-              This is an official travel order approved electronically and generated from the Enhanced Travel Authority Processing System (ETAPS). No original signature is required.
+              This is an official travel order approved electronically and generated from the Travel Order Processing System (TOPS). No original signature is required.
             </div>
           </div>
         </div>

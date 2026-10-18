@@ -12,7 +12,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -20,7 +20,8 @@ export async function GET(
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = await params;
+    const resolvedParams = await Promise.resolve(params);
+    const id = resolvedParams?.id;
     if (!id) {
       return NextResponse.json({ success: false, error: 'Request ID is required' }, { status: 400 });
     }
@@ -35,7 +36,7 @@ export async function GET(
         where: { id },
         include: {
           createdBy: {
-            select: { id: true, name: true, email: true, section: true, position: true },
+            select: { id: true, name: true, email: true, division: true, section: true, position: true, signatureUrl: true },
           },
           teamMembers: true,
           approvalSteps: {
@@ -52,7 +53,7 @@ export async function GET(
       console.warn('[GET Travel Order] Prisma query fallback to Supabase...', err);
       const { data } = await supabase
         .from('TARequest')
-        .select('*, createdBy:User!createdById(id, name, email, section, position), teamMembers:TARequestMember(*), approvalSteps:ApprovalStep(*)')
+        .select('*, createdBy:User!createdById(id, name, email, division, section, position, signatureUrl), teamMembers:TARequestMember(*), approvalSteps:ApprovalStep(*)')
         .eq('id', id)
         .single();
       requestData = data;

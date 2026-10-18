@@ -82,7 +82,7 @@ async function runTravelOrderTest() {
     { label: 'Arrival Date', check: docXml.includes('Sep 15, 2026') },
     { label: 'Division Chief Name', check: docXml.includes("DIVISION CHIEF's name") },
     { label: 'Head of PENRO Name', check: docXml.includes("HEAD OF PENRO's name") },
-    { label: 'System Name', check: docXml.includes('Enhanced Travel Authority Processing System (ETAPS)') },
+    { label: 'System Name', check: docXml.includes('Travel Order Processing System (TOPS)') },
     { label: 'No unreplaced placeholders', check: !docXml.includes('[AUTO-GENERATED NO.]') && !docXml.includes('[Employee Full Name]') },
   ];
 
