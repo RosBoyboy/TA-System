@@ -80,6 +80,20 @@ export async function GET(
       );
     }
 
+    // Access control: Only the owner, a team member, verifiers, or admin can access/download this Travel Order
+    const currentUserId = (session.user as any)?.id;
+    const currentUserRole = (session.user as any)?.role;
+    const isOwner = requestData.createdById === currentUserId;
+    const isTeamMember = Array.isArray(requestData.teamMembers) && requestData.teamMembers.some((m: any) => m.userId === currentUserId);
+    const isStaffOrAdmin = ['SECTION_CHIEF', 'DIVISION_CHIEF', 'HEAD_PENRO', 'ACCOUNT_MANAGER', 'ADMIN'].includes(currentUserRole);
+
+    if (!isOwner && !isTeamMember && !isStaffOrAdmin) {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden. You do not have permission to view or download this Travel Order.' },
+        { status: 403 }
+      );
+    }
+
     // If docx download requested
     if (format === 'docx') {
       const docxBuffer = await generatePopulatedTravelOrderDocx(requestData as TARequestDTO);

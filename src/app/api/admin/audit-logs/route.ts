@@ -17,6 +17,14 @@ export async function GET(req: Request) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userRole = (session.user as any)?.role;
+    if (userRole !== 'ADMIN') {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden. System Administrator access required.' },
+        { status: 403 }
+      );
+    }
+
     const url = new URL(req.url);
     const limitParam = url.searchParams.get('limit');
     const actionFilter = url.searchParams.get('action');

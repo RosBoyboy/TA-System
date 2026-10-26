@@ -73,10 +73,6 @@ function LoginForm() {
     }
   };
 
-  const handleQuickLogin = (demoUsername: string) => {
-    setIdentifier(demoUsername);
-    setPassword('password123');
-  };
 
   return (
     <div className="min-h-screen bg-[#F4F6F5] flex flex-col lg:flex-row font-sans text-slate-800">
@@ -331,56 +327,7 @@ function LoginForm() {
             <span className="leading-snug font-medium">New employee registrations are reviewed by the Account Manager who generates official login credentials.</span>
           </div>
 
-          {/* Quick Demo Test Buttons */}
-          <div className="mt-6 pt-4 border-t border-slate-100">
-            <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">
-              Quick Test Accounts (Password: password123)
-            </span>
-            <div className="grid grid-cols-2 gap-1.5 text-[11px]">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('employee')}
-                className="px-2 py-1.5 bg-slate-50 text-slate-700 rounded-lg hover:bg-emerald-50 font-medium text-left border border-slate-200 truncate cursor-pointer"
-              >
-                👤 Employee
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('sectionchief')}
-                className="px-2 py-1.5 bg-slate-50 text-slate-700 rounded-lg hover:bg-emerald-50 font-medium text-left border border-slate-200 truncate cursor-pointer"
-              >
-                👔 Section Chief
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('divchief')}
-                className="px-2 py-1.5 bg-slate-50 text-slate-700 rounded-lg hover:bg-emerald-50 font-medium text-left border border-slate-200 truncate cursor-pointer"
-              >
-                🏢 Division Chief
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('headpenro')}
-                className="px-2 py-1.5 bg-slate-50 text-slate-700 rounded-lg hover:bg-emerald-50 font-medium text-left border border-slate-200 truncate cursor-pointer"
-              >
-                🏛️ Head of PENRO
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('acctmgr')}
-                className="px-2 py-1.5 bg-slate-50 text-slate-700 rounded-lg hover:bg-emerald-50 font-medium text-left border border-slate-200 truncate cursor-pointer"
-              >
-                🔑 Acct Manager
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin')}
-                className="px-2 py-1.5 bg-slate-50 text-slate-700 rounded-lg hover:bg-emerald-50 font-medium text-left border border-slate-200 truncate cursor-pointer"
-              >
-                ⚙️ Admin
-              </button>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>

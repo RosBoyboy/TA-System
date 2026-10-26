@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { prisma, isDummyDbUrl } from '@/lib/prisma';
 import { createClient } from '@supabase/supabase-js';
 
@@ -21,6 +23,11 @@ const EXCLUDED_NAMES = new Set([
  */
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     let rawEmployees: any[] = [];
 
     // Attempt 1: Query via Prisma (if direct connection is enabled)
