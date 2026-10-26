@@ -1233,12 +1233,36 @@ function AdminPortalContent() {
   /* -------------------------------------------------------------------------- */
   const renderDataTab = () => (
     <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Travel Order Data</h2>
           <p className="text-xs text-slate-500 mt-0.5">Card-based overview of active and archived Travel Orders</p>
         </div>
-        <span className="text-xs text-slate-500 font-medium">Showing {filteredRecords.length} of {taRecords.length} records</span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handlePrintReport}
+            className="h-8 px-3 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 hover:bg-slate-50 shadow-2xs flex items-center gap-1.5 shrink-0 transition-colors"
+            title="Print Monthly / Filtered Report"
+          >
+            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2z" />
+            </svg>
+            <span>Print Report</span>
+          </button>
+          <button
+            onClick={handleExportCSV}
+            className="h-8 px-3 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 hover:bg-slate-50 shadow-2xs flex items-center gap-1.5 shrink-0 transition-colors"
+            title="Export CSV / Excel"
+          >
+            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>Export CSV</span>
+          </button>
+          <span className="text-xs text-slate-500 font-medium pl-1">
+            Showing {filteredRecords.length} of {taRecords.length} records
+          </span>
+        </div>
       </div>
 
       {/* Filters Bar */}
@@ -1376,7 +1400,7 @@ function AdminPortalContent() {
               onClick={() => setSelectedRecord(req)}
               className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all cursor-pointer space-y-3"
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between gap-2">
                 <div>
                   <span className="font-mono text-xs font-semibold text-[#1B4332] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                     {req.trackingNumber}
@@ -1384,7 +1408,23 @@ function AdminPortalContent() {
                   <h4 className="text-sm font-semibold text-slate-900 mt-1.5">{req.createdBy?.name || 'Juan Dela Cruz'}</h4>
                   <p className="text-[11px] text-slate-500">{req.employeePosition} — {req.office}</p>
                 </div>
-                <div>{renderStatusBadge(req.status)}</div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingRecord(req);
+                    }}
+                    className="px-2 py-0.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-[#1B4332] rounded text-[11px] font-semibold transition-colors flex items-center gap-1 shadow-2xs"
+                    title="Edit Travel Order"
+                  >
+                    <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <span>Edit</span>
+                  </button>
+                  {renderStatusBadge(req.status)}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3 pt-2.5 border-t border-slate-100 text-xs">
@@ -1394,7 +1434,11 @@ function AdminPortalContent() {
                 </div>
                 <div>
                   <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Travel Date</span>
-                  <span className="font-medium text-slate-800">{formatDateDisplay(req.startDate)}</span>
+                  <span className="font-medium text-slate-800">
+                    {req.endDate && toCalendarDateString(req.startDate) !== toCalendarDateString(req.endDate)
+                      ? `${formatDateDisplay(req.startDate)} – ${formatDateDisplay(req.endDate)}`
+                      : formatDateDisplay(req.startDate)}
+                  </span>
                 </div>
                 <div>
                   <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">AOR Scope</span>
@@ -2733,15 +2777,12 @@ function AdminPortalContent() {
       case 'dashboard':
         return renderHomeTab();
       case 'data':
-        return renderDataTab();
       case 'tables':
-        return renderTablesTab();
+      case 'search':
+      case 'edit':
+        return renderDataTab();
       case 'cancelled':
         return renderCancelledTab();
-      case 'search':
-        return renderSearchTab();
-      case 'edit':
-        return renderEditTab();
       case 'approval-monitoring':
         return renderApprovalMonitoringTab();
       case 'travel-analytics':

@@ -103,7 +103,24 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       // Listen for custom immediate notification dispatch events from user actions
       const handleManualNotification = (e: any) => {
         if (e.detail) {
-          const notif = e.detail as NotificationPopupItem;
+          const raw = e.detail as NotificationPopupItem;
+          const notif: NotificationPopupItem = {
+            ...raw,
+            title: raw.title
+              ? raw.title
+                  .replace(/\bTravel Authority\b/g, 'Travel Order')
+                  .replace(/\bTA Request\b/g, 'TO Request')
+                  .replace(/\bTA Requests\b/g, 'TO Requests')
+                  .replace(/\bTA\b/g, 'TO')
+              : raw.title,
+            message: raw.message
+              ? raw.message
+                  .replace(/\bTravel Authority\b/g, 'Travel Order')
+                  .replace(/\bTA Request\b/g, 'TO Request')
+                  .replace(/\bTA Requests\b/g, 'TO Requests')
+                  .replace(/\bTA\b/g, 'TO')
+              : raw.message,
+          };
           shownToastIdsRef.current.add(notif.id);
           setPopups((prev) => [notif, ...prev.filter((p) => p.id !== notif.id)].slice(0, 4));
           setNotificationsList((prev) => [notif, ...prev.filter((p) => p.id !== notif.id)]);
@@ -183,9 +200,14 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     router.push(targetHref);
   };
 
-  // Sidebar links based on role using clean vector SVG outline icons matching PDF
-  const isEmployee = role === 'EMPLOYEE' || pathname.startsWith('/employee');
+  // Role and route detection
+  const isAccountManagerRole = role === 'ACCOUNT_MANAGER';
+  const isAdminRole = role === 'ADMIN';
+
   const isStaffPage = pathname.startsWith('/staff');
+  const isAdminPage = pathname.startsWith('/admin');
+  const isAccountManagerPage = pathname.startsWith('/account-manager') || (isAccountManagerRole && !isAdminPage && !isStaffPage);
+  const isEmployee = (role === 'EMPLOYEE' || pathname.startsWith('/employee')) && !isAccountManagerRole && !isAdminRole && !isAdminPage && !isStaffPage;
 
   const employeeNavLinks = [
     {
@@ -280,8 +302,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const isAccountManagerPage = pathname.startsWith('/account-manager');
-
   const accountManagerNavLinks = [
     {
       id: 'dashboard',
@@ -344,9 +364,27 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         </svg>
       ),
     },
+    {
+      id: 'requests',
+      href: '/employee?tab=requests',
+      label: 'My Requests',
+      icon: (
+        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      ),
+    },
+    {
+      id: 'schedule',
+      href: '/employee?tab=schedule',
+      label: 'Travel Dates',
+      icon: (
+        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+    },
   ];
-
-  const isAdminPage = pathname.startsWith('/admin');
 
   const adminNavOverview = [
     {
@@ -380,42 +418,12 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       ),
     },
     {
-      id: 'tables',
-      href: '/admin?tab=tables',
-      label: 'Records Table',
-      icon: (
-        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
-    },
-    {
       id: 'cancelled',
       href: '/admin?tab=cancelled',
       label: 'Cancelled TAs',
       icon: (
         <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-    },
-    {
-      id: 'search',
-      href: '/admin?tab=search',
-      label: 'Search by ID',
-      icon: (
-        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      ),
-    },
-    {
-      id: 'edit',
-      href: '/admin?tab=edit',
-      label: 'Edit TA',
-      icon: (
-        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
         </svg>
       ),
     },
@@ -495,15 +503,12 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         case 'dashboard':
           return 'Admin Dashboard';
         case 'data':
-          return 'Travel Order Data';
         case 'tables':
-          return 'Travel Order Records';
+        case 'search':
+        case 'edit':
+          return 'Travel Order Data';
         case 'cancelled':
           return 'Cancelled Travel Orders';
-        case 'search':
-          return 'Search by ID';
-        case 'edit':
-          return 'Edit Travel Order';
         case 'approval-monitoring':
           return 'Approval Monitoring';
         case 'travel-analytics':
@@ -531,14 +536,17 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         default: return 'Dashboard';
       }
     }
-    if (pathname.startsWith('/account-manager')) {
+    if (pathname.startsWith('/account-manager') || (isAccountManagerRole && pathname.startsWith('/employee'))) {
       switch (currentTab) {
         case 'accounts': return 'View Accounts';
         case 'pending-accounts':
         case 'create-account': return 'Pending Accounts';
         case 'password-management': return 'Password Management';
         case 'configuration': return 'Configuration';
-        case 'create-travel': return 'Create Travel Order';
+        case 'create-travel':
+        case 'create': return 'Create Travel Order';
+        case 'requests': return 'My Requests';
+        case 'schedule': return 'Travel Dates';
         default: return 'Dashboard';
       }
     }
@@ -651,13 +659,20 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
               <div className="space-y-1.5">
                 {accountManagerNavLinks.map((link) => {
                   const isActive =
-                    currentTab === link.id ||
-                    (currentTab === 'dashboard' && link.id === 'dashboard') ||
-                    (link.id === 'pending-accounts' && currentTab === 'create-account');
+                    (link.id === 'requests' && ((pathname.startsWith('/employee') && currentTab === 'requests') || (pathname.startsWith('/account-manager') && currentTab === 'requests'))) ||
+                    (link.id === 'schedule' && ((pathname.startsWith('/employee') && currentTab === 'schedule') || (pathname.startsWith('/account-manager') && (currentTab === 'schedule' || currentTab === 'travel-dates')))) ||
+                    (pathname.startsWith('/account-manager') && currentTab === link.id) ||
+                    (pathname.startsWith('/account-manager') && currentTab === 'dashboard' && link.id === 'dashboard') ||
+                    (pathname.startsWith('/account-manager') && link.id === 'pending-accounts' && currentTab === 'create-account');
                   return (
                     <Link
                       key={link.id}
                       href={link.href}
+                      onClick={() => {
+                        if (typeof window !== 'undefined') {
+                          window.dispatchEvent(new CustomEvent('taps:reset-views'));
+                        }
+                      }}
                       className={`flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-xs tracking-wide transition-all ${
                         isActive
                           ? 'bg-[#2E6F4E] text-white shadow-md font-bold'

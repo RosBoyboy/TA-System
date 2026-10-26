@@ -122,6 +122,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           role: user.role,
           status: user.status,
+          division: user.division || null,
           section: user.section,
           position: user.position || null,
           birthday: user.birthday || null,
@@ -140,6 +141,7 @@ export const authOptions: NextAuthOptions = {
         token.username = u.username || null;
         token.role = u.role as Role;
         token.status = u.status as UserStatus;
+        token.division = u.division || null;
         token.section = u.section;
         token.position = u.position || null;
         token.birthday = u.birthday || null;
@@ -153,7 +155,8 @@ export const authOptions: NextAuthOptions = {
         if (session.email) token.email = session.email;
         if (session.phoneNumber) token.phoneNumber = session.phoneNumber;
         if (session.image !== undefined) token.picture = session.image;
-        if (session.section) token.section = session.section;
+        if (session.division !== undefined) token.division = session.division;
+        if (session.section !== undefined) token.section = session.section;
         if (session.position) token.position = session.position;
         if (session.birthday) token.birthday = session.birthday;
         if (session.address) token.address = session.address;
@@ -167,6 +170,7 @@ export const authOptions: NextAuthOptions = {
         u.username = token.username;
         u.role = token.role;
         u.status = token.status;
+        u.division = token.division;
         u.section = token.section;
         u.position = token.position;
         u.birthday = token.birthday;

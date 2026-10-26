@@ -17,6 +17,7 @@ import {
 
 import { formatNominatimAddress } from '@/utils/address';
 import { exportApprovalHistoryToCSV, printApprovalHistoryReport } from '@/utils/export';
+import { getDivisionForSection } from '@/lib/constants/organization';
 
 function StaffDashboardContent() {
   const searchParams = useSearchParams();
@@ -26,6 +27,8 @@ function StaffDashboardContent() {
   const { data: session } = useSession();
   const user = session?.user as any;
   const userRole = user?.role || 'SECTION_CHIEF';
+  const userSection = user?.section || '';
+  const userDivision = user?.division || '';
 
   const [requests, setRequests] = useState<TARequestDTO[]>([]);
   const [loading, setLoading] = useState(true);
@@ -101,6 +104,7 @@ function StaffDashboardContent() {
 
   // Modals & Signature State
   const [showApproveModal, setShowApproveModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [hasDigitalSignature, setHasDigitalSignature] = useState(false);
   const [remarks, setRemarks] = useState('');
@@ -249,8 +253,17 @@ function StaffDashboardContent() {
     );
   };
 
-  const handleAction = async (action: 'APPROVED' | 'REJECTED') => {
-    if (!reviewRequest) return;
+  const handleAction = async (action: 'APPROVED' | 'REJECTED', targetRequest?: TARequestDTO, customRemarks?: string) => {
+    const target = targetRequest || reviewRequest;
+    if (!target) return;
+
+    const finalRemarks = (customRemarks !== undefined ? customRemarks : remarks).trim();
+
+    if (action === 'REJECTED' && !finalRemarks) {
+      setActionError('A reason/remarks is required when returning a request.');
+      return;
+    }
+
     setActionLoading(true);
     setActionError('');
 
@@ -259,9 +272,9 @@ function StaffDashboardContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          requestId: reviewRequest.id,
+          requestId: target.id,
           action,
-          remarks: remarks.trim(),
+          remarks: finalRemarks,
         }),
       });
 
@@ -273,18 +286,40 @@ function StaffDashboardContent() {
       }
 
       setShowApproveModal(false);
-      const reqRef = reviewRequest;
+      setShowRejectModal(false);
+      const reqRef = target;
       setReviewRequest(null);
       setRemarks('');
       setHasDigitalSignature(false);
+
+      // Optimistic instant dashboard status reflection
+      setRequests((prev) =>
+        prev.map((r) => {
+          if (r.id !== target.id) return r;
+          const nextStatus =
+            action === 'REJECTED'
+              ? 'REJECTED_MANUAL'
+              : target.status === 'PENDING_SECTION_CHIEF'
+              ? 'PENDING_DIVISION_CHIEF'
+              : target.status === 'PENDING_DIVISION_CHIEF'
+              ? 'PENDING_HEAD_PENRO'
+              : 'APPROVED';
+          return {
+            ...r,
+            status: nextStatus as any,
+          };
+        })
+      );
+
       fetchRequests();
       fetchNotifications();
 
       if (typeof window !== 'undefined') {
         const actionTitle = action === 'APPROVED' ? 'Travel Endorsement Approved' : 'Travel Request Returned';
+        const remarksSuffix = finalRemarks ? ` Remarks: "${finalRemarks}"` : '';
         const actionMsg = action === 'APPROVED'
-          ? `TA Request ${reqRef.trackingNumber || ''} has been endorsed and forwarded to the next signatory.`
-          : `TA Request ${reqRef.trackingNumber || ''} has been returned with your remarks.`;
+          ? `TA Request ${reqRef.trackingNumber || ''} has been endorsed and forwarded to the next signatory.${remarksSuffix}`
+          : `TA Request ${reqRef.trackingNumber || ''} has been returned with your remarks.${finalRemarks ? ` Reason: "${finalRemarks}"` : ''}`;
 
         window.dispatchEvent(
           new CustomEvent('taps:new-notification', {
@@ -360,10 +395,32 @@ function StaffDashboardContent() {
       .filter((s: any) => s.order < myRoleOrder)
       .every((s: any) => s.action === 'APPROVED');
 
-    return (
+    const isPendingForMyRole = (
       r.status === myPendingStatus ||
       (myStepObj?.action === 'PENDING' && (myRoleOrder === 1 || prevStepsApproved) && r.status !== 'REJECTED_MANUAL' && r.status !== 'REJECTED_OVERDUE' && r.status !== 'APPROVED')
     );
+
+    if (!isPendingForMyRole) return false;
+
+    // Scoped hierarchical routing check:
+    // If current verifier is a Section Chief, only show requests from their specific section
+    if (userRole === 'SECTION_CHIEF' && userSection && r.createdBy?.section) {
+      if (r.createdBy.section.trim().toLowerCase() !== userSection.trim().toLowerCase()) {
+        return false;
+      }
+    }
+
+    const effectiveUserDivision = userDivision || getDivisionForSection(userSection);
+    const effectiveReqDivision = r.createdBy?.division || getDivisionForSection(r.createdBy?.section);
+
+    // If current verifier is a Division Chief, only show requests from their specific division
+    if (userRole === 'DIVISION_CHIEF' && effectiveUserDivision && effectiveReqDivision) {
+      if (effectiveReqDivision.trim().toLowerCase() !== effectiveUserDivision.trim().toLowerCase()) {
+        return false;
+      }
+    }
+
+    return true;
   });
 
   const approvedCount = displayList.filter((r) => r.status === 'APPROVED').length;
@@ -441,12 +498,14 @@ function StaffDashboardContent() {
 
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                    POSITION & DIVISION
+                    POSITION & UNIT
                   </span>
                   <p className="font-bold text-slate-800">
-                    Environmental Management Specialist II
+                    {reviewRequest.createdBy?.position || 'Personnel'}
                   </p>
-                  <p className="text-[11px] text-slate-500">{reviewRequest.createdBy?.section || 'Conservation and Development'}</p>
+                  <p className="text-[11px] text-slate-500">
+                    {[reviewRequest.createdBy?.division, reviewRequest.createdBy?.section].filter(Boolean).join(' • ') || 'PENRO Agusan del Norte'}
+                  </p>
                 </div>
 
                 <div>
@@ -516,7 +575,29 @@ function StaffDashboardContent() {
 
             {/* 3. Attachments Card — Outlier Premium Design */}
             {(() => {
-              const attachments: { name: string; type: string; size: string; color: 'rose' | 'blue' | 'violet'; icon: 'doc' | 'mail' }[] = (reviewRequest as any).attachments || [];
+              const rawAttachments: any[] = (reviewRequest as any).attachments || [];
+              const attachments = rawAttachments.map((file) => {
+                const name = file.name || 'document';
+                const isWord = name.toLowerCase().endsWith('.doc') || name.toLowerCase().endsWith('.docx') || file.type?.includes('word');
+                const isPdf = name.toLowerCase().endsWith('.pdf') || file.type?.includes('pdf');
+                const color: 'rose' | 'blue' = isWord ? 'blue' : 'rose';
+                const typeLabel = isWord ? 'Word Document' : isPdf ? 'PDF Document' : (file.type || 'Document');
+                const badgeLabel = isWord ? 'DOC' : 'PDF';
+                const formattedSize = typeof file.size === 'number'
+                  ? file.size < 1024 * 1024
+                    ? `${(file.size / 1024).toFixed(1)} KB`
+                    : `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+                  : (file.size || '');
+                return {
+                  ...file,
+                  name,
+                  color,
+                  typeLabel,
+                  badgeLabel,
+                  formattedSize,
+                  icon: isWord ? 'doc' : 'doc',
+                };
+              });
               const hasFiles = attachments.length > 0;
               return (
                 <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
@@ -550,27 +631,40 @@ function StaffDashboardContent() {
                           violet: 'bg-violet-100 text-violet-600',
                         };
                         return (
-                          <div key={idx} className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300 cursor-pointer">
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              if (file.url) {
+                                window.open(file.url, '_blank', 'noopener,noreferrer');
+                              }
+                            }}
+                            title={`Click to open/download ${file.name}`}
+                            className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300 cursor-pointer"
+                          >
                             <div className="absolute inset-0 bg-gradient-to-br from-violet-50/0 to-violet-100/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                             <div className="relative p-4 flex items-center gap-3.5">
                               <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradients[file.color] || gradients.rose} flex items-center justify-center shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300`}>
-                                {file.icon === 'mail' ? (
-                                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                                ) : (
-                                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                )}
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                               </div>
                               <div className="min-w-0 flex-1">
-                                <h4 className="text-xs font-extrabold text-slate-900 truncate">{file.name}</h4>
-                                <p className="text-[10px] text-slate-500 mt-0.5 font-medium">{file.type}</p>
+                                <h4 className="text-xs font-extrabold text-slate-900 truncate" title={file.name}>{file.name}</h4>
+                                <p className="text-[10px] text-slate-500 mt-0.5 font-medium">{file.typeLabel}</p>
                                 <div className="flex items-center gap-2 mt-1.5">
-                                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${badgeColors[file.color] || badgeColors.rose}`}>PDF</span>
-                                  <span className="text-[9px] text-slate-400 font-medium">{file.size}</span>
+                                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${badgeColors[file.color] || badgeColors.rose}`}>{file.badgeLabel}</span>
+                                  <span className="text-[9px] text-slate-400 font-medium">{file.formattedSize}</span>
                                 </div>
                               </div>
-                              <div className="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-violet-600 flex items-center justify-center shrink-0 transition-colors duration-300">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (file.url) window.open(file.url, '_blank', 'noopener,noreferrer');
+                                }}
+                                title="Download / Open in new tab"
+                                className="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-violet-600 flex items-center justify-center shrink-0 transition-colors duration-300 cursor-pointer"
+                              >
                                 <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                              </div>
+                              </button>
                             </div>
                           </div>
                         );
@@ -614,9 +708,16 @@ function StaffDashboardContent() {
                 .filter((s: any) => s.order < myRoleOrder)
                 .every((s: any) => s.action === 'APPROVED');
 
+              const isMyUnit =
+                userRole === 'ADMIN' ||
+                userRole === 'HEAD_PENRO' ||
+                (userRole === 'SECTION_CHIEF' && (!userSection || !reviewRequest.createdBy?.section || reviewRequest.createdBy.section.trim().toLowerCase() === userSection.trim().toLowerCase())) ||
+                (userRole === 'DIVISION_CHIEF' && (!userDivision || !reviewRequest.createdBy?.division || reviewRequest.createdBy.division.trim().toLowerCase() === userDivision.trim().toLowerCase()));
+
               const requiresMyAction =
-                reviewRequest.status === myPendingStatus ||
-                (myStepObj?.action === 'PENDING' && (myRoleOrder === 1 || prevStepsApproved) && reviewRequest.status !== 'REJECTED_MANUAL' && reviewRequest.status !== 'REJECTED_OVERDUE' && reviewRequest.status !== 'APPROVED');
+                isMyUnit &&
+                (reviewRequest.status === myPendingStatus ||
+                (myStepObj?.action === 'PENDING' && (myRoleOrder === 1 || prevStepsApproved) && reviewRequest.status !== 'REJECTED_MANUAL' && reviewRequest.status !== 'REJECTED_OVERDUE' && reviewRequest.status !== 'APPROVED'));
 
               if (requiresMyAction) {
                 // ── ACTIVE ACTION PANEL ──────────────────────────────────
@@ -677,9 +778,16 @@ function StaffDashboardContent() {
                       <div className="flex items-center gap-3 pt-2">
                         <button
                           type="button"
-                          onClick={() => handleAction('REJECTED')}
+                          onClick={() => {
+                            if (!remarks.trim()) {
+                              setActionError('');
+                              setShowRejectModal(true);
+                            } else {
+                              handleAction('REJECTED');
+                            }
+                          }}
                           disabled={actionLoading}
-                          className="flex-1 py-2.5 rounded-xl border border-rose-300 text-rose-700 bg-white hover:bg-rose-50 text-xs font-bold transition-all shadow-2xs"
+                          className="flex-1 py-2.5 rounded-xl border border-rose-300 text-rose-700 bg-white hover:bg-rose-50 text-xs font-bold transition-all shadow-2xs cursor-pointer"
                         >
                           Return
                         </button>
@@ -758,6 +866,13 @@ function StaffDashboardContent() {
                           No further action needed from you on this request.
                         </p>
                       </>
+                    ) : !isMyUnit ? (
+                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                        <p className="text-xs font-bold text-amber-900">Different Unit Assignment</p>
+                        <p className="text-[11px] text-amber-800 mt-1">
+                          This request belongs to {reviewRequest.createdBy?.section || reviewRequest.createdBy?.division || 'another unit'} and is assigned to their designated Chief.
+                        </p>
+                      </div>
                     ) : (
                       <p className="text-xs text-slate-500">
                         This request has not yet reached your review step. You will be notified when it requires your action.
@@ -819,6 +934,91 @@ function StaffDashboardContent() {
                     className="px-6 py-2.5 rounded-xl bg-[#0F4C2E] hover:bg-[#165E3A] text-white text-xs font-bold shadow-md disabled:opacity-50 transition-all"
                   >
                     {actionLoading ? 'Affixing Signature...' : 'Affix Signature'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Reject / Return Confirmation Modal */}
+        {showRejectModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+            <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+              <div className="bg-rose-700 text-white p-4 font-bold text-sm flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <svg className="w-5 h-5 text-rose-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span>Return Request for Revision</span>
+                </div>
+                <button
+                  onClick={() => setShowRejectModal(false)}
+                  className="text-rose-200 hover:text-white font-bold text-sm cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4">
+                {reviewRequest && (
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400 font-semibold">Reference:</span>
+                      <span className="font-mono font-bold text-slate-800">{reviewRequest.trackingNumber}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400 font-semibold">Employee:</span>
+                      <span className="font-bold text-slate-800">{reviewRequest.createdBy?.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400 font-semibold">Destination:</span>
+                      <span className="font-bold text-slate-800">{reviewRequest.destination}</span>
+                    </div>
+                  </div>
+                )}
+
+                {actionError && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-semibold text-rose-800">
+                    {actionError}
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    Reason for Return / Revision Instructions <span className="text-rose-600">*</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={remarks}
+                    onChange={(e) => {
+                      setRemarks(e.target.value);
+                      if (actionError) setActionError('');
+                    }}
+                    placeholder="E.g., Please adjust travel dates or provide further travel justification..."
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-rose-500"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    This reason will be sent immediately via SMS and in-app notification to the employee.
+                  </p>
+                </div>
+
+                <div className="flex justify-end items-center gap-3 pt-3 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowRejectModal(false)}
+                    className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={actionLoading || !remarks.trim()}
+                    onClick={() => handleAction('REJECTED')}
+                    className="px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md disabled:opacity-50 transition-all cursor-pointer"
+                  >
+                    {actionLoading ? 'Returning...' : 'Confirm Return'}
                   </button>
                 </div>
               </div>
@@ -1007,7 +1207,12 @@ function StaffDashboardContent() {
                   {displayList.map((req, idx) => (
                     <tr key={req.id || idx} className="hover:bg-slate-50/80 transition-colors">
                       <td className="py-4 font-bold text-slate-900">
-                        {req.createdBy?.name || 'Maria Santos'}
+                        <div>{req.createdBy?.name || 'Maria Santos'}</div>
+                        {(req.createdBy?.section || req.createdBy?.division) && (
+                          <div className="text-[10px] text-slate-400 font-normal mt-0.5">
+                            {[req.createdBy?.division, req.createdBy?.section].filter(Boolean).join(' • ')}
+                          </div>
+                        )}
                       </td>
                       <td className="py-4 max-w-xs">
                         <p className="font-bold text-slate-800 truncate">{req.destination}</p>
@@ -1188,7 +1393,21 @@ function StaffDashboardContent() {
                         </td>
                         <td className="py-4 px-4 font-bold text-slate-900">
                           <div>{req.createdBy?.name || 'Maria Santos'}</div>
-                          <div className="text-[10px] text-slate-400 font-mono mt-0.5">ID-2021-045</div>
+                          <div className="text-[10px] text-slate-400 font-mono mt-0.5">{req.trackingNumber}</div>
+                          {(req.createdBy?.section || req.createdBy?.division) && (
+                            <div className="mt-1 flex flex-wrap gap-1">
+                              {req.createdBy?.division && (
+                                <span className="inline-block px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[9px] font-semibold">
+                                  {req.createdBy.division}
+                                </span>
+                              )}
+                              {req.createdBy?.section && (
+                                <span className="inline-block px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-semibold border border-emerald-200">
+                                  {req.createdBy.section}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </td>
                         <td className="py-4 px-4 font-bold text-slate-800">{req.destination}</td>
                         <td className="py-4 px-4 text-slate-600 max-w-xs leading-relaxed">{req.purpose}</td>
@@ -1211,9 +1430,11 @@ function StaffDashboardContent() {
                           <button
                             onClick={() => {
                               setReviewRequest(req);
-                              handleAction('REJECTED');
+                              setRemarks('');
+                              setActionError('');
+                              setShowRejectModal(true);
                             }}
-                            className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition-colors shadow-2xs"
+                            className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition-colors shadow-2xs cursor-pointer"
                           >
                             Disapprove
                           </button>
@@ -1732,6 +1953,31 @@ function StaffDashboardContent() {
                         </span>
                       </div>
                       <p className="text-xs text-slate-600 mt-1">{notif.message}</p>
+                      {(() => {
+                        const match = notif.message?.match(/(?:Remarks|Reason):\s*"([^"]+)"/i);
+                        let remarksText = match ? match[1] : null;
+                        if (!remarksText && linkedRequest?.approvalSteps) {
+                          const actedWithRemarks = linkedRequest.approvalSteps
+                            .filter((s: any) => s.remarks && (s.action === 'APPROVED' || s.action === 'REJECTED'))
+                            .sort((a: any, b: any) => (b.order || 0) - (a.order || 0));
+                          if (actedWithRemarks[0]?.remarks) remarksText = actedWithRemarks[0].remarks;
+                        }
+                        if (!remarksText) return null;
+
+                        return (
+                          <div className="mt-2.5 p-2.5 bg-slate-50/90 rounded-xl border border-slate-200/80 text-xs text-slate-700 shadow-2xs">
+                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#0B5A3A] uppercase tracking-wider mb-1">
+                              <svg className="w-3.5 h-3.5 text-[#0B5A3A] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                              </svg>
+                              <span>Signatory Remarks:</span>
+                            </div>
+                            <p className="italic text-slate-800 font-medium pl-5">
+                              &ldquo;{remarksText}&rdquo;
+                            </p>
+                          </div>
+                        );
+                      })()}
                       {(linkedRequest || notif.requestId) && (
                         <div className="flex items-center justify-end mt-2">
                           <span className="text-[10px] font-bold text-[#0B5A3A] flex items-center gap-0.5">

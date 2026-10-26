@@ -36,6 +36,8 @@ export interface NotifyUserParams {
 
 export interface NotifyRoleParams {
   role: Role | 'SECTION_CHIEF' | 'DIVISION_CHIEF' | 'HEAD_PENRO' | 'ADMIN' | 'ACCOUNT_MANAGER';
+  section?: string | null;
+  division?: string | null;
   requestId?: string;
   title: string;
   message: string;
@@ -395,6 +397,8 @@ export async function notifyUser({
  */
 export async function notifyRole({
   role,
+  section,
+  division,
   requestId,
   title,
   message,
@@ -405,15 +409,35 @@ export async function notifyRole({
   try {
     let targetUsers: Array<{ id: string; phoneNumber?: string; email?: string; name?: string }> = [];
 
-    // 1. Fetch matching active users via Prisma
+    // 1. Fetch matching active users via Prisma (with optional section/division scoping)
     try {
+      const whereClause: any = {
+        role: role as Role,
+        status: 'ACTIVE',
+      };
+
+      if (section && role === 'SECTION_CHIEF') {
+        whereClause.section = { equals: section.trim(), mode: 'insensitive' };
+      }
+      if (division && role === 'DIVISION_CHIEF') {
+        whereClause.division = { equals: division.trim(), mode: 'insensitive' };
+      }
+
       targetUsers = await prisma.user.findMany({
-        where: {
-          role: role as Role,
-          status: 'ACTIVE',
-        },
+        where: whereClause,
         select: { id: true, name: true, phoneNumber: true, email: true },
       });
+
+      // If scoped search found no one (e.g. unit chief not assigned yet), fallback to role-wide
+      if (targetUsers.length === 0 && (section || division)) {
+        targetUsers = await prisma.user.findMany({
+          where: {
+            role: role as Role,
+            status: 'ACTIVE',
+          },
+          select: { id: true, name: true, phoneNumber: true, email: true },
+        });
+      }
     } catch (err) {
       console.warn('[notifyRole] Prisma fetch fallback to Supabase...', err);
     }
@@ -421,14 +445,31 @@ export async function notifyRole({
     // 2. Fallback to Supabase REST if Prisma was empty or failed
     if (targetUsers.length === 0 && supabaseUrl && supabaseKey) {
       try {
-        const { data: sbUsers } = await supabase
+        let sbQuery = supabase
           .from('User')
-          .select('id, name, phoneNumber, email')
+          .select('id, name, phoneNumber, email, section, division')
           .eq('role', role)
           .eq('status', 'ACTIVE');
 
+        if (section && role === 'SECTION_CHIEF') {
+          sbQuery = sbQuery.ilike('section', section.trim());
+        }
+        if (division && role === 'DIVISION_CHIEF') {
+          sbQuery = sbQuery.ilike('division', division.trim());
+        }
+
+        const { data: sbUsers } = await sbQuery;
         if (sbUsers && sbUsers.length > 0) {
           targetUsers = sbUsers;
+        } else {
+          const { data: allRoleUsers } = await supabase
+            .from('User')
+            .select('id, name, phoneNumber, email')
+            .eq('role', role)
+            .eq('status', 'ACTIVE');
+          if (allRoleUsers && allRoleUsers.length > 0) {
+            targetUsers = allRoleUsers;
+          }
         }
       } catch (sbErr) {
         console.error('[notifyRole] Supabase role query error:', sbErr);

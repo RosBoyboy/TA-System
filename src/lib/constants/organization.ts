@@ -62,3 +62,17 @@ export function divisionRequiresSection(divisionName?: string | null): boolean {
   const division = findOfficialDivision(divisionName);
   return !!division && division.sections.length > 0;
 }
+
+/**
+ * Automatically infers the parent Division for a given Section name.
+ */
+export function getDivisionForSection(sectionName?: string | null): string | undefined {
+  if (!sectionName) return undefined;
+  const cleanSec = sectionName.trim().toLowerCase();
+  for (const div of OFFICIAL_DIVISIONS) {
+    if (div.sections.some((s) => s.name.trim().toLowerCase() === cleanSec)) {
+      return div.name;
+    }
+  }
+  return undefined;
+}

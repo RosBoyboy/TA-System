@@ -80,14 +80,26 @@ export function useRealtimeNotifications(userId: string | null | undefined) {
           // this is a real-time push — we know it literally just happened
           const clientNow = new Date().toISOString();
 
+          const normalizedTitle = (newRow.title || 'New Notification')
+            .replace(/\bTravel Authority\b/g, 'Travel Order')
+            .replace(/\bTA Request\b/g, 'TO Request')
+            .replace(/\bTA Requests\b/g, 'TO Requests')
+            .replace(/\bTA\b/g, 'TO');
+
+          const normalizedMessage = (newRow.message || '')
+            .replace(/\bTravel Authority\b/g, 'Travel Order')
+            .replace(/\bTA Request\b/g, 'TO Request')
+            .replace(/\bTA Requests\b/g, 'TO Requests')
+            .replace(/\bTA\b/g, 'TO');
+
           // Dispatch the existing custom event that layout.tsx already listens for
           if (typeof window !== 'undefined') {
             window.dispatchEvent(
               new CustomEvent('taps:new-notification', {
                 detail: {
                   id: newRow.id,
-                  title: newRow.title || 'New Notification',
-                  message: newRow.message || '',
+                  title: normalizedTitle,
+                  message: normalizedMessage,
                   createdAt: clientNow,
                   requestId: newRow.requestId || null,
                   type: newRow.type || 'GENERAL',

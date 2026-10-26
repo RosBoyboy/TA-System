@@ -60,7 +60,10 @@ export async function generatePopulatedTravelOrderDocx(req: TARequestDTO): Promi
   // 1. Employee Name (Single source of truth from Step 2 / createdBy)
   const employeeName = req.createdBy?.name || 'Juan Dela Cruz';
   const employeePosition = (req.createdBy as any)?.position || 'Administrative Officer V';
-  const employeeSection = req.createdBy?.section || 'Technical Services Division';
+  const employeeDivision = req.createdBy?.division;
+  const isMSD = employeeDivision?.toLowerCase().includes('management');
+  const defaultDivTitle = isMSD ? 'Chief, Management Services Division' : 'Chief, Technical Services Division';
+  const employeeSection = req.createdBy?.section || (isMSD ? 'Management Services Division' : 'Technical Services Division');
   const trackingNumber = req.trackingNumber ? req.trackingNumber.replace('TA-', 'TO-') : 'TO-2026-0001';
   const dateFiled = formatOfficialDate(req.createdAt);
   const departureDate = formatShortDate(req.startDate);
@@ -72,11 +75,11 @@ export async function generatePopulatedTravelOrderDocx(req: TARequestDTO): Promi
   const step2 = req.approvalSteps?.find((s: any) => s.order === 2);
   const step3 = req.approvalSteps?.find((s: any) => s.order === 3);
 
-  const divChiefName = "DIVISION CHIEF's name";
-  const divChiefPosition = (step2?.approver as any)?.position || 'Chief, Technical Services Division';
+  const divChiefName = step2?.approver?.name || "DIVISION CHIEF's name";
+  const divChiefPosition = (step2?.approver as any)?.position || defaultDivTitle;
 
-  const penroName = "HEAD OF PENRO's name";
-  const penroPosition = (step3?.approver as any)?.position || 'OIC, PENR Officer';
+  const penroName = step3?.approver?.name || "HEAD OF PENRO's name";
+  const penroPosition = (step3?.approver as any)?.position || 'Provincial Environment and Natural Resources Officer';
   const dateApproved = formatOfficialDate(step3?.actionDate || req.updatedAt || req.createdAt);
 
   // Replacements in word/document.xml

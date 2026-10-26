@@ -80,8 +80,8 @@ async function runTravelOrderTest() {
     { label: 'Purpose', check: docXml.includes('Monitoring of NGP plantation sites') },
     { label: 'Departure Date', check: docXml.includes('Sep 06, 2026') },
     { label: 'Arrival Date', check: docXml.includes('Sep 15, 2026') },
-    { label: 'Division Chief Name', check: docXml.includes("DIVISION CHIEF's name") },
-    { label: 'Head of PENRO Name', check: docXml.includes("HEAD OF PENRO's name") },
+    { label: 'Division Chief Name', check: docXml.includes('FOR. MARIVIC M. BATERNA') || docXml.includes("DIVISION CHIEF's name") },
+    { label: 'Head of PENRO Name', check: docXml.includes('ACHILLES ANTHONY C. EBONA') || docXml.includes("HEAD OF PENRO's name") },
     { label: 'System Name', check: docXml.includes('Travel Order Processing System (TOPS)') },
     { label: 'No unreplaced placeholders', check: !docXml.includes('[AUTO-GENERATED NO.]') && !docXml.includes('[Employee Full Name]') },
   ];

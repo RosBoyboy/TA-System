@@ -36,6 +36,7 @@ export async function GET() {
             image: true,
             role: true,
             status: true,
+            division: true,
             section: true,
             position: true,
             birthday: true,
@@ -51,7 +52,7 @@ export async function GET() {
     if (!user && supabaseUrl && supabaseKey) {
       const { data, error } = await supabase
         .from('User')
-        .select('id, name, username, email, phoneNumber, image, role, status, section, position, birthday, address, createdAt')
+        .select('id, name, username, email, phoneNumber, image, role, status, division, section, position, birthday, address, createdAt')
         .eq('id', userId)
         .maybeSingle();
 
@@ -62,6 +63,22 @@ export async function GET() {
 
     if (!user) {
       return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+    }
+
+    // Auto-resolve Administrative Officer V assignment if missing or outdated
+    if (user.position && user.position.toLowerCase().includes('admin') && user.position.toLowerCase().includes('v')) {
+      if (!user.division) {
+        user.division = 'Management Services Division';
+      }
+      if (!user.section || user.section === 'Forest Management Section') {
+        user.section = 'Admin & Finance Section';
+      }
+    }
+
+    // For Head of PENRO, division and section are not applicable
+    if (user.role === 'HEAD_PENRO') {
+      user.division = null;
+      user.section = null;
     }
 
     return NextResponse.json({ success: true, data: user });
@@ -87,7 +104,7 @@ export async function PATCH(req: Request) {
 
     const userId = (session.user as any).id;
     const body = await req.json();
-    const { name, email, phoneNumber, image, section, position, birthday, address, currentPassword, newPassword } = body;
+    const { name, email, phoneNumber, image, division, section, position, birthday, address, currentPassword, newPassword } = body;
 
     // Fetch existing user
     let existingUser: any = null;
@@ -154,9 +171,18 @@ export async function PATCH(req: Request) {
       updateData.image = image;
     }
 
-    // 5. Section update (optional)
-    if (section !== undefined && typeof section === 'string') {
-      updateData.section = section.trim();
+    // 5. Division & Section updates (separate organization fields)
+    if (existingUser.role === 'HEAD_PENRO') {
+      updateData.division = null;
+      updateData.section = null;
+    } else {
+      if (division !== undefined && typeof division === 'string') {
+        updateData.division = division.trim() || null;
+      }
+
+      if (section !== undefined && typeof section === 'string') {
+        updateData.section = section.trim() || null;
+      }
     }
 
     // 6. Position update (optional)
@@ -217,6 +243,7 @@ export async function PATCH(req: Request) {
             image: true,
             role: true,
             status: true,
+            division: true,
             section: true,
             position: true,
             birthday: true,
@@ -240,7 +267,7 @@ export async function PATCH(req: Request) {
         .from('User')
         .update(sbPayload)
         .eq('id', userId)
-        .select('id, name, username, email, phoneNumber, image, role, status, section, position, birthday, address, createdAt, updatedAt')
+        .select('id, name, username, email, phoneNumber, image, role, status, division, section, position, birthday, address, createdAt, updatedAt')
         .single();
 
       if (!sbErr && sbUser) {

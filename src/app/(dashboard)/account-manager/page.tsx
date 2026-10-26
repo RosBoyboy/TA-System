@@ -5,6 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import DynamicMapPicker from '@/components/map/DynamicMapPicker';
 import { formatNominatimAddress } from '@/utils/address';
 import SignaturePad from '@/components/signature/SignaturePad';
+import SupportingDocumentsUpload from '@/components/travel-order/SupportingDocumentsUpload';
+import { AttachmentDTO } from '@/types';
 
 interface UserRecord {
   id: string;
@@ -267,6 +269,14 @@ function AccountManagerContent() {
   const router = useRouter();
   const activeTab = searchParams.get('tab') || 'dashboard';
 
+  useEffect(() => {
+    if (activeTab === 'requests') {
+      router.replace('/employee?tab=requests');
+    } else if (activeTab === 'schedule' || activeTab === 'travel-dates') {
+      router.replace('/employee?tab=schedule');
+    }
+  }, [activeTab, router]);
+
   // System Users State
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [counts, setCounts] = useState({
@@ -344,25 +354,26 @@ function AccountManagerContent() {
   const getInitialCreateForm = () => ({
     departureDate: '',
     returnDate: '',
-    employeeName: 'Account Manager User',
-    position: 'Account Manager',
-    designation: 'System Administrator / Account Manager',
+    employeeName: '',
+    position: '',
+    designation: '',
     travelArea: 'WITHIN AOR',
     destination: '',
     destinationLat: 14.275,
     destinationLng: 121.415,
     purpose: '',
     salaryGrade: '18',
-    division: 'Management Services Division',
-    station: 'PENRO Laguna',
+    division: 'Admin & Finance Section (Management Services Division)',
+    station: 'PENRO ADN PLANNING',
     employmentStatus: 'Permanent',
-    office: 'PENRO Laguna Main Station',
-    signatoryStation: 'PENRO Main Station',
-    perDiems: 'Standard Per Diem Allowed',
-    appropriations: 'Regular Operational Fund',
+    office: 'PENRO ADN',
+    signatoryStation: 'PENRO ADN PLANNING',
+    perDiems: '',
+    appropriations: '',
     remarks: '',
-    certification: 'I hereby certify that the travel requested is necessary for official public service.',
-    contactNumber: '09170000000',
+    certification: '',
+    contactNumber: '09063951218',
+    attachments: [] as AttachmentDTO[],
   });
 
   const [createForm, setCreateForm] = useState(() => getInitialCreateForm());
@@ -550,11 +561,15 @@ function AccountManagerContent() {
   const handleEmployeeSelect = (name: string) => {
     const emp = employeeList.find((item) => item.name === name);
     const pos = emp?.position || '';
+    const div = (emp as any)?.section && (emp as any)?.division
+      ? `${(emp as any).section} (${(emp as any).division})`
+      : ((emp as any)?.division || '');
     setCreateForm((prev) => ({
       ...prev,
       employeeName: name,
       position: pos,
       designation: pos,
+      ...(div ? { division: div } : {}),
     }));
   };
 
@@ -688,17 +703,20 @@ function AccountManagerContent() {
   const handleCreateAccountSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!newAccountData.division) {
-      showToast('Please select an official Division.', 'error');
-      return;
-    }
-
+    const isHeadPenro = newAccountData.role === 'HEAD_PENRO';
     const selectedDivisionObj = orgDivisions.find((d) => d.name === newAccountData.division);
-    const requiresSection = selectedDivisionObj && selectedDivisionObj.sections && selectedDivisionObj.sections.length > 0;
+    const requiresSection = !isHeadPenro && !!(selectedDivisionObj && selectedDivisionObj.sections && selectedDivisionObj.sections.length > 0);
 
-    if (requiresSection && !newAccountData.section) {
-      showToast('Please select a Section under the selected Division.', 'error');
-      return;
+    if (!isHeadPenro) {
+      if (!newAccountData.division) {
+        showToast('Please select an official Division.', 'error');
+        return;
+      }
+
+      if (requiresSection && !newAccountData.section) {
+        showToast('Please select a Section under the selected Division.', 'error');
+        return;
+      }
     }
 
     if (!newAccountData.position.trim()) {
@@ -727,8 +745,8 @@ function AccountManagerContent() {
           email: newAccountData.email.trim(),
           phoneNumber: newAccountData.phoneNumber.trim(),
           role: newAccountData.role,
-          division: newAccountData.division.trim(),
-          section: requiresSection && newAccountData.section ? newAccountData.section.trim() : null,
+          division: isHeadPenro ? null : newAccountData.division.trim(),
+          section: isHeadPenro ? null : (requiresSection && newAccountData.section ? newAccountData.section.trim() : null),
           position: newAccountData.position.trim(),
           signatureData: newAccountData.signatureData,
           status: 'ACTIVE',
@@ -785,6 +803,7 @@ function AccountManagerContent() {
           destinationLng: createForm.destinationLng,
           startDate: createForm.departureDate,
           endDate: createForm.returnDate,
+          attachments: createForm.attachments,
           submitImmediately: true,
         }),
       });
@@ -1548,82 +1567,112 @@ function AccountManagerContent() {
                     {/* Section 2: Organizational Assignment */}
                     <div className="pt-2 border-t border-slate-100">
                       <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">2. Organizational Assignment</h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">Division *</label>
-                          <select
-                            required
-                            value={newAccountData.division}
-                            onChange={(e) => {
-                              const newDiv = e.target.value;
-                              setNewAccountData((prev) => ({
-                                ...prev,
-                                division: newDiv,
-                                section: '', // Clear dependent section on division switch
-                              }));
-                            }}
-                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#0F4C2E]"
-                          >
-                            <option value="">Select Division...</option>
-                            {orgDivisions.map((div) => (
-                              <option key={div.id} value={div.name}>
-                                {div.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                      {newAccountData.role === 'HEAD_PENRO' ? (
+                        <div className="space-y-4">
+                          <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-950 flex items-start gap-2.5">
+                            <svg className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            <div>
+                              <p className="font-bold text-emerald-900">PENRO Executive Office (Head of Office)</p>
+                              <p className="mt-0.5 text-emerald-800 text-[11px] leading-relaxed">
+                                As the Head of Office and Final Approving Authority, the Head of PENRO oversees all operations across both Management Services Division and Technical Services Division. Division and Section selections are not required.
+                              </p>
+                            </div>
+                          </div>
 
-                        <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">
-                            Section {(() => {
-                              const selDiv = orgDivisions.find((d) => d.name === newAccountData.division);
-                              if (!newAccountData.division) return <span className="text-slate-400 font-normal">(Select Division first)</span>;
-                              if (selDiv && (!selDiv.sections || selDiv.sections.length === 0)) return <span className="text-emerald-700 font-normal">(No section required)</span>;
-                              return <span className="text-rose-500">*</span>;
-                            })()}
-                          </label>
-                          {(() => {
-                            const selDiv = orgDivisions.find((d) => d.name === newAccountData.division);
-                            const divHasSections = selDiv && selDiv.sections && selDiv.sections.length > 0;
-                            return (
-                              <select
-                                required={!!divHasSections}
-                                disabled={!newAccountData.division || !divHasSections}
-                                value={newAccountData.section}
-                                onChange={(e) => setNewAccountData({ ...newAccountData, section: e.target.value })}
-                                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#0F4C2E] disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                <option value="">
-                                  {!newAccountData.division
-                                    ? 'Choose a Division above'
-                                    : !divHasSections
-                                    ? 'No section required for this division'
-                                    : 'Select Dependent Section...'}
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Position * <span className="text-slate-400 font-normal">(Official Designation)</span>
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={newAccountData.position}
+                              onChange={(e) => setNewAccountData({ ...newAccountData, position: e.target.value })}
+                              placeholder="e.g. Provincial Environment and Natural Resources Officer"
+                              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">Division *</label>
+                            <select
+                              required
+                              value={newAccountData.division}
+                              onChange={(e) => {
+                                const newDiv = e.target.value;
+                                setNewAccountData((prev) => ({
+                                  ...prev,
+                                  division: newDiv,
+                                  section: '', // Clear dependent section on division switch
+                                }));
+                              }}
+                              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                            >
+                              <option value="">Select Division...</option>
+                              {orgDivisions.map((div) => (
+                                <option key={div.id} value={div.name}>
+                                  {div.name}
                                 </option>
-                                {(selDiv?.sections || []).map((sec) => (
-                                  <option key={sec.id} value={sec.name}>
-                                    {sec.name}
-                                  </option>
-                                ))}
-                              </select>
-                            );
-                          })()}
-                        </div>
+                              ))}
+                            </select>
+                          </div>
 
-                        <div className="sm:col-span-2">
-                          <label className="block text-xs font-bold text-slate-700 mb-1">
-                            Position * <span className="text-slate-400 font-normal">(Manually entered)</span>
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={newAccountData.position}
-                            onChange={(e) => setNewAccountData({ ...newAccountData, position: e.target.value })}
-                            placeholder="e.g. Environmental Specialist / Forest Ranger / Administrative Officer"
-                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
-                          />
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Section {(() => {
+                                const selDiv = orgDivisions.find((d) => d.name === newAccountData.division);
+                                if (!newAccountData.division) return <span className="text-slate-400 font-normal">(Select Division first)</span>;
+                                if (selDiv && (!selDiv.sections || selDiv.sections.length === 0)) return <span className="text-emerald-700 font-normal">(No section required)</span>;
+                                return <span className="text-rose-500">*</span>;
+                              })()}
+                            </label>
+                            {(() => {
+                              const selDiv = orgDivisions.find((d) => d.name === newAccountData.division);
+                              const divHasSections = selDiv && selDiv.sections && selDiv.sections.length > 0;
+                              return (
+                                <select
+                                  required={!!divHasSections}
+                                  disabled={!newAccountData.division || !divHasSections}
+                                  value={newAccountData.section}
+                                  onChange={(e) => setNewAccountData({ ...newAccountData, section: e.target.value })}
+                                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#0F4C2E] disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  <option value="">
+                                    {!newAccountData.division
+                                      ? 'Choose a Division above'
+                                      : !divHasSections
+                                      ? 'No section required for this division'
+                                      : 'Select Dependent Section...'}
+                                  </option>
+                                  {(selDiv?.sections || []).map((sec) => (
+                                    <option key={sec.id} value={sec.name}>
+                                      {sec.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              );
+                            })()}
+                          </div>
+
+                          <div className="sm:col-span-2">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Position * <span className="text-slate-400 font-normal">(Manually entered)</span>
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={newAccountData.position}
+                              onChange={(e) => setNewAccountData({ ...newAccountData, position: e.target.value })}
+                              placeholder="e.g. Environmental Specialist / Forest Ranger / Administrative Officer"
+                              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                            />
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
 
                     {/* Section 3: E-Signature Capture */}
@@ -2070,7 +2119,7 @@ function AccountManagerContent() {
 
                       <div className="md:col-span-2">
                         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                          <span>Position / Designation</span>
+                          <span>Position</span>
                           <span className="text-[10px] font-bold text-[#0F4C2E] bg-emerald-100/90 border border-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1">
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -2082,7 +2131,7 @@ function AccountManagerContent() {
                           type="text"
                           readOnly
                           value={createForm.position || createForm.designation || ''}
-                          placeholder="Position/Designation will automatically populate upon selecting an employee above..."
+                          placeholder="Position will automatically populate upon selecting an employee above..."
                           className="w-full px-4 py-2.5 bg-slate-100/90 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none cursor-not-allowed select-none shadow-2xs"
                         />
                         <p className="text-[10px] text-slate-400 mt-1">Automatically retrieved from the employee database record.</p>
@@ -2221,7 +2270,7 @@ function AccountManagerContent() {
                           type="text"
                           value={createForm.salaryGrade}
                           onChange={(e) => setCreateForm({ ...createForm, salaryGrade: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none"
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
                         />
                       </div>
                       <div>
@@ -2230,7 +2279,7 @@ function AccountManagerContent() {
                           type="text"
                           value={createForm.division}
                           onChange={(e) => setCreateForm({ ...createForm, division: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none"
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
                         />
                       </div>
                       <div>
@@ -2239,7 +2288,7 @@ function AccountManagerContent() {
                           type="text"
                           value={createForm.station}
                           onChange={(e) => setCreateForm({ ...createForm, station: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none"
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
                         />
                       </div>
                       <div>
@@ -2248,7 +2297,7 @@ function AccountManagerContent() {
                           type="text"
                           value={createForm.employmentStatus}
                           onChange={(e) => setCreateForm({ ...createForm, employmentStatus: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none"
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
                         />
                       </div>
                       <div>
@@ -2257,7 +2306,7 @@ function AccountManagerContent() {
                           type="text"
                           value={createForm.office}
                           onChange={(e) => setCreateForm({ ...createForm, office: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none"
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
                         />
                       </div>
                       <div>
@@ -2266,65 +2315,85 @@ function AccountManagerContent() {
                           type="text"
                           value={createForm.signatoryStation}
                           onChange={(e) => setCreateForm({ ...createForm, signatoryStation: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none"
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-4 pt-2">
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Per Diems/Expense Allowed</label>
+                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                          Per Diems/Expense Allowed
+                        </label>
                         <input
                           type="text"
                           value={createForm.perDiems}
                           onChange={(e) => setCreateForm({ ...createForm, perDiems: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none"
+                          placeholder="Enter per diems information..."
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Appropriations</label>
+                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                          Appropriations to which travel should be charged
+                        </label>
                         <input
                           type="text"
                           value={createForm.appropriations}
                           onChange={(e) => setCreateForm({ ...createForm, appropriations: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none"
+                          placeholder="Enter appropriations Information..."
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Remarks or Special Instructions</label>
+                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                          Remarks or Special Instructions
+                        </label>
                         <textarea
                           rows={3}
                           value={createForm.remarks}
                           onChange={(e) => setCreateForm({ ...createForm, remarks: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none"
+                          placeholder="Enter any remarks or special instructions..."
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Contact Number</label>
+                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                          Certification
+                        </label>
+                        <input
+                          type="text"
+                          value={createForm.certification}
+                          onChange={(e) => setCreateForm({ ...createForm, certification: e.target.value })}
+                          placeholder="Enter certification details..."
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                          Contact Number
+                        </label>
                         <input
                           type="text"
                           value={createForm.contactNumber}
                           onChange={(e) => setCreateForm({ ...createForm, contactNumber: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none"
+                          placeholder="Enter contact number..."
+                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
                         />
                       </div>
 
                       <div className="pt-2">
                         <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                          Supporting Documents * (e.g. Invitation Letter, Memorandum)
+                          Supporting Documents * (e.g., Invitation Letter, Memorandum, Program of Activities)
                         </label>
-                        <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer">
-                          <div className="w-10 h-10 rounded-full bg-slate-200/60 text-slate-500 flex items-center justify-center mx-auto mb-2">
-                            <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                            </svg>
-                          </div>
-                          <p className="text-xs font-bold text-slate-700">Click to upload files or drag and drop</p>
-                          <p className="text-[10px] text-slate-400 mt-1">PDF, DOC, DOCX, JPG, PNG (Max 25MB)</p>
-                        </div>
+                        <SupportingDocumentsUpload
+                          attachments={createForm.attachments}
+                          onChange={(newAtts) => setCreateForm((prev) => ({ ...prev, attachments: newAtts }))}
+                        />
                       </div>
                     </div>
                   </div>
@@ -2347,6 +2416,28 @@ function AccountManagerContent() {
                         <p className="text-slate-700">Dates: {createForm.departureDate} to {createForm.returnDate}</p>
                         <p className="text-slate-600">Purpose: {createForm.purpose}</p>
                         <p className="text-slate-500">Employee: {createForm.employeeName} ({createForm.position})</p>
+                        {createForm.perDiems && <p className="text-slate-500">Per Diems: {createForm.perDiems}</p>}
+                        {createForm.appropriations && <p className="text-slate-500">Appropriations: {createForm.appropriations}</p>}
+                        {createForm.remarks && <p className="text-slate-500">Remarks: {createForm.remarks}</p>}
+                        {createForm.certification && <p className="text-slate-500">Certification: {createForm.certification}</p>}
+                        {createForm.contactNumber && <p className="text-slate-500">Contact: {createForm.contactNumber}</p>}
+                        <div className="pt-2 border-t border-slate-200">
+                          <p className="font-bold text-slate-700 mb-1">
+                            Supporting Documents: {createForm.attachments && createForm.attachments.length > 0 ? `${createForm.attachments.length} attached` : 'None attached'}
+                          </p>
+                          {createForm.attachments && createForm.attachments.length > 0 && (
+                            <div className="space-y-1">
+                              {createForm.attachments.map((doc, idx) => (
+                                <div key={doc.id || idx} className="flex items-center justify-between text-slate-600 bg-white p-2 rounded-lg border border-slate-200">
+                                  <span className="font-medium truncate">{doc.name}</span>
+                                  <span className="text-[10px] text-slate-400">
+                                    {typeof doc.size === 'number' ? `${(doc.size / (1024 * 1024)).toFixed(1)} MB` : (doc.size || '')}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

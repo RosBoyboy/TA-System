@@ -44,11 +44,15 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
   const step2 = request.approvalSteps?.find((s: any) => s.order === 2);
   const step3 = request.approvalSteps?.find((s: any) => s.order === 3);
 
-  const divChiefName = "DIVISION CHIEF's name";
-  const divChiefPosition = (step2?.approver as any)?.position || 'Chief, Technical Services Division';
+  const employeeDivision = request.createdBy?.division;
+  const isMSD = employeeDivision?.toLowerCase().includes('management');
+  const defaultDivTitle = isMSD ? 'Chief, Management Services Division' : 'Chief, Technical Services Division';
 
-  const penroName = "HEAD OF PENRO's name";
-  const penroPosition = (step3?.approver as any)?.position || 'OIC, PENR Officer';
+  const divChiefName = step2?.approver?.name || "DIVISION CHIEF's name";
+  const divChiefPosition = (step2?.approver as any)?.position || defaultDivTitle;
+
+  const penroName = step3?.approver?.name || "HEAD OF PENRO's name";
+  const penroPosition = (step3?.approver as any)?.position || 'Provincial Environment and Natural Resources Officer';
   const dateApproved = formatDocDate(step3?.actionDate || request.updatedAt || request.createdAt);
 
   const handlePrint = () => {
@@ -94,10 +98,25 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
               padding-bottom: 8px;
               margin-bottom: 10px;
             }
-            .header-logo {
+            .header-logo, .header-logo-placeholder {
               width: 65px;
               height: 65px;
-              object-fit: contain;
+              box-sizing: border-box;
+            }
+            .header-logo-placeholder {
+              border: 1px dashed #666;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
+              font-size: 7.5pt;
+              font-weight: bold;
+              color: #555;
+              text-transform: uppercase;
+              line-height: 1.15;
+              padding: 4px;
+              border-radius: 4px;
+              background-color: #fafafa;
             }
             .header-text {
               text-align: center;
@@ -326,13 +345,13 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
             className="bg-white w-full max-w-[780px] p-8 sm:p-12 shadow-md rounded-lg border border-slate-300/80 text-black text-[13px] leading-snug space-y-3"
             style={{ fontFamily: 'Arial, sans-serif' }}
           >
-            {/* 1. Header with Logos */}
+            {/* 1. Header with Logos (Placeholder for Demo/Copyright Compliance) */}
             <div className="header-container flex items-center justify-between border-b-2 border-black pb-2.5 mb-3">
-              <img
-                src="/template_media/image4.png"
-                alt="DENR Logo"
-                className="header-logo w-16 h-16 object-contain shrink-0"
-              />
+              <div className="header-logo-placeholder w-16 h-16 border border-dashed border-slate-400 bg-slate-50 rounded flex items-center justify-center text-center p-1 shrink-0 select-none">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight leading-tight">
+                  LOGO<br />HERE
+                </span>
+              </div>
               <div className="header-text text-center flex-1 px-3">
                 <h3 className="text-[11px] font-normal tracking-wide">Republic of the Philippines</h3>
                 <h2 className="text-[13px] font-bold uppercase tracking-wide">
@@ -342,11 +361,11 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
                   Provincial Environment and Natural Resources Office - Agusan del Norte
                 </h4>
               </div>
-              <img
-                src="/template_media/image5.jpeg"
-                alt="Bagong Pilipinas"
-                className="header-logo w-16 h-16 object-contain shrink-0"
-              />
+              <div className="header-logo-placeholder w-16 h-16 border border-dashed border-slate-400 bg-slate-50 rounded flex items-center justify-center text-center p-1 shrink-0 select-none">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight leading-tight">
+                  LOGO<br />HERE
+                </span>
+              </div>
             </div>
 
             {/* 2. Document Title & Numbers */}

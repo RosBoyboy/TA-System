@@ -175,30 +175,37 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!division || !division.trim()) {
-      return NextResponse.json(
-        { success: false, error: 'Division is required.' },
-        { status: 400 }
-      );
-    }
+    const isHeadPenro = role === 'HEAD_PENRO' || role === Role.HEAD_PENRO;
+    let cleanDivision: string | null = null;
+    let cleanSection: string | null = null;
 
-    const needsSection = divisionRequiresSection(division);
-    if (needsSection && (!section || !section.trim())) {
-      return NextResponse.json(
-        { success: false, error: 'Section is required.' },
-        { status: 400 }
-      );
-    }
+    if (!isHeadPenro) {
+      if (!division || !division.trim()) {
+        return NextResponse.json(
+          { success: false, error: 'Division is required.' },
+          { status: 400 }
+        );
+      }
 
-    if (!isValidDivisionSection(division, needsSection ? section : null)) {
-      return NextResponse.json(
-        { success: false, error: needsSection
-            ? `Invalid Division and Section combination: '${section}' is not under '${division}'.`
-            : `Invalid Division: '${division}' is not an official division.` },
-        { status: 400 }
-      );
+      const needsSection = divisionRequiresSection(division);
+      if (needsSection && (!section || !section.trim())) {
+        return NextResponse.json(
+          { success: false, error: 'Section is required.' },
+          { status: 400 }
+        );
+      }
+
+      if (!isValidDivisionSection(division, needsSection ? section : null)) {
+        return NextResponse.json(
+          { success: false, error: needsSection
+              ? `Invalid Division and Section combination: '${section}' is not under '${division}'.`
+              : `Invalid Division: '${division}' is not an official division.` },
+          { status: 400 }
+        );
+      }
+      cleanDivision = division.trim();
+      cleanSection = needsSection ? section.trim() : null;
     }
-    const cleanSection: string | null = needsSection ? section.trim() : null;
 
     if (!position || !position.trim()) {
       return NextResponse.json(
@@ -252,7 +259,7 @@ export async function POST(req: Request) {
             password: hashedPassword,
             phoneNumber: phoneNumber.trim(),
             role: role ? (role as Role) : Role.EMPLOYEE,
-            division: division.trim(),
+            division: cleanDivision,
             section: cleanSection,
             position: position.trim(),
             signatureUrl: savedSignatureUrl,
@@ -296,7 +303,7 @@ export async function POST(req: Request) {
           password: hashedPassword,
           phoneNumber: phoneNumber.trim(),
           role: role || 'EMPLOYEE',
-          division: division.trim(),
+          division: cleanDivision,
           section: cleanSection,
           position: position.trim(),
           signatureUrl: savedSignatureUrl,
@@ -384,9 +391,17 @@ export async function PATCH(req: Request) {
       updateData.status = status;
     } else {
       if (status) updateData.status = status;
-      if (role) updateData.role = role;
-      if (division !== undefined) updateData.division = division;
-      if (section !== undefined) updateData.section = section;
+      if (role) {
+        updateData.role = role;
+        if (role === 'HEAD_PENRO' || role === Role.HEAD_PENRO) {
+          updateData.division = null;
+          updateData.section = null;
+        }
+      }
+      if (role !== 'HEAD_PENRO' && role !== Role.HEAD_PENRO) {
+        if (division !== undefined) updateData.division = division;
+        if (section !== undefined) updateData.section = section;
+      }
       if (position !== undefined) updateData.position = position;
     }
 

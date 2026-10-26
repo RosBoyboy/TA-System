@@ -28,6 +28,25 @@ export default function ApprovalTrail({ status, approvalSteps = [] }: ApprovalTr
     return { state: 'PENDING', label: 'Pending', stepData: step };
   };
 
+  const formatStatus = (rawStatus: string) => {
+    switch (rawStatus) {
+      case 'PENDING_SECTION_CHIEF':
+        return 'Pending Section Chief';
+      case 'PENDING_DIVISION_CHIEF':
+        return 'Pending Division Chief';
+      case 'PENDING_HEAD_PENRO':
+        return 'Pending Head of PENRO';
+      case 'APPROVED':
+        return 'Approved';
+      case 'REJECTED_MANUAL':
+        return 'Returned (Manual)';
+      case 'REJECTED_OVERDUE':
+        return 'Rejected (Overdue)';
+      default:
+        return (rawStatus || '').replace(/_/g, ' ');
+    }
+  };
+
   return (
     <div className="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
@@ -48,7 +67,7 @@ export default function ApprovalTrail({ status, approvalSteps = [] }: ApprovalTr
               : 'bg-sky-50 text-sky-800 border-sky-300'
           }`}
         >
-          {status.replace('_', ' ')}
+          {formatStatus(status)}
         </span>
       </div>
 
@@ -96,9 +115,10 @@ export default function ApprovalTrail({ status, approvalSteps = [] }: ApprovalTr
                   </span>
                 </div>
 
-                {stepData?.approver && (
+                {stepData?.approver?.name && (
                   <p className="text-xs text-gray-600 font-medium mt-1">
-                    Signatory: <strong className="text-gray-900">{stepData.approver.name}</strong> ({stepData.approver.email})
+                    Signatory: <strong className="text-gray-900">{stepData.approver.name}</strong>
+                    {stepData.approver.email ? ` (${stepData.approver.email})` : ''}
                   </p>
                 )}
 

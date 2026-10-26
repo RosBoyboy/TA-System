@@ -115,8 +115,8 @@ export async function GET(req: Request) {
       await notifyUser({
         userId: reqItem.createdById,
         requestId: reqItem.id,
-        title: 'TA Request Auto-Rejected (Overdue)',
-        message: `Your TA Request (${reqItem.trackingNumber}) was automatically rejected because the travel start date (${new Date(reqItem.startDate).toLocaleDateString()}) passed before full approval was completed. This rejection is terminal — please submit a new request if needed.`,
+        title: 'TO Request Auto-Rejected (Overdue)',
+        message: `Your TO Request (${reqItem.trackingNumber}) was automatically rejected because the travel start date (${new Date(reqItem.startDate).toLocaleDateString()}) passed before full approval was completed. This rejection is terminal — please submit a new request if needed.`,
         channel: 'BOTH',
         taDetails: overdueTaDetails,
         actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,

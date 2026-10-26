@@ -5,7 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import DynamicMapPicker from '@/components/map/DynamicMapPicker';
 import ApprovalTrail from '@/components/approval-trail/ApprovalTrail';
-import { TARequestDTO } from '@/types';
+import { TARequestDTO, AttachmentDTO } from '@/types';
+import SupportingDocumentsUpload from '@/components/travel-order/SupportingDocumentsUpload';
 import {
   formatDateDisplay,
   formatTimeDisplay,
@@ -299,6 +300,12 @@ function EmployeeContent() {
   const router = useRouter();
   const currentTab = searchParams.get('tab') || 'dashboard';
 
+  useEffect(() => {
+    if (sessionUser?.role === 'ACCOUNT_MANAGER' && (currentTab === 'dashboard' || !searchParams.get('tab'))) {
+      router.replace('/account-manager?tab=dashboard');
+    }
+  }, [sessionUser, currentTab, searchParams, router]);
+
   const [requests, setRequests] = useState<TARequestDTO[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -306,6 +313,13 @@ function EmployeeContent() {
   const [selectedRequest, setSelectedRequest] = useState<TARequestDTO | null>(null);
   const [travelOrderModalRequest, setTravelOrderModalRequest] = useState<TARequestDTO | null>(null);
   const [scheduleCalendarDate, setScheduleCalendarDate] = useState(() => new Date());
+
+  // Resubmit / Date Revision Modal State
+  const [resubmitModalRequest, setResubmitModalRequest] = useState<TARequestDTO | null>(null);
+  const [resubmitStartDate, setResubmitStartDate] = useState('');
+  const [resubmitEndDate, setResubmitEndDate] = useState('');
+  const [resubmitLoading, setResubmitLoading] = useState(false);
+  const [resubmitError, setResubmitError] = useState('');
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -331,8 +345,9 @@ function EmployeeContent() {
     const matched = list.find((e: any) => e.name === currentName) || list[0];
 
     const empName = matched?.name || currentName || 'Juan Dela Cruz';
-    const empPos = matched?.position || userObj?.position || sessionUser?.position || 'Environmental Management Specialist II';
-    const empSection = userObj?.section || sessionUser?.section || 'MSD/Planning Section';
+    const empPos = matched?.position || userObj?.position || sessionUser?.position || 'Administrative Officer V';
+    const empDiv = userObj?.division || sessionUser?.division || 'Management Services Division';
+    const empSec = userObj?.section || sessionUser?.section || 'Admin & Finance Section';
     const empPhone = userObj?.phoneNumber || sessionUser?.phoneNumber || '09295855403';
 
     return {
@@ -340,7 +355,7 @@ function EmployeeContent() {
       position: empPos,
       designation: empPos,
       salaryGrade: '18',
-      division: empSection,
+      division: empSec ? `${empSec} (${empDiv})` : empDiv,
       station: 'PENRO ADN PLANNING',
       employmentStatus: 'Permanent',
       office: 'PENRO ADN',
@@ -374,7 +389,7 @@ function EmployeeContent() {
       remarks: '',
       certification: '',
       contactNumber: profile.contactNumber,
-      attachments: [] as string[],
+      attachments: [] as AttachmentDTO[],
       teamMembers: [] as { name: string; position: string }[],
     };
   };
@@ -638,34 +653,91 @@ function EmployeeContent() {
     };
     fetchEmployees();
 
-    // Listen for realtime push-based notification refresh events
+    // Listen for realtime push-based notification refresh events & update requests list
     const handleRealtimeRefresh = () => {
       fetchNotifications();
+      fetchRequests();
     };
     window.addEventListener('taps:refresh-notifications', handleRealtimeRefresh);
+    window.addEventListener('taps:new-notification', handleRealtimeRefresh);
+
+    // Listen for profile changes from ProfileModal
+    const handleProfileUpdateEvent = (e: any) => {
+      const detail = e.detail;
+      if (detail) {
+        setCreateForm((prev) => ({
+          ...prev,
+          employeeName: detail.name || prev.employeeName,
+          position: detail.position || prev.position,
+          designation: detail.position || prev.designation,
+          division: detail.section && detail.division ? `${detail.section} (${detail.division})` : (detail.division || prev.division),
+          contactNumber: detail.phoneNumber || prev.contactNumber,
+        }));
+      }
+    };
+    window.addEventListener('taps:profile-updated', handleProfileUpdateEvent);
 
     return () => {
       window.removeEventListener('taps:refresh-notifications', handleRealtimeRefresh);
+      window.removeEventListener('taps:new-notification', handleRealtimeRefresh);
+      window.removeEventListener('taps:profile-updated', handleProfileUpdateEvent);
     };
   }, []);
 
+  // Sync and refetch when current tab changes
+  useEffect(() => {
+    fetchRequests();
+    fetchNotifications();
+  }, [currentTab]);
+
+  const handleResubmit = async () => {
+    if (!resubmitModalRequest || !resubmitStartDate || !resubmitEndDate) return;
+    setResubmitLoading(true);
+    setResubmitError('');
+
+    try {
+      const res = await fetch(`/api/ta-requests/${resubmitModalRequest.id}/resubmit`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          startDate: resubmitStartDate,
+          endDate: resubmitEndDate,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setResubmitError(data.error || 'Failed to resubmit request.');
+        setResubmitLoading(false);
+        return;
+      }
+
+      showToast('Travel Order resubmitted successfully! Approval restarted at Section Chief.', 'success');
+      setResubmitModalRequest(null);
+      setSelectedRequest(null);
+      setResubmitStartDate('');
+      setResubmitEndDate('');
+      fetchRequests();
+      fetchNotifications();
+    } catch (err: any) {
+      setResubmitError(err.message || 'An error occurred while resubmitting.');
+    } finally {
+      setResubmitLoading(false);
+    }
+  };
+
   // Sync profile defaults when session user loads
   useEffect(() => {
-    if (sessionUser?.name && employeeList.length > 0) {
-      setCreateForm((prev) => {
-        if (!prev.employeeName || prev.employeeName === 'Juan Dela Cruz') {
-          const profile = getProfileDefaults(sessionUser, employeeList);
-          return {
-            ...prev,
-            employeeName: profile.employeeName,
-            position: profile.position,
-            designation: profile.designation,
-            division: profile.division,
-            contactNumber: profile.contactNumber,
-          };
-        }
-        return prev;
-      });
+    if (sessionUser?.name) {
+      const profile = getProfileDefaults(sessionUser, employeeList);
+      setCreateForm((prev) => ({
+        ...prev,
+        employeeName: profile.employeeName,
+        position: profile.position,
+        designation: profile.designation,
+        division: profile.division,
+        contactNumber: profile.contactNumber,
+      }));
     }
   }, [sessionUser, employeeList]);
 
@@ -779,6 +851,7 @@ function EmployeeContent() {
           startDate: createForm.departureDate,
           endDate: createForm.returnDate,
           teamMembers: createForm.teamMembers,
+          attachments: createForm.attachments,
           submitImmediately: true,
         }),
       });
@@ -906,6 +979,38 @@ function EmployeeContent() {
     const end = new Date(endDate);
     if (isNaN(start.getTime()) || isNaN(end.getTime())) return 'N/A';
     return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+  };
+
+  const getNotificationRemarks = (notifItem: any, linkedReq: any) => {
+    if (!notifItem) return null;
+    const match = notifItem.message?.match(/(?:Remarks|Reason):\s*"([^"]+)"/i);
+    if (match && match[1]) return match[1];
+
+    if (linkedReq?.approvalSteps && Array.isArray(linkedReq.approvalSteps)) {
+      const titleLower = (notifItem.title || '').toLowerCase();
+      const msgLower = (notifItem.message || '').toLowerCase();
+
+      if (titleLower.includes('section chief') || msgLower.includes('section chief')) {
+        const s1 = linkedReq.approvalSteps.find((s: any) => s.order === 1);
+        if (s1?.remarks) return s1.remarks;
+      }
+      if (titleLower.includes('division chief') || msgLower.includes('division chief')) {
+        const s2 = linkedReq.approvalSteps.find((s: any) => s.order === 2);
+        if (s2?.remarks) return s2.remarks;
+      }
+      if (titleLower.includes('head of penro') || msgLower.includes('head of penro') || titleLower.includes('fully approved')) {
+        const s3 = linkedReq.approvalSteps.find((s: any) => s.order === 3);
+        if (s3?.remarks) return s3.remarks;
+      }
+
+      const actedWithRemarks = linkedReq.approvalSteps
+        .filter((s: any) => s.remarks && (s.action === 'APPROVED' || s.action === 'REJECTED'))
+        .sort((a: any, b: any) => (b.order || 0) - (a.order || 0));
+      if (actedWithRemarks[0]?.remarks) {
+        return actedWithRemarks[0].remarks;
+      }
+    }
+    return null;
   };
 
   const renderTabContent = () => {
@@ -1179,6 +1284,14 @@ function EmployeeContent() {
                       const isApproved = notif.title?.toLowerCase().includes('approved');
                       const isRejected = notif.title?.toLowerCase().includes('reject') || notif.title?.toLowerCase().includes('revision');
 
+                      const linkedReq = notif.requestId ? requests.find((r) => r.id === notif.requestId) : null;
+                      const extraRemarks = getNotificationRemarks(notif, linkedReq);
+                      const displayMsg = notif.message?.includes('Remarks:') || notif.message?.includes('Reason:')
+                        ? notif.message
+                        : extraRemarks
+                        ? `${notif.message} Remarks: "${extraRemarks}"`
+                        : notif.message;
+
                       return (
                         <div
                           key={notif.id || nIdx}
@@ -1205,7 +1318,7 @@ function EmployeeContent() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <h4 className="text-xs font-bold text-slate-900 truncate">{notif.title}</h4>
-                            <p className="text-[11px] text-slate-600 mt-0.5 leading-snug line-clamp-2">{notif.message}</p>
+                            <p className="text-[11px] text-slate-600 mt-0.5 leading-snug line-clamp-2">{displayMsg}</p>
                             <span className="text-[10px] font-semibold text-slate-400 mt-1 block">
                               {new Date(notif.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                             </span>
@@ -1411,25 +1524,22 @@ function EmployeeContent() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                      <span>Select a Name *</span>
-                      {loadingEmployees && (
-                        <span className="text-[10px] text-emerald-700 font-normal">Loading from database...</span>
-                      )}
+                      <span>Name</span>
+                      <span className="text-[10px] font-bold text-[#0F4C2E] bg-emerald-100/90 border border-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        Read-Only (Auto-filled)
+                      </span>
                     </label>
-                    <select
-                      required
+                    <input
+                      type="text"
+                      readOnly
                       value={createForm.employeeName}
-                      onChange={(e) => handleEmployeeSelect(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 outline-none focus:ring-2 focus:ring-[#2E6F4E] cursor-pointer hover:bg-white transition-all shadow-2xs"
-                    >
-                      <option value="">-- Select a Name --</option>
-                      {employeeList.map((emp) => (
-                        <option key={emp.id || emp.name} value={emp.name}>
-                          {emp.name}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="text-[10px] text-slate-400 mt-1">Select an employee from the database directory.</p>
+                      placeholder="Employee name..."
+                      className="w-full px-4 py-2.5 bg-slate-100/90 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 outline-none cursor-not-allowed select-none shadow-2xs"
+                    />
+                    <p className="text-[10px] text-slate-400 mt-1">Automatically retrieved from your employee account.</p>
                   </div>
 
                   <div>
@@ -1449,7 +1559,7 @@ function EmployeeContent() {
 
                   <div className="md:col-span-2">
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                      <span>Position / Designation</span>
+                      <span>Position</span>
                       <span className="text-[10px] font-bold text-[#0F4C2E] bg-emerald-100/90 border border-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1">
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -1460,8 +1570,8 @@ function EmployeeContent() {
                     <input
                       type="text"
                       readOnly
-                      value={createForm.position || createForm.designation || ''}
-                      placeholder="Position/Designation will automatically populate upon selecting an employee above..."
+                      value={createForm.position || ''}
+                      placeholder="Position automatically retrieved from your account..."
                       className="w-full px-4 py-2.5 bg-slate-100/90 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none cursor-not-allowed select-none shadow-2xs"
                     />
                     <p className="text-[10px] text-slate-400 mt-1">Automatically retrieved from the employee database record.</p>
@@ -1737,15 +1847,10 @@ function EmployeeContent() {
                   <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                     Supporting Documents * (e.g., Invitation Letter, Memorandum, Program of Activities)
                   </label>
-                  <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer">
-                    <div className="w-10 h-10 rounded-full bg-slate-200/60 text-slate-500 flex items-center justify-center mx-auto mb-2">
-                      <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                    </div>
-                    <p className="text-xs font-bold text-slate-700">Click to upload files or drag and drop</p>
-                    <p className="text-[10px] text-slate-400 mt-1">PDF, DOC, DOCX, JPG, JPEG, PNG (Max 25MB)</p>
-                  </div>
+                  <SupportingDocumentsUpload
+                    attachments={createForm.attachments}
+                    onChange={(newAtts) => setCreateForm((prev) => ({ ...prev, attachments: newAtts }))}
+                  />
                 </div>
               </div>
             )}
@@ -1859,9 +1964,9 @@ function EmployeeContent() {
 
                       <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 md:col-span-2">
                         <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
-                          Position / Designation
+                          Position
                         </span>
-                        <span className="font-bold text-slate-800">{createForm.position || createForm.designation || 'Not specified'}</span>
+                        <span className="font-bold text-slate-800">{createForm.position || 'Not specified'}</span>
                       </div>
 
                       <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
@@ -2007,21 +2112,54 @@ function EmployeeContent() {
                   </div>
 
                   {/* 5. Supporting Documents */}
-                  <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <svg className="w-6 h-6 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                      </svg>
-                      <div>
-                        <h4 className="text-xs font-extrabold text-slate-900">Supporting Documents</h4>
-                        <p className="text-[11px] text-slate-500 mt-0.5">Invitation Letter, Memorandum, Program of Activities attached</p>
+                  <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <svg className="w-5 h-5 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                        </svg>
+                        <div>
+                          <h4 className="text-xs font-extrabold text-slate-900">Supporting Documents</h4>
+                          <p className="text-[11px] text-slate-500 mt-0.5">
+                            {createForm.attachments && createForm.attachments.length > 0
+                              ? `${createForm.attachments.length} document${createForm.attachments.length === 1 ? '' : 's'} attached`
+                              : 'No supporting documents attached (optional)'}
+                          </p>
+                        </div>
                       </div>
+
+                      {createForm.attachments && createForm.attachments.length > 0 ? (
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 uppercase tracking-wider">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span>
+                          Attached ({createForm.attachments.length})
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                          None attached
+                        </span>
+                      )}
                     </div>
 
-                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 uppercase tracking-wider">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span>
-                      Attached & Ready
-                    </span>
+                    {createForm.attachments && createForm.attachments.length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                        {createForm.attachments.map((doc, idx) => {
+                          const isPdf = doc.name.toLowerCase().endsWith('.pdf');
+                          return (
+                            <div key={doc.id || idx} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 text-xs">
+                              <div className="flex items-center gap-2 truncate">
+                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-black ${isPdf ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'}`}>
+                                  {isPdf ? 'PDF' : 'DOC'}
+                                </span>
+                                <span className="font-semibold text-slate-800 truncate" title={doc.name}>{doc.name}</span>
+                              </div>
+                              <span className="text-[10px] text-slate-400 shrink-0 ml-2">
+                                {typeof doc.size === 'number' ? `${(doc.size / (1024 * 1024)).toFixed(1)} MB` : (doc.size || '')}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -2034,7 +2172,11 @@ function EmployeeContent() {
                 onClick={() => {
                   setWizardStep(1);
                   setFormError('');
-                  router.push('/employee?tab=dashboard');
+                  if (sessionUser?.role === 'ACCOUNT_MANAGER') {
+                    router.push('/account-manager?tab=dashboard');
+                  } else {
+                    router.push('/employee?tab=dashboard');
+                  }
                 }}
                 className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
               >
@@ -2263,6 +2405,23 @@ function EmployeeContent() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                               </svg>
                               <span>Print Travel Order</span>
+                            </button>
+                          )}
+                          {req.status === 'REJECTED_MANUAL' && (
+                            <button
+                              onClick={() => {
+                                setResubmitModalRequest(req);
+                                setResubmitStartDate(new Date(req.startDate).toISOString().slice(0, 10));
+                                setResubmitEndDate(new Date(req.endDate).toISOString().slice(0, 10));
+                                setResubmitError('');
+                              }}
+                              className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                              title="Revise travel dates and resubmit"
+                            >
+                              <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                              </svg>
+                              <span>Revise Dates</span>
                             </button>
                           )}
                           <button
@@ -2738,6 +2897,23 @@ function EmployeeContent() {
                           </span>
                         </div>
                         <p className="text-xs text-slate-600 mt-1">{notif.message}</p>
+                        {(() => {
+                          const remarksText = getNotificationRemarks(notif, linkedRequest);
+                          if (!remarksText) return null;
+                          return (
+                            <div className="mt-2.5 p-2.5 bg-slate-50/90 rounded-xl border border-slate-200/80 text-xs text-slate-700 shadow-2xs">
+                              <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#0B5A3A] uppercase tracking-wider mb-1">
+                                <svg className="w-3.5 h-3.5 text-[#0B5A3A] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                </svg>
+                                <span>Signatory Remarks:</span>
+                              </div>
+                              <p className="italic text-slate-800 font-medium pl-5">
+                                &ldquo;{remarksText}&rdquo;
+                              </p>
+                            </div>
+                          );
+                        })()}
                         {linkedRequest && (
                           <div className="flex items-center justify-end mt-2">
                             <span className="text-[10px] font-bold text-[#0B5A3A] flex items-center gap-0.5">
@@ -2813,6 +2989,25 @@ function EmployeeContent() {
               </div>
 
               <div className="flex items-center gap-3">
+                {selectedRequest.status === 'REJECTED_MANUAL' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setResubmitModalRequest(selectedRequest);
+                      setResubmitStartDate(new Date(selectedRequest.startDate).toISOString().slice(0, 10));
+                      setResubmitEndDate(new Date(selectedRequest.endDate).toISOString().slice(0, 10));
+                      setResubmitError('');
+                    }}
+                    className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+                    title="Revise travel dates and resubmit"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>Revise & Resubmit</span>
+                  </button>
+                )}
+
                 {selectedRequest.status === 'APPROVED' && (
                   <button
                     type="button"
@@ -2903,7 +3098,9 @@ function EmployeeContent() {
                   ].map((sig, index) => {
                     const isLeft = index % 2 === 0;
                     const step = selectedRequest.approvalSteps?.find((s) => s.order === sig.order);
-                    const name = step?.approver?.name || sig.defaultName;
+                    const name = step?.approver?.name || (step as any)?.designatedApprover?.name || sig.defaultName;
+                    const isCustomName = name && name.trim().toLowerCase() !== sig.defaultName.toLowerCase();
+                    const roleSubtitle = isCustomName ? `${sig.defaultName} · ${sig.role}` : sig.role;
                     const isApproved = step?.action === 'APPROVED';
                     const isRejected = step?.action === 'REJECTED';
 
@@ -2927,7 +3124,7 @@ function EmployeeContent() {
                         <div className={`w-1/2 pr-8 text-right ${isLeft ? 'block' : 'invisible'}`}>
                           <div className={`inline-block p-5 rounded-2xl border shadow-xs hover:shadow-md transition-all text-left max-w-sm w-full ${cardBorderClass}`}>
                             <h4 className="text-sm font-bold text-[#0B5A3A]">{name}</h4>
-                            <p className="text-xs text-slate-500 mt-1">{sig.role}</p>
+                            <p className="text-xs text-slate-500 mt-1">{roleSubtitle}</p>
                             {isApproved && step?.actionDate && (
                               <p className="text-[10px] text-[#16835D] font-semibold mt-1 flex items-center gap-1 justify-end">
                                 <svg className="w-3 h-3 text-[#16835D] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2937,12 +3134,20 @@ function EmployeeContent() {
                               </p>
                             )}
                             {isRejected && (
-                              <p className="text-[10px] text-[#DC3545] font-semibold mt-1 flex items-center gap-1 justify-end">
-                                <svg className="w-3 h-3 text-[#DC3545] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                                <span>Returned · {formatFullDateTimeDisplay(step?.actionDate || step?.updatedAt)}</span>
-                              </p>
+                              <div className="mt-1">
+                                <p className="text-[10px] text-[#DC3545] font-semibold flex items-center gap-1 justify-end">
+                                  <svg className="w-3 h-3 text-[#DC3545] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                  <span>Returned · {formatFullDateTimeDisplay(step?.actionDate || step?.updatedAt)}</span>
+                                </p>
+                                {step?.remarks && (
+                                  <div className="mt-2 p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-left">
+                                    <span className="text-[10px] font-bold text-rose-800 uppercase tracking-wider block">Return Remarks:</span>
+                                    <p className="text-xs text-rose-900 font-semibold mt-0.5">{step.remarks}</p>
+                                  </div>
+                                )}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -2968,7 +3173,7 @@ function EmployeeContent() {
                         <div className={`w-1/2 pl-8 text-left ${!isLeft ? 'block' : 'invisible'}`}>
                           <div className={`inline-block p-5 rounded-2xl border shadow-xs hover:shadow-md transition-all text-left max-w-sm w-full ${cardBorderClass}`}>
                             <h4 className="text-sm font-bold text-[#0B5A3A]">{name}</h4>
-                            <p className="text-xs text-slate-500 mt-1">{sig.role}</p>
+                            <p className="text-xs text-slate-500 mt-1">{roleSubtitle}</p>
                             {isApproved && step?.actionDate && (
                               <p className="text-[10px] text-[#16835D] font-semibold mt-1 flex items-center gap-1">
                                 <svg className="w-3 h-3 text-[#16835D] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2978,12 +3183,20 @@ function EmployeeContent() {
                               </p>
                             )}
                             {isRejected && (
-                              <p className="text-[10px] text-[#DC3545] font-semibold mt-1 flex items-center gap-1">
-                                <svg className="w-3 h-3 text-[#DC3545] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                                <span>Returned · {formatFullDateTimeDisplay(step?.actionDate || step?.updatedAt)}</span>
-                              </p>
+                              <div className="mt-1">
+                                <p className="text-[10px] text-[#DC3545] font-semibold flex items-center gap-1">
+                                  <svg className="w-3 h-3 text-[#DC3545] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                  <span>Returned · {formatFullDateTimeDisplay(step?.actionDate || step?.updatedAt)}</span>
+                                </p>
+                                {step?.remarks && (
+                                  <div className="mt-2 p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-left">
+                                    <span className="text-[10px] font-bold text-rose-800 uppercase tracking-wider block">Return Remarks:</span>
+                                    <p className="text-xs text-rose-900 font-semibold mt-0.5">{step.remarks}</p>
+                                  </div>
+                                )}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -2993,10 +3206,160 @@ function EmployeeContent() {
                 </div>
               </section>
 
+              {/* Supporting Documents Section in View Modal */}
+              {selectedRequest.attachments && (selectedRequest.attachments as any[]).length > 0 && (
+                <>
+                  <div className="border-t border-slate-200/60 w-3/4 mx-auto"></div>
+                  <section className="space-y-4 max-w-2xl mx-auto">
+                    <div className="text-center space-y-1">
+                      <h2 className="text-xl font-serif font-bold text-slate-900 tracking-tight">Supporting Documents</h2>
+                      <p className="text-xs text-slate-500 font-medium">Uploaded documentation for this Travel Authority.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                      {(selectedRequest.attachments as any[]).map((doc: any, idx: number) => {
+                        const isPdf = doc.name?.toLowerCase().endsWith('.pdf') || doc.type?.includes('pdf');
+                        const formattedSize = typeof doc.size === 'number'
+                          ? doc.size < 1024 * 1024
+                            ? `${(doc.size / 1024).toFixed(1)} KB`
+                            : `${(doc.size / (1024 * 1024)).toFixed(1)} MB`
+                          : (doc.size || '');
+
+                        return (
+                          <div
+                            key={doc.id || idx}
+                            onClick={() => doc.url && window.open(doc.url, '_blank')}
+                            className="flex items-center justify-between p-3.5 rounded-2xl bg-white border border-slate-200/80 hover:border-emerald-300 hover:shadow-sm transition-all cursor-pointer group"
+                            title={`Open ${doc.name}`}
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-[10px] shrink-0 ${
+                                isPdf ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'
+                              }`}>
+                                {isPdf ? 'PDF' : 'DOC'}
+                              </span>
+                              <div className="min-w-0">
+                                <p className="text-xs font-bold text-slate-800 truncate group-hover:text-[#0B5A3A] transition-colors">{doc.name}</p>
+                                <p className="text-[10px] text-slate-400">{formattedSize}</p>
+                              </div>
+                            </div>
+                            <div className="w-7 h-7 rounded-lg bg-slate-50 group-hover:bg-[#0B5A3A] group-hover:text-white flex items-center justify-center text-slate-400 shrink-0 transition-colors">
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                </>
+              )}
+
             </div>
           </div>
         </div>
       )}
+
+      {/* Resubmit / Date Revision Modal */}
+      {resubmitModalRequest && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <div className="bg-amber-600 text-white p-4 font-bold text-sm flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-amber-100 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Revise Travel Dates & Resubmit</span>
+              </div>
+              <button
+                onClick={() => setResubmitModalRequest(null)}
+                className="text-amber-100 hover:text-white font-bold text-sm cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="p-3 bg-amber-50 border border-amber-200/80 rounded-xl text-xs space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-amber-800 font-semibold">Reference:</span>
+                  <span className="font-mono font-bold text-amber-950">{resubmitModalRequest.trackingNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-amber-800 font-semibold">Destination:</span>
+                  <span className="font-bold text-amber-950">{resubmitModalRequest.destination}</span>
+                </div>
+                {(() => {
+                  const rejectedStep = resubmitModalRequest.approvalSteps?.find((s: any) => s.action === 'REJECTED');
+                  if (!rejectedStep?.remarks) return null;
+                  return (
+                    <div className="pt-1.5 mt-1.5 border-t border-amber-200 text-amber-900">
+                      <span className="font-bold block">Chief's Return Remarks:</span>
+                      <p className="italic mt-0.5 font-medium">"{rejectedStep.remarks}"</p>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {resubmitError && (
+                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-semibold text-rose-800">
+                  {resubmitError}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    New Departure Date <span className="text-rose-600">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={resubmitStartDate}
+                    onChange={(e) => setResubmitStartDate(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    New Arrival Date <span className="text-rose-600">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={resubmitEndDate}
+                    onChange={(e) => setResubmitEndDate(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+              </div>
+
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                Upon resubmission, this request will restart verification at <strong>Step 1 (Section Chief)</strong> with your updated dates.
+              </p>
+
+              <div className="flex justify-end items-center gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setResubmitModalRequest(null)}
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  disabled={resubmitLoading || !resubmitStartDate || !resubmitEndDate}
+                  onClick={handleResubmit}
+                  className="px-6 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-md disabled:opacity-50 transition-all cursor-pointer"
+                >
+                  {resubmitLoading ? 'Resubmitting...' : 'Confirm Resubmission'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Official Travel Order Printable Document Modal */}
       <TravelOrderModal
         isOpen={!!travelOrderModalRequest}

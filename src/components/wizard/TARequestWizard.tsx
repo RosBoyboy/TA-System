@@ -252,7 +252,7 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
                 />
                 <input
                   type="text"
-                  placeholder="Position / Designation"
+                  placeholder="Position"
                   value={newMemberPosition}
                   onChange={(e) => setNewMemberPosition(e.target.value)}
                   className="w-40 px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-xs"

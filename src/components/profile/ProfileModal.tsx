@@ -27,6 +27,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [section, setSection] = useState('');
+  const [division, setDivision] = useState('');
   const [position, setPosition] = useState('');
   const [birthday, setBirthday] = useState('');
   const [address, setAddress] = useState('');
@@ -59,7 +60,19 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
         setUsername(user.username || '');
         setEmail(user.email || '');
         setPhoneNumber(user.phoneNumber || '');
-        setSection(user.section || '');
+        const isHeadPenroUser = user.role === 'HEAD_PENRO';
+        if (isHeadPenroUser) {
+          setDivision('');
+          setSection('');
+        } else {
+          const isAO5 = (user.position || '').toLowerCase().includes('admin') && (user.position || '').toLowerCase().includes('v');
+          const defaultDiv = isAO5 ? (user.division || 'Management Services Division') : (user.division || '');
+          const defaultSec = isAO5
+            ? (user.section && user.section !== 'Forest Management Section' ? user.section : 'Admin & Finance Section')
+            : (user.section || '');
+          setDivision(defaultDiv);
+          setSection(defaultSec);
+        }
         setPosition(user.position || '');
         setBirthday(user.birthday || '');
         setAddress(user.address || '');
@@ -79,7 +92,19 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
               setUsername(u.username || '');
               setEmail(u.email || '');
               setPhoneNumber(u.phoneNumber || '');
-              setSection(u.section || '');
+              const isHeadPenroUser = u.role === 'HEAD_PENRO';
+              if (isHeadPenroUser) {
+                setDivision('');
+                setSection('');
+              } else {
+                const isAO5 = (u.position || '').toLowerCase().includes('admin') && (u.position || '').toLowerCase().includes('v');
+                const resolvedDiv = isAO5 ? (u.division || 'Management Services Division') : (u.division || '');
+                const resolvedSec = isAO5
+                  ? (u.section && u.section !== 'Forest Management Section' ? u.section : 'Admin & Finance Section')
+                  : (u.section || '');
+                setDivision(resolvedDiv);
+                setSection(resolvedSec);
+              }
               setPosition(u.position || '');
               setBirthday(u.birthday || '');
               setAddress(u.address || '');
@@ -100,6 +125,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
   if (!isOpen || !mounted) return null;
 
   const userRole = user?.role || 'EMPLOYEE';
+  const isHeadPenro = userRole === 'HEAD_PENRO' || user?.role === 'HEAD_PENRO';
 
   const initials = (name || user?.name || 'U')
     .split(' ')
@@ -191,7 +217,8 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
         name: name.trim(),
         email: email.trim(),
         phoneNumber: phoneNumber.trim(),
-        section: section.trim(),
+        division: isHeadPenro ? '' : division.trim(),
+        section: isHeadPenro ? '' : section.trim(),
         position: position.trim(),
         birthday: birthday.trim(),
         address: address.trim(),
@@ -227,6 +254,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
         name: payload.name,
         email: payload.email,
         phoneNumber: payload.phoneNumber,
+        division: payload.division,
         section: payload.section,
         position: payload.position,
         birthday: payload.birthday,
@@ -236,6 +264,10 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
 
       if (onProfileUpdated) {
         onProfileUpdated(data.data);
+      }
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('taps:profile-updated', { detail: payload }));
       }
 
       setTimeout(() => {
@@ -350,7 +382,11 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
               <span>&bull;</span>
               <span className="font-semibold text-slate-700">{position || 'Position not set'}</span>
               <span>&bull;</span>
-              <span className="font-semibold text-slate-600">{section || 'PENRO General Office'}</span>
+              <span className="font-semibold text-slate-600">
+                {isHeadPenro
+                  ? 'PENRO Executive Office'
+                  : section ? `${section}${division ? ` • ${division}` : ''}` : division || 'PENRO General Office'}
+              </span>
             </div>
 
             {profileImage && (
@@ -427,7 +463,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    System Username <span className="text-emerald-700 font-normal">(Login Identifier)</span>
+                    System Username
                   </label>
                   <div className="relative">
                     <input
@@ -473,7 +509,6 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                     required
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
                   />
-                  <p className="text-[10px] text-emerald-700 font-medium mt-1">Used for Resend Travel Order email alerts.</p>
                 </div>
 
                 <div>
@@ -488,39 +523,107 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                     required
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white font-mono"
                   />
-                  <p className="text-[10px] text-emerald-700 font-medium mt-1">Used for Semaphore SMS approval alerts.</p>
                 </div>
               </div>
 
-              {/* Position & Section */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Position <span className="text-slate-400 font-normal">(Editable)</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={position}
-                    onChange={(e) => setPosition(e.target.value)}
-                    placeholder="e.g. Planning Officer II"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
-                  />
-                  <p className="text-[10px] text-slate-400 mt-1">Auto-fills in Step 2 when selected.</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Section / Division
-                  </label>
-                  <input
-                    type="text"
-                    value={section}
-                    onChange={(e) => setSection(e.target.value)}
-                    placeholder="e.g. Planning Section"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
-                  />
-                </div>
+              {/* Position */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Position <span className="text-slate-400 font-normal">(Editable)</span>
+                </label>
+                <input
+                  type="text"
+                  value={position}
+                  onChange={(e) => {
+                    const newPos = e.target.value;
+                    setPosition(newPos);
+                    if (!isHeadPenro && newPos.toLowerCase().includes('admin') && newPos.toLowerCase().includes('v')) {
+                      setDivision('Management Services Division');
+                      setSection('Admin & Finance Section');
+                    }
+                  }}
+                  placeholder={isHeadPenro ? 'e.g. Provincial Environment and Natural Resources Officer' : 'e.g. Administrative Officer V'}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
+                />
+                <p className="text-[10px] text-slate-400 mt-1">
+                  {isHeadPenro ? 'Official designation appearing on Travel Order approvals.' : 'Auto-fills in Step 2 when selected.'}
+                </p>
               </div>
+
+              {/* Division & Section as Separate Fields (Not applicable for Head of PENRO) */}
+              {isHeadPenro ? (
+                <div className="p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl text-xs text-emerald-950 flex items-start gap-2.5">
+                  <svg className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  <div>
+                    <span className="font-bold text-emerald-900 block">PENRO Executive Office (Head of Office)</span>
+                    <span className="text-[11px] text-emerald-800 leading-relaxed block mt-0.5">
+                      As the Head of PENRO and final approving authority, your mandate oversees all operations across both Management Services Division and Technical Services Division. Division and Section assignments are not applicable.
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Division
+                    </label>
+                    <select
+                      value={division}
+                      onChange={(e) => {
+                        const newDiv = e.target.value;
+                        setDivision(newDiv);
+                        if (newDiv === 'Management Services Division') {
+                          setSection('Admin & Finance Section');
+                        } else if (newDiv === 'Technical Services Division') {
+                          setSection('Conservation and Development Section');
+                        } else {
+                          setSection('');
+                        }
+                      }}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
+                    >
+                      <option value="">Select Division</option>
+                      <option value="Management Services Division">Management Services Division</option>
+                      <option value="Technical Services Division">Technical Services Division</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Section
+                    </label>
+                    <select
+                      value={section}
+                      onChange={(e) => setSection(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
+                    >
+                      <option value="">Select Section</option>
+                      {division === 'Management Services Division' ? (
+                        <>
+                          <option value="Admin & Finance Section">Admin & Finance Section</option>
+                          <option value="Planning Section">Planning Section</option>
+                        </>
+                      ) : division === 'Technical Services Division' ? (
+                        <>
+                          <option value="Conservation and Development Section">Conservation and Development Section</option>
+                          <option value="Regulation and Permitting Section">Regulation and Permitting Section</option>
+                          <option value="Monitoring and Enforcement Section">Monitoring and Enforcement Section</option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="Admin & Finance Section">Admin & Finance Section</option>
+                          <option value="Planning Section">Planning Section</option>
+                          <option value="Conservation and Development Section">Conservation and Development Section</option>
+                          <option value="Regulation and Permitting Section">Regulation and Permitting Section</option>
+                          <option value="Monitoring and Enforcement Section">Monitoring and Enforcement Section</option>
+                        </>
+                      )}
+                    </select>
+                  </div>
+                </div>
+              )}
 
               {/* Birthday & Address */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

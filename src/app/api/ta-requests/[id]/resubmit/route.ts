@@ -162,19 +162,22 @@ export async function PATCH(
     await notifyUser({
       userId,
       requestId: updatedRequest.id,
-      title: 'TA Request Resubmitted',
-      message: `Your TA Request (${trackingNum}) travel dates have been updated. The approval chain has been restarted at Section Chief.`,
+      title: 'TO Request Resubmitted',
+      message: `Your TO Request (${trackingNum}) travel dates have been updated. The approval chain has been restarted at Section Chief.`,
       channel: 'BOTH',
       taDetails,
       actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,
     });
 
-    // 2. Notify all Section Chiefs about the resubmission
+    const userSection = (session.user as any).section as string | undefined;
+
+    // 2. Notify the Section Chief about the resubmission
     await notifyRole({
       role: Role.SECTION_CHIEF,
+      section: userSection,
       requestId: updatedRequest.id,
-      title: 'Resubmitted TA Awaiting Verification',
-      message: `TA Request (${trackingNum}) by ${userName} has been resubmitted with updated travel dates and is awaiting Section Chief verification.`,
+      title: 'Resubmitted TO Awaiting Verification',
+      message: `TO Request (${trackingNum}) by ${userName} has been resubmitted with updated travel dates and is awaiting Section Chief verification.`,
       channel: 'BOTH',
       taDetails,
       actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
@@ -214,7 +217,7 @@ export async function PATCH(
 
     return NextResponse.json({
       success: true,
-      message: 'TA Request resubmitted successfully. Approval restarted at Section Chief.',
+      message: 'TO Request resubmitted successfully. Approval restarted at Section Chief.',
       data: updatedRequest,
     });
   } catch (error: any) {

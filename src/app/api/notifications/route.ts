@@ -55,10 +55,28 @@ export async function GET() {
       }
     }
 
+    const formattedNotifications = notifications.map((n) => ({
+      ...n,
+      title: n.title
+        ? n.title
+            .replace(/\bTravel Authority\b/g, 'Travel Order')
+            .replace(/\bTA Request\b/g, 'TO Request')
+            .replace(/\bTA Requests\b/g, 'TO Requests')
+            .replace(/\bTA\b/g, 'TO')
+        : n.title,
+      message: n.message
+        ? n.message
+            .replace(/\bTravel Authority\b/g, 'Travel Order')
+            .replace(/\bTA Request\b/g, 'TO Request')
+            .replace(/\bTA Requests\b/g, 'TO Requests')
+            .replace(/\bTA\b/g, 'TO')
+        : n.message,
+    }));
+
     return NextResponse.json({
       success: true,
       data: {
-        notifications,
+        notifications: formattedNotifications,
         unreadCount,
       },
     });

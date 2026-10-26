@@ -23,6 +23,7 @@ export default function ProfileDropdown() {
     name: string;
     email: string;
     phoneNumber: string;
+    division?: string;
     section: string;
     position: string;
     image?: string | null;
@@ -37,6 +38,7 @@ export default function ProfileDropdown() {
         name: user.name || 'Juan Dela Cruz',
         email: user.email || '',
         phoneNumber: user.phoneNumber || '',
+        division: user.division || '',
         section: user.section || 'PENRO Laguna',
         position: user.position || '',
         image: user.image || null,
@@ -62,6 +64,7 @@ export default function ProfileDropdown() {
   const name = profileData?.name || user?.name || 'Juan Dela Cruz';
   const email = profileData?.email || user?.email || 'user@denr.gov.ph';
   const phoneNumber = profileData?.phoneNumber || user?.phoneNumber || '';
+  const division = profileData?.division || user?.division || '';
   const section = profileData?.section || user?.section || 'PENRO General';
   const position = profileData?.position || user?.position || '';
   const image = profileData?.image ?? user?.image;
@@ -79,6 +82,7 @@ export default function ProfileDropdown() {
       name: updated.name,
       email: updated.email,
       phoneNumber: updated.phoneNumber,
+      division: updated.division,
       section: updated.section,
       position: updated.position,
       image: updated.image,

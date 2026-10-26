@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { prisma, isDummyDbUrl } from '@/lib/prisma';
 import { notifyUser, notifyRole } from '@/lib/sms';
 import { logAuditEvent, extractIpAddress } from '@/lib/auditLog';
 import { createClient } from '@supabase/supabase-js';
 import { TARequestStatus, Role, ApprovalAction } from '@prisma/client';
+import { getDivisionForSection } from '@/lib/constants/organization';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://rltypymiubbwdhbthsky.supabase.co';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
@@ -44,7 +45,7 @@ export async function GET(req: Request) {
         whereClause.startDate = { ...whereClause.startDate, lte: endDay };
       }
 
-      if (userRole === Role.EMPLOYEE) {
+      if (userRole === Role.EMPLOYEE || userRole === Role.ACCOUNT_MANAGER) {
         whereClause.OR = [
           { createdById: userId },
           { teamMembers: { some: { userId: userId } } },
@@ -56,7 +57,7 @@ export async function GET(req: Request) {
         where: whereClause,
         include: {
           createdBy: {
-            select: { id: true, name: true, email: true, section: true, position: true },
+            select: { id: true, name: true, email: true, section: true, division: true, position: true },
           },
           teamMembers: true,
           approvalSteps: {
@@ -72,7 +73,9 @@ export async function GET(req: Request) {
       });
     } catch (err) {
       console.warn('[GET TA Requests] Prisma query error, using Supabase REST API fallback...', err);
-      let query = supabase.from('TARequest').select('*, createdBy:User!createdById(id, name, email, section, position), teamMembers:TARequestMember(*), approvalSteps:ApprovalStep(*)');
+      let query = supabase
+        .from('TARequest')
+        .select('*, createdBy:User!createdById(id, name, email, section, division, position), teamMembers:TARequestMember(*), approvalSteps:ApprovalStep(*, approver:User!approverId(id, name, email, position, role))');
       
       if (statusParam) {
         query = query.eq('status', statusParam);
@@ -83,7 +86,7 @@ export async function GET(req: Request) {
       if (dateToParam) {
         query = query.lte('startDate', `${dateToParam}T23:59:59.999`);
       }
-      if (userRole === Role.EMPLOYEE) {
+      if (userRole === Role.EMPLOYEE || userRole === Role.ACCOUNT_MANAGER) {
         query = query.or(`createdById.eq.${userId}`);
       }
 
@@ -93,10 +96,95 @@ export async function GET(req: Request) {
       }
     }
 
-    // Post-process requests: Sort approval steps by order and ensure status is synchronized with real steps
+    // Query active verifiers to dynamically attach designated signatories to steps
+    let verifiers: any[] = [];
+    if (!isDummyDbUrl) {
+      try {
+        verifiers = await prisma.user.findMany({
+          where: {
+            role: { in: ['SECTION_CHIEF', 'DIVISION_CHIEF', 'HEAD_PENRO'] },
+            status: 'ACTIVE',
+          },
+          select: { id: true, name: true, email: true, role: true, section: true, division: true, position: true },
+        });
+      } catch (err) {}
+    }
+    if ((!verifiers || verifiers.length === 0) && supabaseUrl && supabaseKey) {
+      const { data: vData } = await supabase
+        .from('User')
+        .select('id, name, email, role, section, division, position')
+        .in('role', ['SECTION_CHIEF', 'DIVISION_CHIEF', 'HEAD_PENRO'])
+        .eq('status', 'ACTIVE');
+      if (vData) verifiers = vData;
+    }
+
+    // Post-process requests: Sort approval steps, attach designated verifiers, and synchronize status
     const processedRequests = (requests || []).map((req) => {
-      let steps = Array.isArray(req.approvalSteps) ? [...req.approvalSteps] : [];
-      steps.sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+      let rawSteps = Array.isArray(req.approvalSteps) ? [...req.approvalSteps] : [];
+      rawSteps.sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+
+      const reqSection = req.createdBy?.section;
+      const reqDivision = req.createdBy?.division || getDivisionForSection(reqSection);
+
+      // Match designated Section Chief, Division Chief, and Head of PENRO based on creator's unit
+      const designatedSectionChief =
+        verifiers.find(
+          (v) =>
+            v.role === 'SECTION_CHIEF' &&
+            v.section &&
+            reqSection &&
+            v.section.trim().toLowerCase() === reqSection.trim().toLowerCase()
+        ) ||
+        verifiers.find(
+          (v) =>
+            v.role === 'SECTION_CHIEF' &&
+            v.division &&
+            reqDivision &&
+            v.division.trim().toLowerCase() === reqDivision.trim().toLowerCase()
+        ) ||
+        verifiers.find((v) => v.role === 'SECTION_CHIEF');
+
+      const designatedDivChief =
+        verifiers.find(
+          (v) =>
+            v.role === 'DIVISION_CHIEF' &&
+            v.division &&
+            reqDivision &&
+            v.division.trim().toLowerCase() === reqDivision.trim().toLowerCase()
+        ) || verifiers.find((v) => v.role === 'DIVISION_CHIEF');
+
+      const designatedHeadPenro = verifiers.find((v) => v.role === 'HEAD_PENRO');
+
+      const steps = rawSteps.map((s: any) => {
+        let approverObj = s.approver;
+        const designated =
+          s.order === 1 ? designatedSectionChief : s.order === 2 ? designatedDivChief : designatedHeadPenro;
+
+        if (!approverObj || !approverObj.name) {
+          if (designated) {
+            approverObj = {
+              id: designated.id,
+              name: designated.name,
+              role: designated.role,
+              position: designated.position,
+              email: designated.email,
+            };
+          }
+        }
+
+        return {
+          ...s,
+          approver: approverObj,
+          designatedApprover: designated
+            ? {
+                id: designated.id,
+                name: designated.name,
+                role: designated.role,
+                position: designated.position,
+              }
+            : null,
+        };
+      });
 
       let synchronizedStatus = req.status;
       if (req.status !== 'REJECTED_MANUAL' && req.status !== 'REJECTED_OVERDUE' && req.status !== 'DRAFT' && steps.length > 0) {
@@ -150,6 +238,7 @@ export async function POST(req: Request) {
       startDate,
       endDate,
       teamMembers = [],
+      attachments = [],
       submitImmediately = true,
     } = body;
 
@@ -160,14 +249,52 @@ export async function POST(req: Request) {
       );
     }
 
+    const userRole = (session.user as any).role as Role;
+    const userSection = (session.user as any).section as string | undefined;
+    const userDivision = (session.user as any).division as string | undefined;
+
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const timeSuffix = Date.now().toString().slice(-4);
     const randomSuffix = Math.floor(100 + Math.random() * 900);
     const trackingNumber = `TA-${dateStr}-${timeSuffix}${randomSuffix}`;
 
-    const initialStatus = submitImmediately
-      ? TARequestStatus.PENDING_SECTION_CHIEF
-      : TARequestStatus.DRAFT;
+    // Determine initial approval step based on submitter's role:
+    // If a Section Chief files a TO, Step 1 is auto-endorsed and it starts at Step 2 (Division Chief)
+    // If a Division Chief files a TO, Steps 1 & 2 are auto-endorsed and it starts at Step 3 (Head of PENRO)
+    let step1Action: ApprovalAction = ApprovalAction.PENDING;
+    let step1ApproverId: string | null = null;
+    let step1Remarks: string | null = null;
+    let step1Date: Date | null = null;
+
+    let step2Action: ApprovalAction = ApprovalAction.PENDING;
+    let step2ApproverId: string | null = null;
+    let step2Remarks: string | null = null;
+    let step2Date: Date | null = null;
+
+    let initialStatus: TARequestStatus = TARequestStatus.DRAFT;
+
+    if (userRole === Role.DIVISION_CHIEF) {
+      step1Action = ApprovalAction.APPROVED;
+      step1ApproverId = userId;
+      step1Remarks = 'N/A - Direct Division Chief request';
+      step1Date = new Date();
+
+      step2Action = ApprovalAction.APPROVED;
+      step2ApproverId = userId;
+      step2Remarks = 'Self-requested by Division Chief';
+      step2Date = new Date();
+
+      initialStatus = submitImmediately ? TARequestStatus.PENDING_HEAD_PENRO : TARequestStatus.DRAFT;
+    } else if (userRole === Role.SECTION_CHIEF) {
+      step1Action = ApprovalAction.APPROVED;
+      step1ApproverId = userId;
+      step1Remarks = 'Self-requested by Section Chief';
+      step1Date = new Date();
+
+      initialStatus = submitImmediately ? TARequestStatus.PENDING_DIVISION_CHIEF : TARequestStatus.DRAFT;
+    } else {
+      initialStatus = submitImmediately ? TARequestStatus.PENDING_SECTION_CHIEF : TARequestStatus.DRAFT;
+    }
 
     let request: any = null;
 
@@ -183,6 +310,7 @@ export async function POST(req: Request) {
           startDate: new Date(startDate),
           endDate: new Date(endDate),
           status: initialStatus,
+          attachments: (Array.isArray(attachments) ? attachments : []) as any,
           teamMembers: {
             create: teamMembers.map((member: { name: string; position?: string; userId?: string }) => ({
               name: member.name.trim(),
@@ -192,8 +320,8 @@ export async function POST(req: Request) {
           },
           approvalSteps: {
             create: [
-              { order: 1, approverRole: Role.SECTION_CHIEF, action: ApprovalAction.PENDING },
-              { order: 2, approverRole: Role.DIVISION_CHIEF, action: ApprovalAction.PENDING },
+              { order: 1, approverRole: Role.SECTION_CHIEF, action: step1Action, approverId: step1ApproverId, remarks: step1Remarks, actionDate: step1Date },
+              { order: 2, approverRole: Role.DIVISION_CHIEF, action: step2Action, approverId: step2ApproverId, remarks: step2Remarks, actionDate: step2Date },
               { order: 3, approverRole: Role.HEAD_PENRO, action: ApprovalAction.PENDING },
             ],
           },
@@ -221,6 +349,7 @@ export async function POST(req: Request) {
           startDate: new Date(startDate).toISOString(),
           endDate: new Date(endDate).toISOString(),
           status: initialStatus,
+          attachments: Array.isArray(attachments) ? attachments : [],
         })
         .select()
         .single();
@@ -230,8 +359,8 @@ export async function POST(req: Request) {
 
         // Insert approval steps
         await supabase.from('ApprovalStep').insert([
-          { id: 'app_step_' + Math.random().toString(36).substring(2, 11), requestId: reqId, order: 1, approverRole: 'SECTION_CHIEF', action: 'PENDING' },
-          { id: 'app_step_' + Math.random().toString(36).substring(2, 11), requestId: reqId, order: 2, approverRole: 'DIVISION_CHIEF', action: 'PENDING' },
+          { id: 'app_step_' + Math.random().toString(36).substring(2, 11), requestId: reqId, order: 1, approverRole: 'SECTION_CHIEF', action: step1Action, approverId: step1ApproverId, remarks: step1Remarks, actionDate: step1Date ? step1Date.toISOString() : null },
+          { id: 'app_step_' + Math.random().toString(36).substring(2, 11), requestId: reqId, order: 2, approverRole: 'DIVISION_CHIEF', action: step2Action, approverId: step2ApproverId, remarks: step2Remarks, actionDate: step2Date ? step2Date.toISOString() : null },
           { id: 'app_step_' + Math.random().toString(36).substring(2, 11), requestId: reqId, order: 3, approverRole: 'HEAD_PENRO', action: 'PENDING' },
         ]);
 
@@ -250,6 +379,7 @@ export async function POST(req: Request) {
     }
 
     if (submitImmediately && request) {
+      const currentPendingStatus = initialStatus as string;
       const taDetails = {
         trackingNumber: request.trackingNumber,
         destination: request.destination,
@@ -257,33 +387,64 @@ export async function POST(req: Request) {
         destinationLng: request.destinationLng,
         startDate: request.startDate,
         endDate: request.endDate,
-        status: 'PENDING_SECTION_CHIEF',
+        status: currentPendingStatus,
       };
 
-      // Notify creator (Employee)
+      // Notify creator (Employee / Signatory)
+      let submitMsg = `Your Travel Order request (${request.trackingNumber}) to ${destination} has been submitted for Section Chief approval.`;
+      if (initialStatus === TARequestStatus.PENDING_DIVISION_CHIEF) {
+        submitMsg = `Your Travel Order request (${request.trackingNumber}) to ${destination} has been submitted for Division Chief approval.`;
+      } else if (initialStatus === TARequestStatus.PENDING_HEAD_PENRO) {
+        submitMsg = `Your Travel Order request (${request.trackingNumber}) to ${destination} has been submitted for Head of PENRO approval.`;
+      }
+
       await notifyUser({
         userId,
         requestId: request.id,
-        title: 'TA Request Submitted',
-        message: `Your Travel Authority request (${request.trackingNumber}) to ${destination} has been submitted for Section Chief approval.`,
+        title: 'TO Request Submitted',
+        message: submitMsg,
         channel: 'BOTH',
         taDetails,
         actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,
       });
 
-      // Notify all Section Chiefs about the new pending TA
-      await notifyRole({
-        role: Role.SECTION_CHIEF,
-        requestId: request.id,
-        title: 'New TA Request for Review',
-        message: `New Travel Authority request (${request.trackingNumber}) by ${userName} to ${destination} is awaiting Section Chief verification.`,
-        channel: 'BOTH',
-        taDetails,
-        actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
-      });
+      // Target the appropriate first pending approver:
+      if (initialStatus === TARequestStatus.PENDING_SECTION_CHIEF) {
+        await notifyRole({
+          role: Role.SECTION_CHIEF,
+          section: userSection,
+          requestId: request.id,
+          title: 'New TO Request for Review',
+          message: `New Travel Order request (${request.trackingNumber}) by ${userName} (${userSection || 'Section'}) to ${destination} is awaiting Section Chief verification.`,
+          channel: 'BOTH',
+          taDetails,
+          actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+        });
+      } else if (initialStatus === TARequestStatus.PENDING_DIVISION_CHIEF) {
+        await notifyRole({
+          role: Role.DIVISION_CHIEF,
+          division: userDivision,
+          requestId: request.id,
+          title: 'New TO Request for Review',
+          message: `New Travel Order request (${request.trackingNumber}) by ${userName} (${userDivision || 'Division'}) to ${destination} is awaiting Division Chief verification.`,
+          channel: 'BOTH',
+          taDetails,
+          actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+        });
+      } else if (initialStatus === TARequestStatus.PENDING_HEAD_PENRO) {
+        await notifyRole({
+          role: Role.HEAD_PENRO,
+          requestId: request.id,
+          title: 'New TO Request for Approval',
+          message: `New Travel Order request (${request.trackingNumber}) by ${userName} to ${destination} is awaiting Head of PENRO approval.`,
+          channel: 'BOTH',
+          taDetails,
+          actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+        });
+      }
     }
 
-    // Audit Log: Record TA creation/submission event
+    // Audit Log: Record TO creation/submission event
     if (request) {
       await logAuditEvent({
         actorId: userId,
@@ -296,8 +457,8 @@ export async function POST(req: Request) {
         trackingNumber: request.trackingNumber,
         requestId: request.id,
         details: submitImmediately
-          ? `Submitted TA request to ${destination} for Section Chief approval.`
-          : `Created TA request draft to ${destination}.`,
+          ? `Submitted TO request to ${destination} for Section Chief approval.`
+          : `Created TO request draft to ${destination}.`,
         metadata: {
           destination: destination.trim(),
           startDate,
@@ -310,7 +471,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         success: true,
-        message: 'TA Request created successfully.',
+        message: 'TO Request created successfully.',
         data: request,
       },
       { status: 201 }

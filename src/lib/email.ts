@@ -209,7 +209,7 @@ export function generateTransactionalEmailHtml({
   }
 
   // Strip emojis from title for clean reference-accurate badge
-  const cleanTitle = (title || 'TA Notification').replace(/^[🔔⚠️✅❌⏳📄\s]+/gu, '').trim();
+  const cleanTitle = (title || 'TO Notification').replace(/^[🔔⚠️✅❌⏳📄\s]+/gu, '').trim();
   const logoSrc = hasLogoAttachment ? 'cid:denr-logo' : `${baseUrl}/Tops-golo.png`;
 
   return `

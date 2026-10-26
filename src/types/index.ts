@@ -8,6 +8,7 @@ export interface UserSession {
   email: string;
   role: Role;
   status: UserStatus;
+  division?: string | null;
   section?: string | null;
   phoneNumber: string;
 }
@@ -35,6 +36,16 @@ export interface ApprovalStepDTO {
   updatedAt?: string | Date;
 }
 
+export interface AttachmentDTO {
+  id?: string;
+  name: string;
+  type: string;
+  size: string;
+  color?: 'rose' | 'blue' | 'violet';
+  icon?: 'doc' | 'mail';
+  url?: string;
+}
+
 export interface TARequestDTO {
   id: string;
   trackingNumber: string;
@@ -59,6 +70,7 @@ export interface TARequestDTO {
   updatedAt: string | Date;
   teamMembers?: TARequestMemberDTO[];
   approvalSteps?: ApprovalStepDTO[];
+  attachments?: AttachmentDTO[];
 }
 
 export interface CreateTARequestPayload {
@@ -69,6 +81,7 @@ export interface CreateTARequestPayload {
   startDate: string;
   endDate: string;
   teamMembers?: { name: string; position?: string; userId?: string }[];
+  attachments?: AttachmentDTO[];
   submitImmediately?: boolean;
 }
 

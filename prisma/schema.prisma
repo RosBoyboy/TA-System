@@ -112,6 +112,7 @@ model TARequest {
   endDate        DateTime
   status         TARequestStatus @default(DRAFT)
   resubmitCount  Int             @default(0)
+  attachments    Json?           @default("[]")
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
