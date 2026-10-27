@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { TARequestDTO } from '@/types';
-import { formatDateDisplay, formatFullDateTimeDisplay, parseUtcDate } from '@/lib/date';
+import { parseUtcDate } from '@/lib/date';
 
 interface TravelOrderModalProps {
   isOpen: boolean;
@@ -12,10 +12,17 @@ interface TravelOrderModalProps {
 
 export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrderModalProps) {
   const printAreaRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Reset scroll to top whenever the modal opens or a new request is shown
+  useEffect(() => {
+    if (isOpen) {
+      scrollRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [isOpen, request?.id]);
 
   if (!isOpen || !request) return null;
 
-  // Single source of truth for employee name from Step 2
   const employeeName = request.createdBy?.name || 'Juan Dela Cruz';
   const employeePosition = (request.createdBy as any)?.position || 'Administrative Officer V';
   const employeeSection = request.createdBy?.section || 'Technical Services Division';
@@ -40,7 +47,6 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
   const departureDate = formatShortDate(request.startDate);
   const arrivalDate = formatShortDate(request.endDate);
 
-  // Approval step records
   const step2 = request.approvalSteps?.find((s: any) => s.order === 2);
   const step3 = request.approvalSteps?.find((s: any) => s.order === 3);
 
@@ -56,252 +62,106 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
   const dateApproved = formatDocDate(step3?.actionDate || request.updatedAt || request.createdAt);
 
   const handlePrint = () => {
-    const printContent = printAreaRef.current;
-    if (!printContent) return;
+    if (!printAreaRef.current) return;
 
-    const printWindow = window.open('', '_blank', 'width=900,height=1100');
-    if (!printWindow) {
-      alert('Please allow popups to print the Travel Order.');
-      return;
-    }
+    const CLONE_ID  = 'tops-print-clone';
+    const STYLE_ID  = 'tops-print-style';
 
-    printWindow.document.open();
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <title>Travel Order - ${trackingNo}</title>
-          <style>
-            @page {
-              size: letter portrait;
-              margin: 10mm 15mm;
-            }
-            * {
-              box-sizing: border-box;
-              margin: 0;
-              padding: 0;
-            }
-            body {
-              font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-              color: #000;
-              background: #fff;
-              font-size: 10.5pt;
-              line-height: 1.35;
-              padding: 10px;
-            }
-            .header-container {
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              border-bottom: 2px solid #000;
-              padding-bottom: 8px;
-              margin-bottom: 10px;
-            }
-            .header-logo, .header-logo-placeholder {
-              width: 65px;
-              height: 65px;
-              box-sizing: border-box;
-            }
-            .header-logo-placeholder {
-              border: 1px dashed #666;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              text-align: center;
-              font-size: 7.5pt;
-              font-weight: bold;
-              color: #555;
-              text-transform: uppercase;
-              line-height: 1.15;
-              padding: 4px;
-              border-radius: 4px;
-              background-color: #fafafa;
-            }
-            .header-text {
-              text-align: center;
-              flex: 1;
-              padding: 0 10px;
-            }
-            .header-text h3 {
-              font-size: 9.5pt;
-              font-weight: normal;
-            }
-            .header-text h2 {
-              font-size: 11pt;
-              font-weight: bold;
-              text-transform: uppercase;
-            }
-            .header-text h4 {
-              font-size: 9.5pt;
-              font-weight: 600;
-            }
-            .doc-title {
-              text-align: center;
-              font-size: 15pt;
-              font-weight: bold;
-              letter-spacing: 1px;
-              margin-top: 4px;
-            }
-            .doc-number {
-              text-align: center;
-              font-size: 11pt;
-              font-weight: bold;
-              margin-bottom: 4px;
-            }
-            .date-filed {
-              text-align: right;
-              font-size: 10pt;
-              font-weight: bold;
-              margin-bottom: 6px;
-            }
-            table.form-grid {
-              width: 100%;
-              border-collapse: collapse;
-              margin-bottom: 10px;
-            }
-            table.form-grid td {
-              border: 1px solid #000;
-              padding: 4px 6px;
-              font-size: 10pt;
-              vertical-align: top;
-            }
-            .lbl {
-              font-weight: bold;
-              width: 18%;
-              background-color: #fafafa;
-            }
-            .val {
-              width: 32%;
-            }
-            .section-block {
-              margin-bottom: 6px;
-              font-size: 10pt;
-            }
-            .section-block strong {
-              display: inline-block;
-              min-width: 140px;
-            }
-            .purpose-box {
-              margin: 4px 0 6px 0;
-              padding: 6px 8px;
-              border: 1px dashed #777;
-              background-color: #fcfcfc;
-              font-size: 10pt;
-            }
-            .cert-heading {
-              text-align: center;
-              font-weight: bold;
-              font-size: 11pt;
-              margin: 10px 0 3px 0;
-              text-decoration: underline;
-            }
-            .cert-text {
-              text-align: center;
-              font-size: 9.5pt;
-              margin-bottom: 8px;
-              padding: 0 16px;
-            }
-            table.sig-grid {
-              width: 100%;
-              border-collapse: collapse;
-              margin: 10px 0 4px 0;
-            }
-            table.sig-grid td {
-              width: 50%;
-              vertical-align: top;
-              padding: 0 14px;
-              text-align: center;
-            }
-            .sig-container {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: flex-end;
-              min-height: 60px;
-              width: 100%;
-              max-width: 280px;
-              margin: 0 auto;
-            }
-            .sig-img {
-              height: 56px;
-              max-width: 190px;
-              object-fit: contain;
-              margin-bottom: -18px;
-              display: block;
-              position: relative;
-              z-index: 2;
-              mix-blend-mode: multiply;
-              background: transparent !important;
-              pointer-events: none;
-            }
-            .sig-line {
-              width: 100%;
-              border-top: 1px solid #000;
-              padding-top: 3px;
-              position: relative;
-              z-index: 1;
-            }
-            .sig-name {
-              font-weight: bold;
-              font-size: 10.5pt;
-              text-transform: uppercase;
-            }
-            .sig-pos {
-              font-size: 9pt;
-              color: #333;
-              margin-top: 1px;
-            }
-            .auth-heading {
-              text-align: center;
-              font-weight: bold;
-              font-size: 11pt;
-              margin: 10px 0 3px 0;
-              text-decoration: underline;
-            }
-            .auth-text {
-              font-size: 8.5pt;
-              text-align: justify;
-              line-height: 1.3;
-              margin-bottom: 8px;
-            }
-            .emp-auth-box {
-              text-align: center;
-              margin: 6px auto;
-              max-width: 280px;
-            }
-            .footer-notice {
-              border-top: 1px solid #777;
-              margin-top: 8px;
-              padding-top: 4px;
-              text-align: center;
-              font-size: 8pt;
-              font-style: italic;
-              color: #444;
-            }
-            @media print {
-              body { padding: 0; }
-            }
-          </style>
-        </head>
-        <body>
-          ${printContent.innerHTML}
-          <script>
-            window.onload = function() {
-              window.print();
-            };
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
+    // ── Clean up any leftovers from a rapid double-click ──────────────────
+    document.getElementById(CLONE_ID)?.remove();
+    document.getElementById(STYLE_ID)?.remove();
+
+    // ── Clone the rendered travel-order node ──────────────────────────────
+    // Cloning the live DOM means all images are already loaded and all
+    // React-rendered content is captured without a second render pass.
+    const clone = printAreaRef.current.cloneNode(true) as HTMLElement;
+    clone.id = CLONE_ID;
+
+    // Override only the layout-breaking inline styles; keep typography.
+    // maxWidth: 780px would constrain width on paper — remove it.
+    // boxShadow is visual-only — remove it.
+    clone.style.maxWidth  = '100%';
+    clone.style.width     = '100%';
+    clone.style.boxShadow = 'none';
+    clone.style.padding   = '0';   // @page margin handles outer spacing
+    clone.style.margin    = '0';
+
+    // Append as a DIRECT body child — completely outside the modal tree,
+    // so no flex columns, overflow:hidden, or max-height can interfere.
+    document.body.appendChild(clone);
+
+    // ── Inject @media print stylesheet ───────────────────────────────────
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = `
+      @page {
+        size: A4 portrait;
+        margin: 12mm 15mm 12mm 15mm;
+      }
+      @media print {
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          background: white !important;
+          width: 100% !important;
+          height: auto !important;
+          overflow: visible !important;
+        }
+
+        /* Hide EVERYTHING that is not the print clone.
+           display:none actually removes layout space — unlike visibility:hidden
+           which kept the sidebar occupying its column width. */
+        body > *:not(#${CLONE_ID}) {
+          display: none !important;
+        }
+
+        /* Show the clone cleanly */
+        #${CLONE_ID} {
+          display: block !important;
+          position: static !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          height: auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          box-shadow: none !important;
+          background: white !important;
+          overflow: visible !important;
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
+
+        /* Keep certification / authorization blocks together */
+        #${CLONE_ID} [class*="cert"],
+        #${CLONE_ID} [class*="auth"],
+        #${CLONE_ID} [class*="sig"] {
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // ── Clean up after the print dialog closes ────────────────────────────
+    const cleanup = () => {
+      document.getElementById(CLONE_ID)?.remove();
+      document.getElementById(STYLE_ID)?.remove();
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+
+    window.print();
   };
 
+
+
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in overflow-y-auto">
-      <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col my-6 border border-slate-200">
-        {/* Top Control Bar (Exclusively Print/Save PDF & Close) */}
-        <div className="bg-slate-900 text-white px-6 py-3.5 flex items-center justify-between gap-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm">
+      <div className="flex w-full max-w-4xl max-h-[90dvh] min-h-0 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl border border-slate-200 my-4 mx-auto">
+
+        {/* â”€â”€ Top Control Bar â”€â”€ */}
+        <div className="z-10 shrink-0 bg-slate-900 text-white px-6 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <svg className="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -338,142 +198,190 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
           </div>
         </div>
 
-        {/* Document Sheet Preview */}
-        <div className="p-6 sm:p-10 bg-slate-100/70 overflow-y-auto max-h-[78vh] flex justify-center">
+        {/* â”€â”€ Document Sheet Preview â”€â”€ */}
+        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain bg-slate-100/70 p-6 sm:p-8 flex flex-col items-center">
           <div
             ref={printAreaRef}
-            className="bg-white w-full max-w-[780px] p-8 sm:p-12 shadow-md rounded-lg border border-slate-300/80 text-black text-[13px] leading-snug space-y-3"
-            style={{ fontFamily: 'Arial, sans-serif' }}
+            id="tops-to-print-area"
+            className="bg-white w-full text-black"
+            style={{
+              maxWidth: '780px',
+              padding: '36px 44px 40px 44px',
+              fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
+              fontSize: '12px',
+              lineHeight: '1.45',
+              boxShadow: '0 2px 16px rgba(0,0,0,0.10)',
+            }}
           >
-            {/* 1. Header with Logos (Placeholder for Demo/Copyright Compliance) */}
-            <div className="header-container flex items-center justify-between border-b-2 border-black pb-2.5 mb-3">
-              <div className="header-logo-placeholder w-16 h-16 border border-dashed border-slate-400 bg-slate-50 rounded flex items-center justify-center text-center p-1 shrink-0 select-none">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight leading-tight">
-                  LOGO<br />HERE
-                </span>
-              </div>
-              <div className="header-text text-center flex-1 px-3">
-                <h3 className="text-[11px] font-normal tracking-wide">Republic of the Philippines</h3>
-                <h2 className="text-[13px] font-bold uppercase tracking-wide">
+            {/* 1. Header */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              borderBottom: '2.5px solid #000',
+              paddingBottom: '10px',
+              marginBottom: '10px',
+            }}>
+              <img
+                src="/Tops-golo.png"
+                alt="TOPS Logo"
+                style={{ width: '68px', height: '68px', objectFit: 'contain', flexShrink: 0 }}
+              />
+              <div style={{ textAlign: 'center', flex: 1, padding: '0 14px' }}>
+                <div style={{ fontSize: '10px', fontWeight: 'normal' }}>Republic of the Philippines</div>
+                <div style={{ fontSize: '13px', fontWeight: 'bold', textTransform: 'uppercase', lineHeight: '1.3', marginTop: '1px' }}>
                   Department of Environment and Natural Resources
-                </h2>
-                <h4 className="text-[11px] font-semibold text-slate-800">
-                  Provincial Environment and Natural Resources Office - Agusan del Norte
-                </h4>
+                </div>
+                <div style={{ fontSize: '10.5px', fontWeight: '600', marginTop: '2px' }}>
+                  Provincial Environment and Natural Resources Office &ndash; Agusan del Norte
+                </div>
               </div>
-              <div className="header-logo-placeholder w-16 h-16 border border-dashed border-slate-400 bg-slate-50 rounded flex items-center justify-center text-center p-1 shrink-0 select-none">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight leading-tight">
-                  LOGO<br />HERE
-                </span>
-              </div>
+              <img
+                src="/template_media/image5.jpeg"
+                alt="Bagong Pilipinas"
+                style={{ width: '68px', height: '68px', objectFit: 'contain', flexShrink: 0 }}
+              />
             </div>
 
-            {/* 2. Document Title & Numbers */}
-            <div className="text-center pt-1">
-              <h1 className="doc-title text-xl font-bold tracking-wider">TRAVEL ORDER</h1>
-              <p className="doc-number text-xs font-bold text-slate-900 mt-0.5">({trackingNo})</p>
+            {/* 2. Document Title */}
+            <div style={{ textAlign: 'center', marginBottom: '4px' }}>
+              <div style={{ fontSize: '18px', fontWeight: 'bold', letterSpacing: '2px' }}>TRAVEL ORDER</div>
+              <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#111', marginTop: '2px' }}>({trackingNo})</div>
             </div>
-            <div className="date-filed text-right text-xs font-bold pb-1">
-              DF: <span className="font-semibold">{dateFiled}</span>
+            <div style={{ textAlign: 'right', fontSize: '10px', fontWeight: 'bold', marginBottom: '10px' }}>
+              DF: <span style={{ fontWeight: 'normal' }}>{dateFiled}</span>
             </div>
 
-            {/* 3. Table 1: Employee & Schedule Grid */}
-            <table className="form-grid w-full border-collapse border border-black text-xs">
+            {/* 3. Employee & Schedule Grid */}
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px', fontSize: '11px' }}>
               <tbody>
                 <tr>
-                  <td className="lbl border border-black p-1.5 font-bold bg-slate-50/70 w-[20%]">Name:</td>
-                  <td className="val border border-black p-1.5 font-bold w-[30%] text-[#0F4C2E]">{employeeName}</td>
-                  <td className="lbl border border-black p-1.5 font-bold bg-slate-50/70 w-[20%]">Salary:</td>
-                  <td className="val border border-black p-1.5 w-[30%]">SG-18 / ₱46,725.00</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px', fontWeight: 'bold', backgroundColor: '#f5f5f5', width: '20%' }}>Name:</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px', fontWeight: 'bold', color: '#0F4C2E', width: '30%' }}>{employeeName}</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px', fontWeight: 'bold', backgroundColor: '#f5f5f5', width: '20%' }}>Salary:</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px', width: '30%' }}>SG-18 / &#8369;46,725.00</td>
                 </tr>
                 <tr>
-                  <td className="lbl border border-black p-1.5 font-bold bg-slate-50/70">Position:</td>
-                  <td className="val border border-black p-1.5">{employeePosition}</td>
-                  <td className="lbl border border-black p-1.5 font-bold bg-slate-50/70">Div./Sec./Unit:</td>
-                  <td className="val border border-black p-1.5">{employeeSection}</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px', fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Position:</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px' }}>{employeePosition}</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px', fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Div./Sec./Unit:</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px' }}>{employeeSection}</td>
                 </tr>
                 <tr>
-                  <td className="lbl border border-black p-1.5 font-bold bg-slate-50/70">Departure Date:</td>
-                  <td className="val border border-black p-1.5 font-semibold">{departureDate}</td>
-                  <td className="lbl border border-black p-1.5 font-bold bg-slate-50/70">Official Station:</td>
-                  <td className="val border border-black p-1.5">PENRO Agusan del Norte</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px', fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Departure Date:</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px', fontWeight: '600' }}>{departureDate}</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px', fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Official Station:</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px' }}>PENRO Agusan del Norte</td>
                 </tr>
                 <tr>
-                  <td className="border border-black p-1.5 bg-slate-50/30"></td>
-                  <td className="border border-black p-1.5"></td>
-                  <td className="lbl border border-black p-1.5 font-bold bg-slate-50/70">Arrival Date:</td>
-                  <td className="val border border-black p-1.5 font-semibold">{arrivalDate}</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px', backgroundColor: '#f5f5f5' }}></td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px' }}></td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px', fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Arrival Date:</td>
+                  <td style={{ border: '1px solid #000', padding: '4px 7px', fontWeight: '600' }}>{arrivalDate}</td>
                 </tr>
               </tbody>
             </table>
 
-            {/* 4. Travel Details */}
-            <div className="space-y-1.5 pt-1 text-xs">
-              <p className="section-block">
-                <strong className="font-bold">Destination:</strong> <span className="font-semibold text-slate-900">{request.destination}</span>
-              </p>
-              <div>
-                <strong className="font-bold block mb-1">Purpose of Travel:</strong>
-                <div className="purpose-box p-2.5 border border-dashed border-slate-400 bg-slate-50/50 rounded-sm text-slate-800 leading-relaxed font-normal">
-                  {request.purpose}
-                </div>
-              </div>
-              <p className="section-block text-[11.5px]">
-                <strong className="font-bold">Per Diems/Expense Allowed:</strong> Official Business / Actual Expenses Allowed subject to availability of funds
-              </p>
-              <p className="section-block text-[11.5px]">
-                <strong className="font-bold">Company/Assistant/Laborers:</strong>{' '}
-                {request.teamMembers && request.teamMembers.length > 0
-                  ? request.teamMembers.map((m: any) => m.name).join(', ')
-                  : 'None'}
-              </p>
-              <p className="section-block text-[11.5px]">
-                <strong className="font-bold">Appropriations:</strong> PENRO Agusan del Norte Regular Funds / Traveling Expenses (50201010-00)
-              </p>
-              <p className="section-block text-[11.5px]">
-                <strong className="font-bold">Remarks / Special Instructions:</strong> Submit Certificate of Appearance and Travel Report upon completion of travel.
-              </p>
+            {/* 4. Destination */}
+            <div style={{ marginBottom: '7px', fontSize: '11px' }}>
+              <span style={{ fontWeight: 'bold' }}>Destination:</span>{' '}
+              <span style={{ wordBreak: 'break-word' }}>{request.destination}</span>
             </div>
 
-            {/* 5. Certification & Signatures */}
-            <div className="pt-2">
-              <h3 className="cert-heading text-center font-bold text-xs uppercase underline tracking-wide mb-1">
-                CERTIFICATION
-              </h3>
-              <p className="cert-text text-center text-[11px] text-slate-700 mb-2 px-4 italic">
-                This is to certify that the travel is necessary and is connected with the functions of the official/employee and this Div/Sec./Units.
-              </p>
+            {/* 5. Purpose of Travel */}
+            <div style={{ marginBottom: '8px', fontSize: '11px' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '3px' }}>Purpose of Travel:</div>
+              <div style={{
+                padding: '6px 9px',
+                border: '1px solid #ccc',
+                backgroundColor: '#fafafa',
+                lineHeight: '1.55',
+                wordBreak: 'break-word',
+              }}>
+                {request.purpose}
+              </div>
+            </div>
 
-              <table className="sig-grid w-full text-center mt-1">
+            {/* 6. Additional Travel Information */}
+            <div style={{ fontSize: '11px', marginBottom: '6px' }}>
+              <span style={{ fontWeight: 'bold' }}>Per Diems/Expense Allowed:</span>{' '}
+              Official Business / Actual Expenses Allowed subject to availability of funds
+            </div>
+            <div style={{ fontSize: '11px', marginBottom: '6px' }}>
+              <span style={{ fontWeight: 'bold' }}>Company/Assistant/Laborers:</span>{' '}
+              {request.teamMembers && request.teamMembers.length > 0
+                ? request.teamMembers.map((m: any) => m.name).join(', ')
+                : 'None'}
+            </div>
+            <div style={{ fontSize: '11px', marginBottom: '6px' }}>
+              <span style={{ fontWeight: 'bold' }}>Appropriations:</span>{' '}
+              PENRO Agusan del Norte Regular Funds / Traveling Expenses (50201010-00)
+            </div>
+            <div style={{ fontSize: '11px', marginBottom: '10px' }}>
+              <span style={{ fontWeight: 'bold' }}>Remarks / Special Instructions:</span>{' '}
+              Submit Certificate of Appearance and Travel Report upon completion of travel.
+            </div>
+
+            {/* 7. Certification */}
+            <div>
+              <div style={{
+                textAlign: 'center',
+                fontWeight: 'bold',
+                fontSize: '12px',
+                textDecoration: 'underline',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                margin: '4px 0 5px 0',
+              }}>
+                CERTIFICATION
+              </div>
+              <div style={{
+                textAlign: 'center',
+                fontSize: '10.5px',
+                fontStyle: 'italic',
+                color: '#333',
+                marginBottom: '12px',
+                padding: '0 20px',
+              }}>
+                This is to certify that the travel is necessary and is connected with the functions of the official/employee and this Div/Sec./Units.
+              </div>
+
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <tbody>
                   <tr>
-                    <td className="w-1/2 align-top px-4">
-                      <div className="text-[11px] font-bold text-left mb-1">Recommending Approval:</div>
-                      <div className="sig-container flex flex-col items-center justify-end min-h-[64px] max-w-[260px] mx-auto">
+                    <td style={{ width: '50%', verticalAlign: 'top', paddingRight: '20px' }}>
+                      <div style={{ fontSize: '10.5px', fontWeight: 'bold', marginBottom: '4px' }}>Recommending Approval:</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '240px' }}>
                         <img
                           src="/signatures/signature_div_chief.png"
                           alt="Division Chief Signature"
-                          className="sig-img h-14 max-w-[190px] object-contain -mb-5 relative z-10 pointer-events-none"
-                          style={{ mixBlendMode: 'multiply', background: 'transparent' }}
+                          style={{
+                            height: '52px', maxWidth: '180px', objectFit: 'contain',
+                            display: 'block', marginBottom: '-16px',
+                            position: 'relative', zIndex: 2, mixBlendMode: 'multiply',
+                          }}
                         />
-                        <div className="sig-line w-full border-t border-black pt-1 relative z-0">
-                          <div className="sig-name font-bold text-xs uppercase">{divChiefName}</div>
-                          <div className="sig-pos text-[10.5px] text-slate-600 mt-0.5">{divChiefPosition}</div>
+                        <div style={{ width: '100%', borderTop: '1px solid #000', paddingTop: '3px', position: 'relative', zIndex: 1 }}>
+                          <div style={{ fontWeight: 'bold', fontSize: '11px', textTransform: 'uppercase', textAlign: 'center' }}>{divChiefName}</div>
+                          <div style={{ fontSize: '10px', color: '#333', marginTop: '1px', textAlign: 'center' }}>{divChiefPosition}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="w-1/2 align-top px-4">
-                      <div className="text-[11px] font-bold text-left mb-1">Approved by:</div>
-                      <div className="sig-container flex flex-col items-center justify-end min-h-[64px] max-w-[260px] mx-auto">
+                    <td style={{ width: '50%', verticalAlign: 'top', paddingLeft: '20px' }}>
+                      <div style={{ fontSize: '10.5px', fontWeight: 'bold', marginBottom: '4px' }}>Approved by:</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '240px' }}>
                         <img
                           src="/signatures/signature_penro.png"
                           alt="Head of PENRO Signature"
-                          className="sig-img h-14 max-w-[190px] object-contain -mb-5 relative z-10 pointer-events-none"
-                          style={{ mixBlendMode: 'multiply', background: 'transparent' }}
+                          style={{
+                            height: '52px', maxWidth: '180px', objectFit: 'contain',
+                            display: 'block', marginBottom: '-16px',
+                            position: 'relative', zIndex: 2, mixBlendMode: 'multiply',
+                          }}
                         />
-                        <div className="sig-line w-full border-t border-black pt-1 relative z-0">
-                          <div className="sig-name font-bold text-xs uppercase">{penroName}</div>
-                          <div className="sig-pos text-[10.5px] text-slate-600 mt-0.5">{penroPosition}</div>
+                        <div style={{ width: '100%', borderTop: '1px solid #000', paddingTop: '3px', position: 'relative', zIndex: 1 }}>
+                          <div style={{ fontWeight: 'bold', fontSize: '11px', textTransform: 'uppercase', textAlign: 'center' }}>{penroName}</div>
+                          <div style={{ fontSize: '10px', color: '#333', marginTop: '1px', textAlign: 'center' }}>{penroPosition}</div>
                         </div>
                       </div>
                     </td>
@@ -481,45 +389,65 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
                 </tbody>
               </table>
 
-              <div className="text-right text-xs font-bold mt-1 pr-4">
-                DA: <span className="font-semibold">{dateApproved}</span>
+              <div style={{ textAlign: 'right', fontSize: '10px', fontWeight: 'bold', marginTop: '6px' }}>
+                DA: <span style={{ fontWeight: 'normal' }}>{dateApproved}</span>
               </div>
             </div>
 
-            {/* 6. Authorization Section */}
-            <div className="pt-2 border-t border-slate-300">
-              <h3 className="auth-heading text-center font-bold text-xs uppercase underline tracking-wide mb-1">
+            {/* 8. Authorization */}
+            <div style={{ borderTop: '1px solid #bbb', marginTop: '12px', paddingTop: '10px' }}>
+              <div style={{
+                textAlign: 'center', fontWeight: 'bold', fontSize: '12px',
+                textDecoration: 'underline', textTransform: 'uppercase',
+                letterSpacing: '1px', marginBottom: '6px',
+              }}>
                 AUTHORIZATION
-              </h3>
-              <p className="auth-text text-[10px] text-justify text-slate-700 leading-normal mb-2">
+              </div>
+              <div style={{
+                fontSize: '10px', textAlign: 'justify',
+                lineHeight: '1.5', marginBottom: '12px', color: '#222',
+              }}>
                 I hereby authorize the accountant to deduct the corresponding amount of the unliquidated cash advance from my succeeding salary for my failure to liquidate this travel within the prescribed thirty-day period upon return to my permanent official station pursuant to item 5.1.3 COA Circular 97-002 dated February 10, 1997, and Sec. 16 EO No. 248 dated May 29, 1995.
-              </p>
-
-              <div className="emp-auth-box text-center max-w-xs mx-auto">
-                <div className="sig-container flex flex-col items-center justify-end min-h-[64px] max-w-[260px] mx-auto">
+              </div>
+              <div style={{ textAlign: 'center', maxWidth: '280px', margin: '0 auto' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <img
                     src={employeeSignatureSrc}
                     alt="Employee Signature"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/signatures/signature_employee.png';
                     }}
-                    className="sig-img h-14 max-w-[190px] object-contain -mb-5 relative z-10 pointer-events-none"
-                    style={{ mixBlendMode: 'multiply', background: 'transparent' }}
+                    style={{
+                      height: '52px',
+                      maxWidth: '180px',
+                      objectFit: 'contain',
+                      display: 'block',
+                      marginBottom: '-16px',
+                      position: 'relative',
+                      zIndex: 2,
+                      mixBlendMode: 'multiply',
+                      background: 'transparent',
+                      pointerEvents: 'none',
+                    }}
                   />
-                  <div className="sig-line w-full border-t border-black pt-1 relative z-0">
-                    <div className="sig-name font-bold text-xs uppercase">{employeeName.toUpperCase()}</div>
-                    <div className="sig-pos text-[10.5px] text-slate-600 mt-0.5">{employeePosition}</div>
+                  <div style={{ width: '100%', borderTop: '1px solid #000', paddingTop: '3px', position: 'relative', zIndex: 1 }}>
+                    <div style={{ fontWeight: 'bold', fontSize: '11px', textTransform: 'uppercase' }}>{employeeName.toUpperCase()}</div>
+                    <div style={{ fontSize: '10px', color: '#333', marginTop: '1px' }}>{employeePosition}</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* 7. Electronic Notice Footer */}
-            <div className="footer-notice border-t border-slate-300 pt-2 text-center text-[10px] italic text-slate-500">
+            {/* 9. Footer */}
+            <div style={{
+              borderTop: '1px solid #bbb', marginTop: '14px', paddingTop: '5px',
+              textAlign: 'center', fontSize: '9px', fontStyle: 'italic', color: '#666',
+            }}>
               This is an official travel order approved electronically and generated from the Travel Order Processing System (TOPS). No original signature is required.
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
