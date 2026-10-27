@@ -1,5 +1,3 @@
-import sharp from 'sharp';
-
 interface GenerateMapParams {
   lat: number;
   lng: number;
@@ -41,21 +39,23 @@ export async function generateStaticMapPng({
       signal: AbortSignal.timeout(5000),
     });
 
-    let baseBuffer: Buffer;
-    if (res.ok) {
-      baseBuffer = Buffer.from(await res.arrayBuffer());
-    } else {
-      // Graceful fallback base image (subtle topographic contour background)
-      baseBuffer = await sharp({
-        create: {
-          width,
-          height,
-          channels: 4,
-          background: { r: 235, g: 245, b: 238, alpha: 1 },
-        },
-      })
-        .png()
-        .toBuffer();
+    if (!res.ok) {
+      return null;
+    }
+
+    const baseBuffer = Buffer.from(await res.arrayBuffer());
+
+    // Dynamically load sharp to avoid crashing serverless runtimes that lack native libvips binaries
+    let sharpModule: any = null;
+    try {
+      sharpModule = (await import('sharp')).default;
+    } catch {
+      // If sharp is not loadable in serverless, gracefully return the clean ArcGIS map buffer directly
+      return baseBuffer;
+    }
+
+    if (!sharpModule) {
+      return baseBuffer;
     }
 
     // Format clean 2-line label to avoid clipping
@@ -108,7 +108,7 @@ export async function generateStaticMapPng({
       </svg>
     `);
 
-    const finalImage = await sharp(baseBuffer)
+    const finalImage = await sharpModule(baseBuffer)
       .composite([{ input: overlaySvg, top: 0, left: 0 }])
       .png({ quality: 85 })
       .toBuffer();

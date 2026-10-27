@@ -1,11 +1,19 @@
 import fs from 'fs';
 import path from 'path';
 
-const STORAGE_DIR = path.join(process.cwd(), 'storage', 'signatures');
+import os from 'os';
 
-// Ensure storage directory exists
-if (!fs.existsSync(STORAGE_DIR)) {
-  fs.mkdirSync(STORAGE_DIR, { recursive: true });
+const STORAGE_DIR = process.env.VERCEL
+  ? path.join(os.tmpdir(), 'signatures')
+  : path.join(process.cwd(), 'storage', 'signatures');
+
+// Ensure storage directory exists without crashing on read-only environments
+try {
+  if (!fs.existsSync(STORAGE_DIR)) {
+    fs.mkdirSync(STORAGE_DIR, { recursive: true });
+  }
+} catch (e) {
+  console.warn('[Signature Storage] Note: Could not create local directory during module evaluation:', e);
 }
 
 /**
