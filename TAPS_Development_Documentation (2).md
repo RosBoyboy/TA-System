@@ -190,32 +190,44 @@ Prototype already covers: multi-step TA wizard, map-based destination picker, ap
 
 ---
 
-## 9. Kanban Board — Backlog (do these in order)
+## 9. Kanban Board — Active Delivery Plan
 
-No fixed sprints — work is pulled one card at a time from the backlog into **In Progress**, then **Review**, then **Done**, respecting a work-in-progress limit (recommended: 1–2 cards in progress at once, since this is mostly solo/small-team work). The order below is the backlog priority — pull the next card only once the current one reaches **Done**.
+Work is pulled continuously from **Backlog** to **In Progress**, then **Review**, then **Done**.
 
-**Board columns:** `Backlog` → `In Progress` → `Review` → `Done`
+**Board columns:** `Backlog` → `In Progress` (WIP limit: 2) → `Review` → `Done`
 
-| # | Card | Depends on |
+### 9.1 Swimlanes / Epics
+
+1. Core Workflow
+2. Auth & Access Control
+3. Notifications (SMS/Email/In-app)
+4. Admin & Data Management
+5. Quality, Security, and Release
+
+### 9.2 Initial Cards (priority order)
+
+| # | Card | Epic |
 |---|---|---|
-| 1 | Repo setup — GitHub repo, Next.js (App Router, TypeScript, Tailwind) | — |
-| 2 | Supabase project — create project, `DATABASE_URL` into `.env` | 1 |
-| 3 | Prisma init — copy `schema.prisma`, `npx prisma migrate dev --name init` | 2 |
-| 4 | Tailwind theme — DENR green tokens (§7) into `tailwind.config.js` | 1 |
-| 4b | shadcn/ui init + component install (§4.2) | 1 |
-| 5 | Auth.js setup — providers, session includes `role` + `status` | 3 |
-| 6 | Seed script — test accounts for all 6 roles, all `ACTIVE`, with phone numbers | 3 |
-| 7 | Semaphore account — API key in `.env`, test `sendSms()` | — |
-| 8 | Registration flow — `POST /api/register` + Account Manager activation queue UI | 5, 6 |
-| 9 | Auth & role-protected routes — login, per-role dashboard redirect | 5, 8 |
-| 10 | TA Request Wizard — multi-step form + Leaflet map picker, `POST /api/ta-requests`, `submit` | 9 |
-| 11 | Approval Workflow — approve/reject endpoints, sequential enforcement, resubmit logic | 10 |
-| 12 | Notifications — wire `notifyUser()` into submit/approve/reject/resubmit | 11, 7 |
-| 13 | Overdue cron — Vercel Cron hitting `/api/cron/check-overdue` | 11 |
-| 14 | Admin & Reports — dashboard, master data CRUD, export endpoint | 9 |
-| 15 | Polish — fix the 4 UI critique issues, add ready-to-print document (once template provided), full UAT pass | 10, 11, 12 |
+| 1 | Validate end-to-end TA request lifecycle (create → approve/reject → resubmit) | Core Workflow |
+| 2 | Enforce strict role/route access for employee/staff/account-manager/admin | Auth & Access Control |
+| 3 | Harden overdue auto-rejection cron flow and edge cases | Core Workflow |
+| 4 | Finalize travel order document generation for approved requests | Core Workflow |
+| 5 | Complete notification reliability checks (in-app + SMS + email) | Notifications (SMS/Email/In-app) |
+| 6 | Add/verify audit-log coverage for all status-changing actions | Quality, Security, and Release |
+| 7 | Stabilize admin CRUD flows (users/divisions/sections/signatures) | Admin & Data Management |
+| 8 | Expand automated tests for approval sequence and rejection paths | Quality, Security, and Release |
+| 9 | Run lint/build/test gate in CI and block merges on failures | Quality, Security, and Release |
+| 10 | Perform security pass (input validation, auth checks, secret handling) | Quality, Security, and Release |
+| 11 | Update docs/runbooks (env setup, seed, deployment, cron operations) | Quality, Security, and Release |
+| 12 | Prepare release checklist and production readiness verification | Quality, Security, and Release |
 
-Cards with no dependency listed beyond an earlier number can be pulled in parallel if you ever have more than one person working — otherwise just follow the numbering top to bottom.
+### 9.3 Definition of Done (applies to every card)
+
+- Acceptance criteria met
+- Relevant tests added/updated and passing
+- Security/privacy impact checked
+- Documentation updated when behavior changes
+- Reviewed and merged
 
 ---
 
@@ -252,10 +264,9 @@ Key business rules to enforce exactly:
 6. Design system: primary #1B4332 (DENR forest green), accent #40916C, light tint
    #D8F3DC, rejection/error #E63946.
 
-Start with card #1–9 only (repo setup through Auth & role-protected routes — see
-the Kanban backlog in TAPS_Development_Documentation.md). Don't build the TA
-request wizard, approval logic, or SMS yet — those are later backlog cards. Ask
-me before assuming anything not covered in schema.prisma or TAPS_API_Design.md.
+Follow the Kanban priority order in this document and implement one card at a time.
+Do not assume scope beyond the active card. Ask me before assuming anything not
+covered in schema.prisma or TAPS_API_Design.md.
 ```
 
 ---
