@@ -53,8 +53,24 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (status === 'unauthenticated' || (sessionTimedOut && !session?.user)) {
       window.location.href = '/login';
+      return;
     }
-  }, [status, sessionTimedOut, session]);
+
+    if (status === 'authenticated' && session?.user) {
+      const userRole = (session.user as any)?.role;
+      // Role-based route authorization guard against unauthorized URL navigation
+      if (pathname.startsWith('/admin') && userRole !== 'ADMIN') {
+        const dest = userRole === 'ACCOUNT_MANAGER' ? '/account-manager' : ['SECTION_CHIEF', 'DIVISION_CHIEF', 'HEAD_PENRO'].includes(userRole) ? '/staff' : '/employee';
+        window.location.href = dest;
+      } else if (pathname.startsWith('/account-manager') && userRole !== 'ACCOUNT_MANAGER' && userRole !== 'ADMIN') {
+        const dest = ['SECTION_CHIEF', 'DIVISION_CHIEF', 'HEAD_PENRO'].includes(userRole) ? '/staff' : '/employee';
+        window.location.href = dest;
+      } else if (pathname.startsWith('/staff') && !['SECTION_CHIEF', 'DIVISION_CHIEF', 'HEAD_PENRO', 'ADMIN'].includes(userRole)) {
+        const dest = userRole === 'ACCOUNT_MANAGER' ? '/account-manager' : '/employee';
+        window.location.href = dest;
+      }
+    }
+  }, [status, sessionTimedOut, session, pathname]);
 
   const fetchNotifications = async (triggerPopups = true) => {
     try {

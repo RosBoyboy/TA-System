@@ -57,14 +57,14 @@ export async function GET(req: Request) {
         where: whereClause,
         include: {
           createdBy: {
-            select: { id: true, name: true, email: true, section: true, division: true, position: true },
+            select: { id: true, name: true, email: true, section: true, division: true, position: true, signatureUrl: true },
           },
           teamMembers: true,
           approvalSteps: {
             orderBy: { order: 'asc' },
             include: {
               approver: {
-                select: { id: true, name: true, email: true, position: true, role: true },
+                select: { id: true, name: true, email: true, position: true, role: true, signatureUrl: true },
               },
             },
           },
@@ -75,7 +75,7 @@ export async function GET(req: Request) {
       console.warn('[GET TA Requests] Prisma query error, using Supabase REST API fallback...', err);
       let query = supabase
         .from('TARequest')
-        .select('*, createdBy:User!createdById(id, name, email, section, division, position), teamMembers:TARequestMember(*), approvalSteps:ApprovalStep(*, approver:User!approverId(id, name, email, position, role))');
+        .select('*, createdBy:User!createdById(id, name, email, section, division, position, signatureUrl), teamMembers:TARequestMember(*), approvalSteps:ApprovalStep(*, approver:User!approverId(id, name, email, position, role, signatureUrl))');
       
       if (statusParam) {
         query = query.eq('status', statusParam);

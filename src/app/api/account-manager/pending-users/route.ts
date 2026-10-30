@@ -40,6 +40,7 @@ export async function GET() {
             address: true,
             role: true,
             status: true,
+            signatureUrl: true,
             createdAt: true,
           },
           orderBy: { createdAt: 'desc' },
@@ -52,7 +53,7 @@ export async function GET() {
     if ((!pendingUsers || pendingUsers.length === 0) && supabaseUrl && supabaseKey) {
       const { data, error } = await supabase
         .from('User')
-        .select('id, name, username, email, phoneNumber, division, position, section, birthday, address, role, status, createdAt')
+        .select('id, name, username, email, phoneNumber, division, position, section, birthday, address, role, status, signatureUrl, createdAt')
         .eq('status', 'PENDING_REVIEW')
         .order('createdAt', { ascending: false });
 

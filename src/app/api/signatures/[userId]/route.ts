@@ -76,14 +76,20 @@ export async function GET(
 
     const buffer = await getSignatureBuffer(userRecord.signatureUrl);
     if (!buffer) {
-      return NextResponse.json({ success: false, error: 'Signature file not found on disk' }, { status: 404 });
+      return NextResponse.json({ success: false, error: 'Signature image could not be loaded' }, { status: 404 });
     }
+
+    const contentType = userRecord.signatureUrl.startsWith('data:image/jpeg')
+      ? 'image/jpeg'
+      : userRecord.signatureUrl.startsWith('data:image/svg')
+      ? 'image/svg+xml'
+      : 'image/png';
 
     return new Response(new Uint8Array(buffer), {
       status: 200,
       headers: {
-        'Content-Type': 'image/png',
-        'Cache-Control': 'private, max-age=3600',
+        'Content-Type': contentType,
+        'Cache-Control': 'public, max-age=86400',
       },
     });
   } catch (error: any) {

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 
 import { OFFICIAL_DIVISIONS } from '@/lib/constants/organization';
+import SignaturePad from '@/components/signature/SignaturePad';
 
 // ─── DENR-PENRO Agusan del Norte Organizational Structure ──────────────────────
 // Single source of truth lives in src/lib/constants/organization.ts
@@ -27,6 +28,7 @@ export default function RegisterPage() {
     phoneNumber: '',
   });
 
+  const [signatureData, setSignatureData] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -95,6 +97,11 @@ export default function RegisterPage() {
       setLoading(false);
       return;
     }
+    if (!signatureData || !signatureData.trim()) {
+      setError('Official Employee E-Signature is required. Please sign using a stylus pen, board, or mouse before submitting.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const payload = {
@@ -106,6 +113,7 @@ export default function RegisterPage() {
         address: formData.address.trim() || null,
         email: formData.email.trim(),
         phoneNumber: formData.phoneNumber.trim(),
+        signatureData: signatureData,
       };
 
       const res = await fetch('/api/auth/register', {
@@ -164,11 +172,17 @@ export default function RegisterPage() {
                 <span className="text-slate-400 block">Position:</span>
                 <span className="font-semibold text-slate-800">{formData.position}</span>
               </div>
+              <div>
+                <span className="text-slate-400 block">E-Signature:</span>
+                <span className="font-semibold text-emerald-700 flex items-center gap-1">
+                  <span>✓ Affixed &amp; Verified</span>
+                </span>
+              </div>
             </div>
           </div>
 
           <p className="text-xs text-slate-600 mb-6 leading-relaxed">
-            Your employee credentials have been received and sent to the{' '}
+            Your employee credentials and official e-signature have been received and sent to the{' '}
             <strong>Account Manager (HRMO)</strong> for review.
             <br />
             <br />
@@ -247,7 +261,7 @@ export default function RegisterPage() {
           </h2>
 
           <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed font-normal">
-            Register your employee credentials to start requesting, endorsing, and processing official Travel Orders online.
+            Register your employee credentials and official e-signature to start requesting, endorsing, and processing official Travel Orders online.
           </p>
 
           <div className="space-y-4 pt-3">
@@ -259,7 +273,7 @@ export default function RegisterPage() {
               </div>
               <div>
                 <h4 className="text-xs font-bold text-white uppercase tracking-wider">HR-Verified Personnel Accounts</h4>
-                <p className="text-[11px] text-emerald-200/80 mt-0.5">All credentials are reviewed and activated by the Account Manager.</p>
+                <p className="text-[11px] text-emerald-200/80 mt-0.5">All credentials and signatures are reviewed and activated by the Account Manager.</p>
               </div>
             </div>
 
@@ -278,13 +292,12 @@ export default function RegisterPage() {
             <div className="flex items-start gap-3.5">
               <div className="w-8 h-8 rounded-full bg-emerald-800/80 text-emerald-300 flex items-center justify-center shrink-0 border border-emerald-600/40 shadow-sm mt-0.5">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
               </div>
               <div>
-                <h4 className="text-xs font-bold text-white uppercase tracking-wider">Integrated Travel Workflow</h4>
-                <p className="text-[11px] text-emerald-200/80 mt-0.5">Access sequential approvals, printable orders, and destination mapping.</p>
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider">Integrated E-Signature Authentication</h4>
+                <p className="text-[11px] text-emerald-200/80 mt-0.5">Stylus pen, board, and mouse input to bind official Travel Order requests.</p>
               </div>
             </div>
           </div>
@@ -316,7 +329,7 @@ export default function RegisterPage() {
             </Link>
             <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight mt-3">Employee Registration</h2>
             <p className="text-xs text-slate-500 mt-1">
-              Submit your personnel credentials for centralized HR onboarding.
+              Submit your personnel credentials and official e-signature for HR onboarding.
             </p>
           </div>
 
@@ -524,6 +537,21 @@ export default function RegisterPage() {
               </div>
             </div>
 
+            {/* Official Employee E-Signature Pad */}
+            <div className="pt-2 border-t border-slate-100">
+              <SignaturePad
+                onChange={(data) => {
+                  setSignatureData(data);
+                  if (data && error.toLowerCase().includes('signature')) {
+                    setError('');
+                  }
+                }}
+                required={true}
+                label="Official Employee E-Signature"
+                description="Sign using a stylus pen & board, touch, or mouse. This e-signature is affixed to your official Travel Authority requests."
+              />
+            </div>
+
             {/* HR Credential Generation Notice */}
             <div className="p-3.5 bg-emerald-50/90 border border-emerald-200 rounded-2xl text-[11px] text-emerald-950 flex items-start gap-2.5">
               <svg className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -533,7 +561,7 @@ export default function RegisterPage() {
                 <strong className="font-bold text-emerald-900">Official HR Account Creation:</strong>
                 <p className="mt-0.5 text-emerald-800">
                   You do not need to set a password. The <strong>Account Manager</strong> will
-                  review your credentials and generate your official{' '}
+                  review your credentials and e-signature before generating your official{' '}
                   <strong>Username</strong> and <strong>Temporary Password</strong>.
                 </p>
               </div>
@@ -542,7 +570,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-[#0F4C2E] hover:bg-[#165E3A] text-white font-bold text-xs rounded-xl shadow-md transition-all disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+              className="w-full py-3 px-4 bg-[#0F4C2E] hover:bg-[#165E3A] text-white font-bold text-xs rounded-xl shadow-md transition-all disabled:opacity-50 flex items-center justify-center gap-2 mt-2 cursor-pointer"
             >
               {loading ? (
                 <>

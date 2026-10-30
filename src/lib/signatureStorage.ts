@@ -1,7 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-
-import os from 'os';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 
 const STORAGE_DIR = process.env.VERCEL
   ? path.join(os.tmpdir(), 'signatures')
@@ -17,10 +16,13 @@ try {
 }
 
 /**
- * Saves a base64 signature image to secure server storage.
+ * Saves an e-signature.
+ * In local development, saves to disk cache.
+ * In cloud/serverless environments (like Vercel), returns the self-contained data URI
+ * so the signature permanently persists in PostgreSQL and is never lost across serverless cold starts.
  * @param userId The ID of the employee
  * @param base64Data The signature data URL or raw base64 string
- * @returns The relative storage path/filename
+ * @returns The persistent signature data URL / storage reference
  */
 export async function saveSignatureFile(userId: string, base64Data: string): Promise<string> {
   const matches = base64Data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
@@ -32,25 +34,45 @@ export async function saveSignatureFile(userId: string, base64Data: string): Pro
     buffer = Buffer.from(base64Data, 'base64');
   }
 
-  // Sanitize and generate unique filename
-  const safeUserId = userId.replace(/[^a-zA-Z0-9_-]/g, '');
-  const filename = `sig_${safeUserId}_${Date.now()}.png`;
-  const filePath = path.join(STORAGE_DIR, filename);
+  // Attempt local disk cache write (best-effort, non-blocking)
+  try {
+    const safeUserId = userId.replace(/[^a-zA-Z0-9_-]/g, '');
+    const filename = `sig_${safeUserId}_${Date.now()}.png`;
+    const filePath = path.join(STORAGE_DIR, filename);
+    await fs.promises.writeFile(filePath, buffer);
+  } catch (e) {
+    console.warn('[Signature Storage] Local disk write skipped or unsupported:', e);
+  }
 
-  await fs.promises.writeFile(filePath, buffer);
+  // Normalize and return standard data URI so signature is completely resilient in PostgreSQL
+  const normalizedDataUrl = base64Data.startsWith('data:')
+    ? base64Data
+    : `data:image/png;base64,${base64Data}`;
 
-  // Return the filename to store in the database
-  return filename;
+  return normalizedDataUrl;
 }
 
 /**
- * Reads a signature file from secure storage.
- * @param filename The stored filename
+ * Reads a signature buffer from either data URI or local storage file.
+ * @param filenameOrData The stored filename or data URL
  * @returns Buffer or null if not found
  */
-export async function getSignatureBuffer(filename: string): Promise<Buffer | null> {
+export async function getSignatureBuffer(filenameOrData: string): Promise<Buffer | null> {
   try {
-    const cleanFilename = path.basename(filename); // Prevent path traversal
+    if (!filenameOrData) return null;
+
+    // Direct base64 Data URL decoding
+    if (filenameOrData.startsWith('data:')) {
+      const matches = filenameOrData.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+      if (matches && matches[2]) {
+        return Buffer.from(matches[2], 'base64');
+      }
+      const rawBase64 = filenameOrData.split(',')[1] || filenameOrData;
+      return Buffer.from(rawBase64, 'base64');
+    }
+
+    // Local file fallback
+    const cleanFilename = path.basename(filenameOrData); // Prevent path traversal
     const filePath = path.join(STORAGE_DIR, cleanFilename);
     if (!fs.existsSync(filePath)) return null;
     return await fs.promises.readFile(filePath);

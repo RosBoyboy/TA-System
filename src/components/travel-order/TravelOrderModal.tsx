@@ -28,7 +28,9 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
   const employeeSection = request.createdBy?.section || 'Technical Services Division';
   const trackingNo = request.trackingNumber ? request.trackingNumber.replace('TA-', 'TO-') : 'TO-2026-0001';
   const employeeSignatureSrc = (request.createdBy as any)?.signatureUrl
-    ? `/api/signatures/${request.createdById}`
+    ? (request.createdBy as any).signatureUrl.startsWith('data:')
+      ? (request.createdBy as any).signatureUrl
+      : `/api/signatures/${request.createdById}`
     : '/signatures/signature_employee.png';
 
   const formatDocDate = (d?: string | Date | null) => {
