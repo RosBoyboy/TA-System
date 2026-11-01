@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, isDummyDbUrl } from '@/lib/prisma';
@@ -398,73 +398,163 @@ export async function POST(req: Request) {
         submitMsg = `Your Travel Order request (${request.trackingNumber}) to ${destination} has been submitted for Head of PENRO approval.`;
       }
 
-      await notifyUser({
-        userId,
-        requestId: request.id,
-        title: 'TO Request Submitted',
-        message: submitMsg,
-        channel: 'BOTH',
-        taDetails,
-        actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,
-      });
-
-      // Target the appropriate first pending approver:
-      if (initialStatus === TARequestStatus.PENDING_SECTION_CHIEF) {
-        await notifyRole({
-          role: Role.SECTION_CHIEF,
-          section: userSection,
-          requestId: request.id,
-          title: 'New TO Request for Review',
-          message: `New Travel Order request (${request.trackingNumber}) by ${userName} (${userSection || 'Section'}) to ${destination} is awaiting Section Chief verification.`,
-          channel: 'BOTH',
-          taDetails,
-          actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
-        });
-      } else if (initialStatus === TARequestStatus.PENDING_DIVISION_CHIEF) {
-        await notifyRole({
-          role: Role.DIVISION_CHIEF,
-          division: userDivision,
-          requestId: request.id,
-          title: 'New TO Request for Review',
-          message: `New Travel Order request (${request.trackingNumber}) by ${userName} (${userDivision || 'Division'}) to ${destination} is awaiting Division Chief verification.`,
-          channel: 'BOTH',
-          taDetails,
-          actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
-        });
+      // ── FAST IN-APP NOTIFICATIONS (Synchronous, ~20ms) ──────────────────────
+      // Immediately write In-App Notification records to Supabase so that
+      // Supabase Realtime emits WebSocket push events to the Section Chief with ZERO delay!
+      let approverTitle = 'New TO Request for Review';
+      let approverMsg = `New Travel Order request (${request.trackingNumber}) by ${userName} (${userSection || 'Section'}) to ${destination} is awaiting Section Chief verification.`;
+      if (initialStatus === TARequestStatus.PENDING_DIVISION_CHIEF) {
+        approverTitle = 'New TO Request for Review';
+        approverMsg = `New Travel Order request (${request.trackingNumber}) by ${userName} (${userDivision || 'Division'}) to ${destination} is awaiting Division Chief verification.`;
       } else if (initialStatus === TARequestStatus.PENDING_HEAD_PENRO) {
-        await notifyRole({
-          role: Role.HEAD_PENRO,
-          requestId: request.id,
-          title: 'New TO Request for Approval',
-          message: `New Travel Order request (${request.trackingNumber}) by ${userName} to ${destination} is awaiting Head of PENRO approval.`,
-          channel: 'BOTH',
-          taDetails,
-          actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
-        });
+        approverTitle = 'New TO Request for Approval';
+        approverMsg = `New Travel Order request (${request.trackingNumber}) by ${userName} to ${destination} is awaiting Head of PENRO approval.`;
       }
-    }
 
-    // Audit Log: Record TO creation/submission event
-    if (request) {
-      await logAuditEvent({
-        actorId: userId,
-        actorName: userName,
-        actorRole: (session.user as any).role || 'EMPLOYEE',
-        ipAddress: extractIpAddress(req),
-        action: submitImmediately ? 'SUBMITTED' : 'DRAFT_CREATED',
-        target: 'TARequest',
-        targetId: request.id,
-        trackingNumber: request.trackingNumber,
-        requestId: request.id,
-        details: submitImmediately
-          ? `Submitted TO request to ${destination} for Section Chief approval.`
-          : `Created TO request draft to ${destination}.`,
-        metadata: {
-          destination: destination.trim(),
-          startDate,
-          endDate,
-          teamMembersCount: teamMembers.length,
-        },
+      const inAppTasks = [
+        notifyUser({
+          userId,
+          requestId: request.id,
+          title: 'TO Request Submitted',
+          message: submitMsg,
+          channel: 'IN_APP',
+          taDetails,
+          actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,
+        }),
+      ];
+
+      if (initialStatus === TARequestStatus.PENDING_SECTION_CHIEF) {
+        inAppTasks.push(
+          notifyRole({
+            role: Role.SECTION_CHIEF,
+            section: userSection,
+            requestId: request.id,
+            title: approverTitle,
+            message: approverMsg,
+            channel: 'IN_APP',
+            taDetails,
+            actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+          })
+        );
+      } else if (initialStatus === TARequestStatus.PENDING_DIVISION_CHIEF) {
+        inAppTasks.push(
+          notifyRole({
+            role: Role.DIVISION_CHIEF,
+            division: userDivision,
+            requestId: request.id,
+            title: approverTitle,
+            message: approverMsg,
+            channel: 'IN_APP',
+            taDetails,
+            actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+          })
+        );
+      } else if (initialStatus === TARequestStatus.PENDING_HEAD_PENRO) {
+        inAppTasks.push(
+          notifyRole({
+            role: Role.HEAD_PENRO,
+            requestId: request.id,
+            title: approverTitle,
+            message: approverMsg,
+            channel: 'IN_APP',
+            taDetails,
+            actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+          })
+        );
+      }
+
+      try {
+        await Promise.all(inAppTasks);
+      } catch (inAppErr) {
+        console.error('[ta-requests] In-app notification error:', inAppErr);
+      }
+
+      // ── SCHEDULE EXTERNAL SMS, EMAIL & AUDIT LOG VIA AFTER() ──────────────────
+      after(async () => {
+        try {
+          const externalTasks: Promise<any>[] = [
+            notifyUser({
+              userId,
+              requestId: request.id,
+              title: 'TO Request Submitted',
+              message: submitMsg,
+              channel: 'BOTH',
+              taDetails,
+              actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,
+              skipDbInsert: true,
+            })
+          ];
+
+          if (initialStatus === TARequestStatus.PENDING_SECTION_CHIEF) {
+            externalTasks.push(
+              notifyRole({
+                role: Role.SECTION_CHIEF,
+                section: userSection,
+                requestId: request.id,
+                title: approverTitle,
+                message: approverMsg,
+                channel: 'BOTH',
+                taDetails,
+                actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+                skipDbInsert: true,
+              })
+            );
+          } else if (initialStatus === TARequestStatus.PENDING_DIVISION_CHIEF) {
+            externalTasks.push(
+              notifyRole({
+                role: Role.DIVISION_CHIEF,
+                division: userDivision,
+                requestId: request.id,
+                title: approverTitle,
+                message: approverMsg,
+                channel: 'BOTH',
+                taDetails,
+                actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+                skipDbInsert: true,
+              })
+            );
+          } else if (initialStatus === TARequestStatus.PENDING_HEAD_PENRO) {
+            externalTasks.push(
+              notifyRole({
+                role: Role.HEAD_PENRO,
+                requestId: request.id,
+                title: approverTitle,
+                message: approverMsg,
+                channel: 'BOTH',
+                taDetails,
+                actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+                skipDbInsert: true,
+              })
+            );
+          }
+
+          externalTasks.push(
+            logAuditEvent({
+              actorId: userId,
+              actorName: userName,
+              actorRole: (session.user as any).role || 'EMPLOYEE',
+              ipAddress: extractIpAddress(req),
+              action: submitImmediately ? 'SUBMITTED' : 'DRAFT_CREATED',
+              target: 'TARequest',
+              targetId: request.id,
+              trackingNumber: request.trackingNumber,
+              requestId: request.id,
+              details: submitImmediately
+                ? `Submitted TO request to ${destination} for Section Chief approval.`
+                : `Created TO request draft to ${destination}.`,
+              metadata: {
+                destination: destination.trim(),
+                startDate,
+                endDate,
+                teamMembersCount: teamMembers.length,
+              },
+            })
+          );
+
+          await Promise.allSettled(externalTasks);
+        } catch (bgErr) {
+          console.error('[ta-requests after()] Background error:', bgErr);
+        }
       });
     }
 

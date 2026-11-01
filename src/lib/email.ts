@@ -449,8 +449,8 @@ export async function sendEmail({
       console.log(`[SMTP Success] Email dispatched to ${trimmedTo} (MessageID: ${info.messageId})`);
       return true;
     } catch (smtpError) {
-      console.error('[SMTP Error] Failed to dispatch email via SMTP:', smtpError);
-      return false;
+      console.warn('[SMTP Warning] Failed to dispatch email via SMTP, attempting Resend fallback...', smtpError);
+      // Fall through to Resend REST API below
     }
   }
 

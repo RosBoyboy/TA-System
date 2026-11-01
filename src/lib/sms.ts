@@ -32,6 +32,7 @@ export interface NotifyUserParams {
   channel?: 'IN_APP' | 'SMS' | 'EMAIL' | 'BOTH';
   taDetails?: TADetails;
   actionUrl?: string;
+  skipDbInsert?: boolean;
 }
 
 export interface NotifyRoleParams {
@@ -44,6 +45,7 @@ export interface NotifyRoleParams {
   channel?: 'IN_APP' | 'SMS' | 'EMAIL' | 'BOTH';
   taDetails?: TADetails;
   actionUrl?: string;
+  skipDbInsert?: boolean;
 }
 
 /**
@@ -169,6 +171,7 @@ export async function notifyUser({
   channel = 'BOTH',
   taDetails,
   actionUrl,
+  skipDbInsert = false,
 }: NotifyUserParams) {
   try {
     let phoneNumber = '';
@@ -210,8 +213,9 @@ export async function notifyUser({
       }
     }
 
-    // 2. Create in-app notification in DB (Option A: Safe zero-migration schema)
-    try {
+    // 2. Create in-app notification in DB (unless skipDbInsert is true)
+    if (!skipDbInsert) {
+      try {
       const dbChannel = channel === 'EMAIL' ? 'IN_APP' : channel;
       notification = await prisma.notification.create({
         data: {
@@ -246,6 +250,12 @@ export async function notifyUser({
 
         notification = sbNotif || { id: notifId, userId, title, message, createdAt: new Date().toISOString() };
       }
+    }
+    }
+
+    // Fast-path: If purely in-app notification, return immediately without performing external network calls
+    if (channel === 'IN_APP') {
+      return notification;
     }
 
     // 3. Fire SMS if channel includes SMS/BOTH and phone is available
@@ -405,6 +415,7 @@ export async function notifyRole({
   channel = 'BOTH',
   taDetails,
   actionUrl,
+  skipDbInsert = false,
 }: NotifyRoleParams) {
   try {
     let targetUsers: Array<{ id: string; phoneNumber?: string; email?: string; name?: string }> = [];
@@ -476,20 +487,21 @@ export async function notifyRole({
       }
     }
 
-    // 3. Send notifications to all target approvers
-    const results = [];
-    for (const user of targetUsers) {
-      const res = await notifyUser({
-        userId: user.id,
-        requestId,
-        title,
-        message,
-        channel,
-        taDetails,
-        actionUrl,
-      });
-      results.push(res);
-    }
+    // 3. Send notifications to all target approvers in parallel
+    const results = await Promise.all(
+      targetUsers.map((user) =>
+        notifyUser({
+          userId: user.id,
+          requestId,
+          title,
+          message,
+          channel,
+          taDetails,
+          actionUrl,
+          skipDbInsert,
+        })
+      )
+    );
 
     return results;
   } catch (error) {

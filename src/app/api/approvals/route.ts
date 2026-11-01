@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma, isDummyDbUrl } from '@/lib/prisma';
@@ -235,87 +235,148 @@ export async function POST(req: Request) {
         remarks: cleanRemarks || undefined,
       };
 
-      // ── NON-BLOCKING BACKGROUND DISPATCH ──────────────────────────────────────
-      // SMS dispatch, external geocoding, and Gmail SMTP TLS handshakes take seconds.
-      // We run them in the background so the user returns to their dashboard in milliseconds!
-      void (async () => {
-        try {
-          // 1. Notify creator employee
-          await notifyUser({
-            userId: request.createdById,
+      // ── FAST IN-APP NOTIFICATION INSERTS (Synchronous, ~20ms) ────────────────
+      // Immediately write In-App Notification records to Supabase so that
+      // Supabase Realtime emits WebSocket push events to the next reviewer with ZERO delay!
+      let divChiefMsg = '';
+      let penroMsg = '';
+      if (currentStepOrder === 1) {
+        divChiefMsg = `${employeeName}'s TO Request (${request.trackingNumber}) has been reviewed and endorsed by the Section Chief. It is now awaiting your Division Chief review.`;
+        if (cleanRemarks) {
+          divChiefMsg += ` Section Chief Remarks: "${cleanRemarks}"`;
+        }
+      } else if (currentStepOrder === 2) {
+        penroMsg = `${employeeName}'s TO Request (${request.trackingNumber}) has been reviewed and endorsed by the Division Chief. It is now awaiting your final approval as Head of PENRO.`;
+        if (cleanRemarks) {
+          penroMsg += ` Division Chief Remarks: "${cleanRemarks}"`;
+        }
+      }
+
+      const inAppTasks = [
+        notifyUser({
+          userId: request.createdById,
+          requestId: request.id,
+          title: currentStepOrder === 3 ? 'TO Request Fully Approved' : 'TO Request Step Approved',
+          message: notificationMsg,
+          channel: 'IN_APP',
+          taDetails,
+          actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,
+        }),
+      ];
+
+      if (currentStepOrder === 1) {
+        inAppTasks.push(
+          notifyRole({
+            role: Role.DIVISION_CHIEF,
+            division: reqDivision,
             requestId: request.id,
-            title: currentStepOrder === 3 ? 'TO Request Fully Approved' : 'TO Request Step Approved',
-            message: notificationMsg,
-            channel: 'BOTH',
-            taDetails,
-            actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,
-          });
-        } catch (notifErr) {
-          console.error('[Approvals API Background] notifyUser error:', notifErr);
-        }
+            title: 'TO Request Reviewed by Section Chief',
+            message: divChiefMsg,
+            channel: 'IN_APP',
+            taDetails: { ...taDetails, status: 'PENDING_DIVISION_CHIEF' },
+            actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+          })
+        );
+      } else if (currentStepOrder === 2) {
+        inAppTasks.push(
+          notifyRole({
+            role: Role.HEAD_PENRO,
+            requestId: request.id,
+            title: 'TO Request Reviewed by Division Chief',
+            message: penroMsg,
+            channel: 'IN_APP',
+            taDetails: { ...taDetails, status: 'PENDING_HEAD_PENRO' },
+            actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+          })
+        );
+      }
 
+      try {
+        await Promise.all(inAppTasks);
+      } catch (inAppErr) {
+        console.error('[Approvals API] In-App notification error:', inAppErr);
+      }
+
+      // ── SCHEDULE EXTERNAL SMS, EMAIL & AUDIT LOG VIA AFTER() ──────────────────
+      // Next.js after() guarantees serverless runtime on Vercel keeps the lambda alive
+      // while dispatching SMS and Transactional Email in the background without blocking HTTP response!
+      after(async () => {
         try {
-          // 2. Notify next approver role — targeted to specific division chief
+          const externalTasks: Promise<any>[] = [];
+
+          // 1. External alerts (SMS & Email) for creator employee
+          externalTasks.push(
+            notifyUser({
+              userId: request.createdById,
+              requestId: request.id,
+              title: currentStepOrder === 3 ? 'TO Request Fully Approved' : 'TO Request Step Approved',
+              message: notificationMsg,
+              channel: 'BOTH',
+              taDetails,
+              actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,
+              skipDbInsert: true,
+            })
+          );
+
+          // 2. External alerts (SMS & Email) for next reviewer
           if (currentStepOrder === 1) {
-            let divChiefMsg = `${employeeName}'s TO Request (${request.trackingNumber}) has been reviewed and endorsed by the Section Chief. It is now awaiting your Division Chief review.`;
-            if (cleanRemarks) {
-              divChiefMsg += ` Section Chief Remarks: "${cleanRemarks}"`;
-            }
-            await notifyRole({
-              role: Role.DIVISION_CHIEF,
-              division: reqDivision,
-              requestId: request.id,
-              title: 'TO Request Reviewed by Section Chief',
-              message: divChiefMsg,
-              channel: 'BOTH',
-              taDetails: { ...taDetails, status: 'PENDING_DIVISION_CHIEF' },
-              actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
-            });
+            externalTasks.push(
+              notifyRole({
+                role: Role.DIVISION_CHIEF,
+                division: reqDivision,
+                requestId: request.id,
+                title: 'TO Request Reviewed by Section Chief',
+                message: divChiefMsg,
+                channel: 'BOTH',
+                taDetails: { ...taDetails, status: 'PENDING_DIVISION_CHIEF' },
+                actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+                skipDbInsert: true,
+              })
+            );
           } else if (currentStepOrder === 2) {
-            let penroMsg = `${employeeName}'s TO Request (${request.trackingNumber}) has been reviewed and endorsed by the Division Chief. It is now awaiting your final approval as Head of PENRO.`;
-            if (cleanRemarks) {
-              penroMsg += ` Division Chief Remarks: "${cleanRemarks}"`;
-            }
-            await notifyRole({
-              role: Role.HEAD_PENRO,
-              requestId: request.id,
-              title: 'TO Request Reviewed by Division Chief',
-              message: penroMsg,
-              channel: 'BOTH',
-              taDetails: { ...taDetails, status: 'PENDING_HEAD_PENRO' },
-              actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
-            });
+            externalTasks.push(
+              notifyRole({
+                role: Role.HEAD_PENRO,
+                requestId: request.id,
+                title: 'TO Request Reviewed by Division Chief',
+                message: penroMsg,
+                channel: 'BOTH',
+                taDetails: { ...taDetails, status: 'PENDING_HEAD_PENRO' },
+                actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/staff?tab=pending`,
+                skipDbInsert: true,
+              })
+            );
           }
-        } catch (roleNotifErr) {
-          console.error('[Approvals API Background] notifyRole error:', roleNotifErr);
-        }
 
-        try {
-          // 3. Audit Log: Record approval event
+          // 3. Audit Log
           const roleLabels: Record<number, string> = { 1: 'Section Chief', 2: 'Division Chief', 3: 'Head of PENRO' };
-          await logAuditEvent({
-            actorId: userId,
-            actorName: approverName,
-            actorRole: userRole,
-            ipAddress: extractIpAddress(req),
-            action: 'APPROVED',
-            target: 'TARequest',
-            targetId: requestId,
-            trackingNumber: request.trackingNumber,
-            requestId: requestId,
-            details: `Step ${currentStepOrder} (${roleLabels[currentStepOrder]}) approved. Status → ${nextStatus}.`,
-            metadata: {
-              stepOrder: currentStepOrder,
-              stepRole: requiredRoleForStep[currentStepOrder],
-              previousStatus: request.status,
-              newStatus: nextStatus,
-              remarks: cleanRemarks || null,
-            },
-          });
-        } catch (auditErr) {
-          console.error('[Approvals API Background] logAuditEvent error:', auditErr);
+          externalTasks.push(
+            logAuditEvent({
+              actorId: userId,
+              actorName: approverName,
+              actorRole: userRole,
+              ipAddress: extractIpAddress(req),
+              action: 'APPROVED',
+              target: 'TARequest',
+              targetId: requestId,
+              trackingNumber: request.trackingNumber,
+              requestId: requestId,
+              details: `Step ${currentStepOrder} (${roleLabels[currentStepOrder]}) approved. Status → ${nextStatus}.`,
+              metadata: {
+                stepOrder: currentStepOrder,
+                stepRole: requiredRoleForStep[currentStepOrder],
+                previousStatus: request.status,
+                newStatus: nextStatus,
+                remarks: cleanRemarks || null,
+              },
+            })
+          );
+
+          await Promise.allSettled(externalTasks);
+        } catch (bgErr) {
+          console.error('[Approvals after()] Background dispatch error:', bgErr);
         }
-      })();
+      });
 
       return NextResponse.json({
         success: true,
@@ -387,48 +448,65 @@ export async function POST(req: Request) {
         remarks: remarks.trim(),
       };
 
-      // ── NON-BLOCKING BACKGROUND DISPATCH FOR REJECTION ────────────────────────
-      void (async () => {
-        try {
-          await notifyUser({
-            userId: request.createdById,
-            requestId: request.id,
-            title: 'TO Request Returned for Revision',
-            message: `Your TO Request (${request.trackingNumber}) was returned by ${userRole}. Reason: "${remarks.trim()}". You may edit the travel dates and resubmit.`,
-            channel: 'BOTH',
-            taDetails: rejectTaDetails,
-            actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,
-          });
-        } catch (notifErr) {
-          console.error('[Approvals API Background] reject notifyUser error:', notifErr);
-        }
+      // ── FAST IN-APP NOTIFICATION INSERT (Synchronous, ~20ms) ────────────────
+      const rejectTitle = 'TO Request Returned for Revision';
+      const rejectMsg = `Your TO Request (${request.trackingNumber}) was returned by ${userRole}. Reason: "${remarks.trim()}". You may edit the travel dates and resubmit.`;
 
+      try {
+        await notifyUser({
+          userId: request.createdById,
+          requestId: request.id,
+          title: rejectTitle,
+          message: rejectMsg,
+          channel: 'IN_APP',
+          taDetails: rejectTaDetails,
+          actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,
+        });
+      } catch (inAppErr) {
+        console.error('[Approvals API] Rejection in-app notification error:', inAppErr);
+      }
+
+      // ── SCHEDULE EXTERNAL SMS, EMAIL & AUDIT LOG VIA AFTER() ──────────────────
+      after(async () => {
         try {
           const rejecterName = (session.user as any)?.name || 'Approving Official';
           const roleLabelsReject: Record<number, string> = { 1: 'Section Chief', 2: 'Division Chief', 3: 'Head of PENRO' };
-          await logAuditEvent({
-            actorId: userId,
-            actorName: rejecterName,
-            actorRole: userRole,
-            ipAddress: extractIpAddress(req),
-            action: 'REJECTED',
-            target: 'TARequest',
-            targetId: requestId,
-            trackingNumber: request.trackingNumber,
-            requestId: requestId,
-            details: `Rejected at step ${currentStepOrder} (${roleLabelsReject[currentStepOrder]}). Reason: "${remarks.trim()}"`,
-            metadata: {
-              stepOrder: currentStepOrder,
-              stepRole: requiredRoleForStep[currentStepOrder],
-              previousStatus: request.status,
-              newStatus: 'REJECTED_MANUAL',
-              remarks: remarks.trim(),
-            },
-          });
-        } catch (auditErr) {
-          console.error('[Approvals API Background] reject logAuditEvent error:', auditErr);
+
+          await Promise.allSettled([
+            notifyUser({
+              userId: request.createdById,
+              requestId: request.id,
+              title: rejectTitle,
+              message: rejectMsg,
+              channel: 'BOTH',
+              taDetails: rejectTaDetails,
+              actionUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`,
+              skipDbInsert: true,
+            }),
+            logAuditEvent({
+              actorId: userId,
+              actorName: rejecterName,
+              actorRole: userRole,
+              ipAddress: extractIpAddress(req),
+              action: 'REJECTED',
+              target: 'TARequest',
+              targetId: requestId,
+              trackingNumber: request.trackingNumber,
+              requestId: requestId,
+              details: `Rejected at step ${currentStepOrder} (${roleLabelsReject[currentStepOrder]}). Reason: "${remarks.trim()}"`,
+              metadata: {
+                stepOrder: currentStepOrder,
+                stepRole: requiredRoleForStep[currentStepOrder],
+                previousStatus: request.status,
+                newStatus: 'REJECTED_MANUAL',
+                remarks: remarks.trim(),
+              },
+            })
+          ]);
+        } catch (err) {
+          console.error('[Approvals Rejection after()] Error:', err);
         }
-      })();
+      });
 
       return NextResponse.json({
         success: true,

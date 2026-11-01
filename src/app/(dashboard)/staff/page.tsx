@@ -156,7 +156,10 @@ function StaffDashboardContent() {
     fetchNotifications();
     // Reduced from 15s to 60s — Supabase Realtime handles instant delivery via layout hook,
     // this is now a safety-net fallback only
-    const interval = setInterval(fetchNotifications, 60000);
+    const interval = setInterval(() => {
+      fetchNotifications();
+      fetchRequests();
+    }, 15000);
 
     // Listen for realtime push-based notification refresh events
     const handleRealtimeRefresh = () => {
