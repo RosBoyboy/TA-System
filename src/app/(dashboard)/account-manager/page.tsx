@@ -37,6 +37,15 @@ interface TARequestRecord {
   createdAt: string;
 }
 
+const roleDisplayNames: Record<string, string> = {
+  EMPLOYEE: 'Employee',
+  SECTION_CHIEF: 'Section Chief',
+  DIVISION_CHIEF: 'Division Chief',
+  HEAD_PENRO: 'Head of PENRO',
+  ACCOUNT_MANAGER: 'Account Manager',
+  ADMIN: 'Administrator',
+};
+
 // Dual Month Calendar Picker Component matching Employee Portal
 function DualMonthCalendarPicker({
   departureDate,
@@ -1189,7 +1198,7 @@ function AccountManagerContent() {
                         </td>
                         <td className="py-3.5 px-4">
                           <span className="text-xs font-semibold text-slate-700">
-                            {u.role}
+                            {roleDisplayNames[u.role] || (u.role ? u.role.replace(/_/g, ' ') : '')}
                           </span>
                         </td>
                         <td className="py-3.5 px-4">
@@ -1819,7 +1828,7 @@ function AccountManagerContent() {
                           <p className="text-[10px] text-slate-400 font-mono">{u.email}</p>
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-slate-700">{u.role}</td>
+                      <td className="py-3.5 px-4 text-slate-700">{roleDisplayNames[u.role] || (u.role ? u.role.replace(/_/g, ' ') : '')}</td>
                       <td className="py-3.5 px-4">
                         <span
                           className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider ${
@@ -2627,11 +2636,11 @@ function AccountManagerContent() {
                   onChange={(e) => setActivationRole(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-[#0F4C2E]"
                 >
-                  <option value="EMPLOYEE">EMPLOYEE (Standard Staff / Requester)</option>
-                  <option value="SECTION_CHIEF">SECTION_CHIEF (Level 1 Signatory)</option>
-                  <option value="DIVISION_CHIEF">DIVISION_CHIEF (Level 2 Signatory)</option>
-                  <option value="HEAD_PENRO">HEAD_PENRO (Final Approver)</option>
-                  <option value="ACCOUNT_MANAGER">ACCOUNT_MANAGER (HR Administrator)</option>
+                  <option value="EMPLOYEE">Employee (Standard Staff / Requester)</option>
+                  <option value="SECTION_CHIEF">Section Chief (Level 1 Signatory)</option>
+                  <option value="DIVISION_CHIEF">Division Chief (Level 2 Signatory)</option>
+                  <option value="HEAD_PENRO">Head of PENRO (Final Approver)</option>
+                  <option value="ACCOUNT_MANAGER">Account Manager (HR Administrator)</option>
                 </select>
               </div>
 

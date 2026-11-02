@@ -10,6 +10,15 @@ interface ProfileModalProps {
   onProfileUpdated?: (updatedData: any) => void;
 }
 
+const roleDisplayNames: Record<string, string> = {
+  EMPLOYEE: 'Employee',
+  SECTION_CHIEF: 'Section Chief',
+  DIVISION_CHIEF: 'Division Chief',
+  HEAD_PENRO: 'Head of PENRO',
+  ACCOUNT_MANAGER: 'Account Manager',
+  ADMIN: 'Administrator',
+};
+
 export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: ProfileModalProps) {
   const { data: session, update: updateSession } = useSession();
   const user = session?.user as any;
@@ -356,7 +365,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
               <h4 className="text-lg font-black text-slate-900 truncate">{name || 'User Profile'}</h4>
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
-                {userRole}
+                {roleDisplayNames[userRole] || userRole.replace(/_/g, ' ')}
               </span>
               {username && (
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-200 text-slate-700 border border-slate-300">

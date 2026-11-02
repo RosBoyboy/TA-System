@@ -450,7 +450,8 @@ export async function POST(req: Request) {
 
       // ── FAST IN-APP NOTIFICATION INSERT (Synchronous, ~20ms) ────────────────
       const rejectTitle = 'TO Request Returned for Revision';
-      const rejectMsg = `Your TO Request (${request.trackingNumber}) was returned by ${userRole}. Reason: "${remarks.trim()}". You may edit the travel dates and resubmit.`;
+      const formattedRejectRole = userRole === 'SECTION_CHIEF' ? 'Section Chief' : userRole === 'DIVISION_CHIEF' ? 'Division Chief' : userRole === 'HEAD_PENRO' ? 'Head of PENRO' : userRole.replace(/_/g, ' ');
+      const rejectMsg = `Your TO Request (${request.trackingNumber}) was returned by ${formattedRejectRole}. Reason: "${remarks.trim()}". You may edit the travel dates and resubmit.`;
 
       try {
         await notifyUser({

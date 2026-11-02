@@ -166,8 +166,8 @@ export default function ProfileDropdown() {
 
             <h4 className="text-sm font-black text-slate-900 mt-1">Hi, {name}!</h4>
             <div className="mt-1 flex flex-wrap items-center justify-center gap-1.5">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                {role}
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                {roleDisplayNames[role] || (role ? role.replace(/_/g, ' ') : '')}
               </span>
               {position && (
                 <span className="text-[10px] text-slate-600 font-semibold truncate max-w-[140px]">
