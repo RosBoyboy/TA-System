@@ -1422,7 +1422,7 @@ function EmployeeContent() {
       return (
         <div className="w-full max-w-[1400px] mx-auto space-y-6 animate-fade-in pb-10 flex flex-col">
           {/* Wizard Stepper Bar at Top (Matching PDF Header Stepper) */}
-          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-2xs">
+          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-2xs relative isolate">
             <div className="flex items-center justify-between relative px-8">
               <div className="absolute left-12 right-12 top-4 h-0.5 bg-slate-200 z-0"></div>
 

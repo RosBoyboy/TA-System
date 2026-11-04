@@ -1242,7 +1242,7 @@ function StaffDashboardContent() {
           </div>
 
           {/* Right Column (1/3): Approval Workflow SOP Card (Matching PDF Page 1) */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden flex flex-col justify-between">
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden flex flex-col justify-between relative isolate">
             <div>
               <div className="bg-[#1B4332] text-white p-5">
                 <h3 className="text-sm font-extrabold">Approval Workflow</h3>

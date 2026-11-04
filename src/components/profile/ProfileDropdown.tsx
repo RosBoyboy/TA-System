@@ -92,7 +92,7 @@ export default function ProfileDropdown() {
   const displaySubtitle = position || roleDisplayNames[role] || (role === 'EMPLOYEE' ? 'Employee' : role.replace(/_/g, ' '));
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative z-50" ref={dropdownRef}>
       {/* Clickable Header Profile Button */}
       <button
         type="button"

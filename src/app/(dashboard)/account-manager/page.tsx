@@ -2006,7 +2006,7 @@ function AccountManagerContent() {
           {taSubTab === 'create' ? (
             <div className="space-y-6 animate-fade-in">
               {/* Wizard Stepper Bar */}
-              <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs">
+              <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs relative isolate">
                 <div className="flex items-center justify-between relative px-8">
                   <div className="absolute left-12 right-12 top-4 h-0.5 bg-slate-200 z-0"></div>
 

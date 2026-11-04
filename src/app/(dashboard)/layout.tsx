@@ -795,7 +795,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       {/* Main Right Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden md:ml-64 md:h-screen">
         {/* Top Header Bar */}
-        <header className="h-16 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between shadow-xs sticky top-0 z-10 shrink-0">
+        <header className="h-16 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between shadow-xs sticky top-0 z-40 shrink-0">
           <div>
             <h2 className="text-base font-bold text-slate-800">{getPageTitle()}</h2>
           </div>
