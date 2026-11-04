@@ -49,6 +49,7 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
   const departureDate = formatShortDate(request.startDate);
   const arrivalDate = formatShortDate(request.endDate);
 
+  const step1 = request.approvalSteps?.find((s: any) => s.order === 1);
   const step2 = request.approvalSteps?.find((s: any) => s.order === 2);
   const step3 = request.approvalSteps?.find((s: any) => s.order === 3);
 
@@ -58,10 +59,31 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
 
   const divChiefName = step2?.approver?.name || "DIVISION CHIEF's name";
   const divChiefPosition = (step2?.approver as any)?.position || defaultDivTitle;
+  const divChiefSignatureSrc = (step2?.approver as any)?.signatureUrl
+    ? (step2?.approver as any).signatureUrl.startsWith('data:')
+      ? (step2?.approver as any).signatureUrl
+      : `/api/signatures/${(step2?.approver as any)?.id}`
+    : '/signatures/signature_div_chief.png';
 
   const penroName = step3?.approver?.name || "HEAD OF PENRO's name";
   const penroPosition = (step3?.approver as any)?.position || 'Provincial Environment and Natural Resources Officer';
+  const penroSignatureSrc = (step3?.approver as any)?.signatureUrl
+    ? (step3?.approver as any).signatureUrl.startsWith('data:')
+      ? (step3?.approver as any).signatureUrl
+      : `/api/signatures/${(step3?.approver as any)?.id}`
+    : '/signatures/signature_penro.png';
+
   const dateApproved = formatDocDate(step3?.actionDate || request.updatedAt || request.createdAt);
+
+  // Section Chief (Step 1) signature & name (if endorsed or on file)
+  const sectionChiefApprover = step1?.approver;
+  const sectionChiefName = sectionChiefApprover?.name || (request.createdBy?.section ? `Chief, ${request.createdBy?.section}` : 'Section Chief');
+  const sectionChiefPosition = (sectionChiefApprover as any)?.position || (request.createdBy?.section ? `Chief, ${request.createdBy.section}` : 'Section Chief');
+  const sectionChiefSignatureSrc = (sectionChiefApprover as any)?.signatureUrl
+    ? (sectionChiefApprover as any).signatureUrl.startsWith('data:')
+      ? (sectionChiefApprover as any).signatureUrl
+      : `/api/signatures/${(sectionChiefApprover as any)?.id}`
+    : null;
 
   const handlePrint = () => {
     if (!printAreaRef.current) return;
@@ -355,12 +377,17 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
                       <div style={{ fontSize: '10.5px', fontWeight: 'bold', marginBottom: '4px' }}>Recommending Approval:</div>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '240px' }}>
                         <img
-                          src="/signatures/signature_div_chief.png"
+                          src={divChiefSignatureSrc}
                           alt="Division Chief Signature"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/signatures/signature_div_chief.png';
+                          }}
                           style={{
                             height: '52px', maxWidth: '180px', objectFit: 'contain',
                             display: 'block', marginBottom: '-16px',
                             position: 'relative', zIndex: 2, mixBlendMode: 'multiply',
+                            background: 'transparent',
+                            pointerEvents: 'none',
                           }}
                         />
                         <div style={{ width: '100%', borderTop: '1px solid #000', paddingTop: '3px', position: 'relative', zIndex: 1 }}>
@@ -373,12 +400,17 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
                       <div style={{ fontSize: '10.5px', fontWeight: 'bold', marginBottom: '4px' }}>Approved by:</div>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '240px' }}>
                         <img
-                          src="/signatures/signature_penro.png"
+                          src={penroSignatureSrc}
                           alt="Head of PENRO Signature"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/signatures/signature_penro.png';
+                          }}
                           style={{
                             height: '52px', maxWidth: '180px', objectFit: 'contain',
                             display: 'block', marginBottom: '-16px',
                             position: 'relative', zIndex: 2, mixBlendMode: 'multiply',
+                            background: 'transparent',
+                            pointerEvents: 'none',
                           }}
                         />
                         <div style={{ width: '100%', borderTop: '1px solid #000', paddingTop: '3px', position: 'relative', zIndex: 1 }}>
@@ -391,8 +423,31 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
                 </tbody>
               </table>
 
-              <div style={{ textAlign: 'right', fontSize: '10px', fontWeight: 'bold', marginTop: '6px' }}>
-                DA: <span style={{ fontWeight: 'normal' }}>{dateApproved}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10px', marginTop: '8px', borderTop: '1px dashed #ccc', paddingTop: '5px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 'bold', color: '#444' }}>Reviewed &amp; Endorsed by:</span>
+                  {sectionChiefSignatureSrc ? (
+                    <img
+                      src={sectionChiefSignatureSrc}
+                      alt="Section Chief Signature"
+                      style={{
+                        height: '28px',
+                        maxWidth: '110px',
+                        objectFit: 'contain',
+                        mixBlendMode: 'multiply',
+                        display: 'inline-block',
+                        verticalAlign: 'middle',
+                      }}
+                    />
+                  ) : (
+                    <span style={{ fontSize: '9px', fontStyle: 'italic', color: '#15803d', fontWeight: 'bold' }}>[Electronically Endorsed]</span>
+                  )}
+                  <span style={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{sectionChiefName}</span>
+                  <span style={{ color: '#555', fontSize: '9.5px' }}>({sectionChiefPosition})</span>
+                </div>
+                <div style={{ textAlign: 'right', fontSize: '10px', fontWeight: 'bold', flexShrink: 0, marginLeft: '12px' }}>
+                  DA: <span style={{ fontWeight: 'normal' }}>{dateApproved}</span>
+                </div>
               </div>
             </div>
 

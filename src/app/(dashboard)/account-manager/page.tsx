@@ -320,6 +320,11 @@ function AccountManagerContent() {
   const [resetUser, setResetUser] = useState<UserRecord | null>(null);
   const [customPassword, setCustomPassword] = useState('password123');
 
+  // Signature Management Modal State
+  const [signatureModalUser, setSignatureModalUser] = useState<UserRecord | null>(null);
+  const [signatureDataInput, setSignatureDataInput] = useState<string | null>(null);
+  const [signatureSaving, setSignatureSaving] = useState(false);
+
   // Create New Account Form State
   const [newAccountData, setNewAccountData] = useState({
     name: '',
@@ -705,6 +710,52 @@ function AccountManagerContent() {
       showToast(err.message || 'An error occurred resetting password.', 'error');
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  // Handle Save E-Signature for User
+  const handleSaveSignature = async () => {
+    if (!signatureModalUser) return;
+    if (!signatureDataInput || !signatureDataInput.trim()) {
+      showToast('Please draw and affix an e-signature on the canvas before saving.', 'error');
+      return;
+    }
+
+    setSignatureSaving(true);
+    try {
+      const res = await fetch('/api/account-manager/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: signatureModalUser.id,
+          action: 'UPDATE_SIGNATURE',
+          signatureData: signatureDataInput,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || 'Failed to save official e-signature.', 'error');
+        setSignatureSaving(false);
+        return;
+      }
+
+      const updatedSigUrl = data.data?.signatureUrl || signatureDataInput;
+
+      // Optimistically update users in local state
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === signatureModalUser.id ? { ...u, signatureUrl: updatedSigUrl } : u
+        )
+      );
+
+      showToast(`Official e-signature saved successfully for ${signatureModalUser.name}!`, 'success');
+      setSignatureModalUser(null);
+      setSignatureDataInput(null);
+    } catch (err: any) {
+      showToast(err.message || 'An error occurred while saving signature.', 'error');
+    } finally {
+      setSignatureSaving(false);
     }
   };
 
@@ -1183,16 +1234,39 @@ function AccountManagerContent() {
                           <p className="font-medium text-slate-800">{u.division || 'General Office'}</p>
                           {u.section && <p className="text-[10px] text-slate-500 font-normal">{u.section}</p>}
                           {u.position && <p className="text-[10px] text-slate-400 font-normal italic">{u.position}</p>}
-                          <div className="mt-1">
+                          <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                             {u.signatureUrl ? (
-                              <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                                Signature on file
-                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSignatureModalUser(u);
+                                  setSignatureDataInput(null);
+                                }}
+                                className="inline-flex items-center gap-1.5 text-[9px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300 transition-all cursor-pointer shadow-2xs group"
+                                title="Official e-signature on file. Click to view or update signature."
+                              >
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                                <span>Signature on file</span>
+                                <span className="text-emerald-600 group-hover:text-emerald-900 font-semibold underline text-[9px] ml-0.5">Edit</span>
+                              </button>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">
-                                No signature
-                              </span>
+                              <div className="inline-flex items-center gap-1 flex-wrap">
+                                <span className="inline-flex items-center gap-1 text-[9px] font-medium text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">
+                                  No signature
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSignatureModalUser(u);
+                                    setSignatureDataInput(null);
+                                  }}
+                                  className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-300 transition-all cursor-pointer shadow-2xs active:scale-95"
+                                  title="Add official e-signature using stylus pen, board, or mouse"
+                                >
+                                  <span className="text-[11px] font-black leading-none text-emerald-600">+</span>
+                                  <span>Add signature</span>
+                                </button>
+                              </div>
                             )}
                           </div>
                         </td>
@@ -1254,6 +1328,16 @@ function AccountManagerContent() {
                               Enable
                             </button>
                           )}
+                          <button
+                            onClick={() => {
+                              setSignatureModalUser(u);
+                              setSignatureDataInput(null);
+                            }}
+                            className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer"
+                            title="Manage official electronic signature"
+                          >
+                            Signature
+                          </button>
                           <button
                             onClick={() => setResetUser(u)}
                             className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-semibold border border-slate-200"
@@ -2828,6 +2912,142 @@ function AccountManagerContent() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Official E-Signature Management Modal ──────────────────────── */}
+      {signatureModalUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
+            {/* Header */}
+            <div className="px-6 py-4 bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
+                  <svg className="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold tracking-tight">Official E-Signature Management</h3>
+                  <p className="text-[11px] text-emerald-100/80">Affix or update digital signature for TOPS authentication</p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  if (!signatureSaving) {
+                    setSignatureModalUser(null);
+                    setSignatureDataInput(null);
+                  }
+                }}
+                className="text-white/70 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+              {/* User Card */}
+              <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900">{signatureModalUser.name}</h4>
+                  <p className="text-xs text-slate-500 font-mono">@{signatureModalUser.username} &bull; {signatureModalUser.email}</p>
+                  <p className="text-[11px] text-slate-600 mt-0.5 font-medium">
+                    {signatureModalUser.position || 'Personnel'} &bull; {signatureModalUser.section ? `${signatureModalUser.section}, ` : ''}{signatureModalUser.division || 'General Office'}
+                  </p>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  {roleDisplayNames[signatureModalUser.role] || signatureModalUser.role}
+                </span>
+              </div>
+
+              {/* Existing Signature Preview (if on file) */}
+              {signatureModalUser.signatureUrl && (
+                <div className="p-3 bg-emerald-50/50 border border-emerald-200/80 rounded-xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-emerald-900 uppercase tracking-wider">
+                      Current Signature on File
+                    </span>
+                    <span className="text-[10px] text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full font-semibold">
+                      Active
+                    </span>
+                  </div>
+                  <div className="h-20 bg-white rounded-lg border border-emerald-200 flex items-center justify-center p-2 shadow-2xs">
+                    <img
+                      src={
+                        signatureModalUser.signatureUrl.startsWith('data:')
+                          ? signatureModalUser.signatureUrl
+                          : `/api/signatures/${signatureModalUser.id}`
+                      }
+                      alt={`${signatureModalUser.name}'s signature`}
+                      className="max-h-16 max-w-full object-contain mix-blend-multiply"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-500 italic text-center">
+                    Sign below using stylus pen, board, or mouse to replace this existing signature.
+                  </p>
+                </div>
+              )}
+
+              {/* Signature Canvas Pad */}
+              <div>
+                <SignaturePad
+                  onChange={(data) => setSignatureDataInput(data)}
+                  label="Draw Official E-Signature"
+                  description="Use a stylus pen, drawing tablet/board, touch screen, or desktop mouse. Must be clearly signed."
+                  required={true}
+                />
+              </div>
+
+              {/* Legal Notice */}
+              <p className="text-[10px] text-slate-500 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                Pursuant to RA 8792 (Electronic Commerce Act), this electronic signature serves as official legal authentication for Travel Order processing, endorsements, and approvals within DENR-PENRO.
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                disabled={signatureSaving}
+                onClick={() => {
+                  setSignatureModalUser(null);
+                  setSignatureDataInput(null);
+                }}
+                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-white hover:bg-slate-100 border border-slate-300 rounded-xl transition-all cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={signatureSaving || !signatureDataInput}
+                onClick={handleSaveSignature}
+                className="px-5 py-2 text-xs font-bold text-white bg-[#0F4C2E] hover:bg-[#165E3A] rounded-xl shadow-sm transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+              >
+                {signatureSaving ? (
+                  <>
+                    <svg className="w-3.5 h-3.5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <span>Saving Signature...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Save &amp; Affix Signature</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

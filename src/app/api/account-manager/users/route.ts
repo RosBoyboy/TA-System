@@ -373,7 +373,7 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
-    const { userId, action, status, role, division, section, position, password } = body;
+    const { userId, action, status, role, division, section, position, password, signatureData } = body;
 
     if (!userId) {
       return NextResponse.json(
@@ -389,6 +389,15 @@ export async function PATCH(req: Request) {
       updateData.password = await bcrypt.hash(newPass, 10);
     } else if (action === 'TOGGLE_STATUS') {
       updateData.status = status;
+    } else if (action === 'UPDATE_SIGNATURE') {
+      if (!signatureData || !signatureData.trim()) {
+        return NextResponse.json(
+          { success: false, error: 'Valid e-signature data is required.' },
+          { status: 400 }
+        );
+      }
+      const savedSignatureUrl = await saveSignatureFile(userId, signatureData);
+      updateData.signatureUrl = savedSignatureUrl;
     } else {
       if (status) updateData.status = status;
       if (role) {
@@ -403,6 +412,10 @@ export async function PATCH(req: Request) {
         if (section !== undefined) updateData.section = section;
       }
       if (position !== undefined) updateData.position = position;
+      if (signatureData && signatureData.trim()) {
+        const savedSignatureUrl = await saveSignatureFile(userId, signatureData);
+        updateData.signatureUrl = savedSignatureUrl;
+      }
     }
 
     let updatedUser: any = null;
@@ -423,6 +436,7 @@ export async function PATCH(req: Request) {
             division: true,
             section: true,
             position: true,
+            signatureUrl: true,
           },
         });
       } catch (err) {
@@ -439,7 +453,7 @@ export async function PATCH(req: Request) {
         .from('User')
         .update(sbPayload)
         .eq('id', userId)
-        .select('id, name, username, email, phoneNumber, role, status, division, section, position')
+        .select('id, name, username, email, phoneNumber, role, status, division, section, position, signatureUrl')
         .single();
 
       if (!error && data) {
@@ -449,11 +463,32 @@ export async function PATCH(req: Request) {
       }
     }
 
+    // Record audit event for signature or password changes
+    if (action === 'UPDATE_SIGNATURE' || updateData.signatureUrl) {
+      await logAuditEvent({
+        actorId: (session.user as any).id,
+        actorName: (session.user as any).name || 'Account Manager',
+        actorRole: userRole,
+        action: 'USER_SIGNATURE_UPDATED',
+        target: 'User',
+        targetId: userId,
+        details: `Official e-signature updated for ${updatedUser?.name || userId} (${updatedUser?.username || ''}, ${updatedUser?.role || ''}).`,
+        metadata: {
+          targetUserId: userId,
+          targetUsername: updatedUser?.username,
+          targetRole: updatedUser?.role,
+          hasSignature: true,
+        },
+      }).catch(() => {});
+    }
+
     return NextResponse.json({
       success: true,
       message:
         action === 'RESET_PASSWORD'
           ? `Password reset successfully for ${updatedUser.name}.`
+          : action === 'UPDATE_SIGNATURE'
+          ? `Official e-signature updated successfully for ${updatedUser.name}.`
           : `User ${updatedUser.name} updated successfully.`,
       data: updatedUser,
     });

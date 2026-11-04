@@ -43,7 +43,7 @@ export async function GET(
             orderBy: { order: 'asc' },
             include: {
               approver: {
-                select: { id: true, name: true, email: true, position: true, role: true },
+                select: { id: true, name: true, email: true, position: true, role: true, signatureUrl: true },
               },
             },
           },
@@ -53,7 +53,7 @@ export async function GET(
       console.warn('[GET Travel Order] Prisma query fallback to Supabase...', err);
       const { data } = await supabase
         .from('TARequest')
-        .select('*, createdBy:User!createdById(id, name, email, division, section, position, signatureUrl), teamMembers:TARequestMember(*), approvalSteps:ApprovalStep(*)')
+        .select('*, createdBy:User!createdById(id, name, email, division, section, position, signatureUrl), teamMembers:TARequestMember(*), approvalSteps:ApprovalStep(*, approver:User!approverId(id, name, email, position, role, signatureUrl))')
         .eq('id', id)
         .single();
       requestData = data;

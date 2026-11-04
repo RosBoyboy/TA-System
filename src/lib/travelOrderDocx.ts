@@ -3,6 +3,7 @@ import path from 'path';
 import JSZip from 'jszip';
 import { TARequestDTO } from '@/types';
 import { parseUtcDate } from '@/lib/date';
+import { getSignatureBuffer } from '@/lib/signatureStorage';
 
 /**
  * Format date for official Travel Order document (e.g. "August 27, 2026")
@@ -135,16 +136,36 @@ export async function generatePopulatedTravelOrderDocx(req: TARequestDTO): Promi
   const sig2Path = path.join(process.cwd(), 'public', 'signatures', 'signature_penro.png');
   const defaultEmpSigPath = path.join(process.cwd(), 'public', 'signatures', 'signature_employee.png');
 
-  if (fs.existsSync(sig1Path)) zip.file('word/media/image1.jpeg', fs.readFileSync(sig1Path));
-  if (fs.existsSync(sig2Path)) zip.file('word/media/image2.jpg', fs.readFileSync(sig2Path));
+  // Dynamically resolve Division Chief signature (Step 2)
+  let divChiefBuffer: Buffer | null = null;
+  const divChiefSigUrl = (step2?.approver as any)?.signatureUrl;
+  if (divChiefSigUrl) {
+    divChiefBuffer = await getSignatureBuffer(divChiefSigUrl);
+  }
+  if (!divChiefBuffer && fs.existsSync(sig1Path)) {
+    divChiefBuffer = fs.readFileSync(sig1Path);
+  }
+  if (divChiefBuffer) {
+    zip.file('word/media/image1.jpeg', divChiefBuffer);
+  }
 
-  // Dynamically resolve employee signature: check secure storage first, fallback to default
+  // Dynamically resolve Head of PENRO signature (Step 3)
+  let penroBuffer: Buffer | null = null;
+  const penroSigUrl = (step3?.approver as any)?.signatureUrl;
+  if (penroSigUrl) {
+    penroBuffer = await getSignatureBuffer(penroSigUrl);
+  }
+  if (!penroBuffer && fs.existsSync(sig2Path)) {
+    penroBuffer = fs.readFileSync(sig2Path);
+  }
+  if (penroBuffer) {
+    zip.file('word/media/image2.jpg', penroBuffer);
+  }
+
+  // Dynamically resolve employee signature: check secure storage/data URI first, fallback to default
   let empSigBuffer: Buffer | null = null;
   if (req.createdBy?.signatureUrl) {
-    const customSigPath = path.join(process.cwd(), 'storage', 'signatures', path.basename(req.createdBy.signatureUrl));
-    if (fs.existsSync(customSigPath)) {
-      empSigBuffer = fs.readFileSync(customSigPath);
-    }
+    empSigBuffer = await getSignatureBuffer(req.createdBy.signatureUrl);
   }
   if (!empSigBuffer && fs.existsSync(defaultEmpSigPath)) {
     empSigBuffer = fs.readFileSync(defaultEmpSigPath);
