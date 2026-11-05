@@ -21,6 +21,8 @@ export async function GET(req: Request) {
 
     const userId = (session.user as any).id;
     const userRole = (session.user as any).role as Role;
+    const userSection = (session.user as any).section as string | undefined;
+    const userDivision = (session.user as any).division as string | undefined || getDivisionForSection(userSection);
 
     const url = new URL(req.url);
     const statusParam = url.searchParams.get('status');
@@ -210,7 +212,105 @@ export async function GET(req: Request) {
       };
     });
 
-    return NextResponse.json({ success: true, data: processedRequests });
+    // Role-based scoping: Strictly filter requests returned to verifiers
+    const scopedRequests = processedRequests.filter((req) => {
+      // 1. Employees and Account Managers only see their own requests or where they are team members
+      if (userRole === Role.EMPLOYEE || userRole === Role.ACCOUNT_MANAGER) {
+        const isOwner = req.createdById === userId;
+        const isTeamMember = Array.isArray(req.teamMembers) && req.teamMembers.some((m: any) => m.userId === userId);
+        return isOwner || isTeamMember;
+      }
+
+      // 2. Administrators can view all agency requests
+      if (userRole === Role.ADMIN) {
+        return true;
+      }
+
+      // Hide DRAFT requests of other users from all verifiers
+      if (req.status === 'DRAFT' && req.createdById !== userId) {
+        return false;
+      }
+
+      const reqSection = req.createdBy?.section;
+      const reqDivision = req.createdBy?.division || getDivisionForSection(reqSection);
+
+      // 3. Section Chief scoping:
+      // Must belong to this chief's section (or division if general/unspecified section)
+      if (userRole === 'SECTION_CHIEF') {
+        if (userSection && reqSection) {
+          if (reqSection.trim().toLowerCase() !== userSection.trim().toLowerCase()) {
+            return false;
+          }
+        } else if (userDivision && reqDivision) {
+          if (reqDivision.trim().toLowerCase() !== userDivision.trim().toLowerCase()) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      // 4. Division Chief scoping:
+      // Must match this chief's division
+      if (userRole === 'DIVISION_CHIEF') {
+        const effectiveUserDiv = (userDivision || getDivisionForSection(userSection) || '').trim().toLowerCase();
+        const effectiveReqDiv = (reqDivision || '').trim().toLowerCase();
+
+        if (effectiveUserDiv && effectiveReqDiv && effectiveReqDiv !== effectiveUserDiv) {
+          return false;
+        }
+
+        // Must have reached Division Chief or later!
+        // If still sitting at PENDING_SECTION_CHIEF and Step 1 not approved, do not show!
+        const step1 = req.approvalSteps?.find((s: any) => s.order === 1);
+        const step2 = req.approvalSteps?.find((s: any) => s.order === 2);
+        const isStep1Approved = step1?.action === 'APPROVED';
+        const isStep2Actioned = step2 && step2.action !== 'PENDING';
+
+        const reachedDivChief = isStep1Approved || isStep2Actioned || [
+          'PENDING_DIVISION_CHIEF',
+          'PENDING_HEAD_PENRO',
+          'APPROVED',
+          'REJECTED_MANUAL',
+          'REJECTED_OVERDUE',
+        ].includes(req.status);
+
+        if (req.status === 'PENDING_SECTION_CHIEF' && !isStep1Approved) {
+          return false;
+        }
+
+        return reachedDivChief;
+      }
+
+      // 5. Head of PENRO scoping:
+      // Must have reached Head of PENRO step or later!
+      if (userRole === 'HEAD_PENRO') {
+        const step2 = req.approvalSteps?.find((s: any) => s.order === 2);
+        const step3 = req.approvalSteps?.find((s: any) => s.order === 3);
+        const isStep2Approved = step2?.action === 'APPROVED';
+        const isStep3Actioned = step3 && step3.action !== 'PENDING';
+
+        const reachedPenro = isStep2Approved || isStep3Actioned || [
+          'PENDING_HEAD_PENRO',
+          'APPROVED',
+        ].includes(req.status);
+
+        // Do not show requests still at Section Chief or Division Chief review
+        if ((req.status === 'PENDING_SECTION_CHIEF' || req.status === 'PENDING_DIVISION_CHIEF') && !isStep2Approved) {
+          return false;
+        }
+
+        // If request was returned at earlier steps, Head of PENRO does not need to see it
+        if (req.status === 'REJECTED_MANUAL' && !isStep2Approved) {
+          return false;
+        }
+
+        return reachedPenro;
+      }
+
+      return true;
+    });
+
+    return NextResponse.json({ success: true, data: scopedRequests });
   } catch (error: any) {
     console.error('[GET TA Requests Error]', error);
     return NextResponse.json(
@@ -475,6 +575,9 @@ export async function POST(req: Request) {
           const externalTasks: Promise<any>[] = [
             notifyUser({
               userId,
+              recipientEmail: (session.user as any)?.email,
+              recipientPhone: (session.user as any)?.phoneNumber,
+              recipientName: userName,
               requestId: request.id,
               title: 'TO Request Submitted',
               message: submitMsg,

@@ -33,6 +33,9 @@ export interface NotifyUserParams {
   taDetails?: TADetails;
   actionUrl?: string;
   skipDbInsert?: boolean;
+  recipientEmail?: string;
+  recipientPhone?: string;
+  recipientName?: string;
 }
 
 export interface NotifyRoleParams {
@@ -172,26 +175,31 @@ export async function notifyUser({
   taDetails,
   actionUrl,
   skipDbInsert = false,
+  recipientEmail,
+  recipientPhone,
+  recipientName,
 }: NotifyUserParams) {
   try {
-    let phoneNumber = '';
-    let email = '';
-    let userName = '';
+    let phoneNumber = recipientPhone?.trim() || '';
+    let email = recipientEmail?.trim() || '';
+    let userName = recipientName?.trim() || '';
     let notification: any = null;
 
-    // 1. Fetch user contact details via Prisma
-    try {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { name: true, phoneNumber: true, email: true },
-      });
-      if (user) {
-        phoneNumber = user.phoneNumber || '';
-        email = user.email || '';
-        userName = user.name || '';
+    // 1. Fetch user contact details via Prisma if not directly provided
+    if (!phoneNumber || !email || !userName) {
+      try {
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { name: true, phoneNumber: true, email: true },
+        });
+        if (user) {
+          phoneNumber = phoneNumber || user.phoneNumber || '';
+          email = email || user.email || '';
+          userName = userName || user.name || '';
+        }
+      } catch (err) {
+        console.warn('[notifyUser] Prisma user fetch fallback to Supabase...', err);
       }
-    } catch (err) {
-      console.warn('[notifyUser] Prisma user fetch fallback to Supabase...', err);
     }
 
     // Supabase fallback to fetch user contact details

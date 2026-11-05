@@ -308,6 +308,9 @@ export async function POST(req: Request) {
           externalTasks.push(
             notifyUser({
               userId: request.createdById,
+              recipientEmail: request.createdBy?.email,
+              recipientPhone: request.createdBy?.phoneNumber,
+              recipientName: request.createdBy?.name,
               requestId: request.id,
               title: currentStepOrder === 3 ? 'TO Request Fully Approved' : 'TO Request Step Approved',
               message: notificationMsg,
@@ -476,6 +479,9 @@ export async function POST(req: Request) {
           await Promise.allSettled([
             notifyUser({
               userId: request.createdById,
+              recipientEmail: request.createdBy?.email,
+              recipientPhone: request.createdBy?.phoneNumber,
+              recipientName: request.createdBy?.name,
               requestId: request.id,
               title: rejectTitle,
               message: rejectMsg,

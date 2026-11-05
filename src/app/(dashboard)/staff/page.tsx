@@ -247,6 +247,19 @@ function StaffDashboardContent() {
         </span>
       );
     }
+    if (role === 'ADMIN') {
+      const stepLabels: Record<string, string> = {
+        PENDING_SECTION_CHIEF: 'SECTION CHIEF REVIEW',
+        PENDING_DIVISION_CHIEF: 'DIVISION CHIEF REVIEW',
+        PENDING_HEAD_PENRO: 'HEAD OF PENRO REVIEW',
+      };
+      return (
+        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+          {stepLabels[status] || status}
+        </span>
+      );
+    }
     // Fallback — steps before this verifier (should rarely appear in their history)
     return (
       <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 uppercase tracking-wider">
@@ -345,9 +358,129 @@ function StaffDashboardContent() {
     }
   };
 
-  const displayList = requests;
+  // ── STRICT HIERARCHICAL ROLE SCOPING ──────────────────────────────────────
+  const stepRoleMap: Record<string, number> = {
+    SECTION_CHIEF: 1,
+    DIVISION_CHIEF: 2,
+    HEAD_PENRO: 3,
+  };
+  const myRoleOrder = stepRoleMap[userRole] ?? 0;
+  const effectiveUserDivision = userDivision || getDivisionForSection(userSection);
 
-  const filteredRequests = displayList.filter((r) => {
+  // 1. Scoped Requests: Only requests within this verifier's jurisdiction and sequence
+  const scopedRequests = requests.filter((r) => {
+    if (userRole === 'ADMIN') return true;
+
+    // Hide other users' drafts
+    if (r.status === 'DRAFT' && r.createdById !== user?.id) return false;
+
+    const reqSection = r.createdBy?.section;
+    const effectiveReqDivision = r.createdBy?.division || getDivisionForSection(reqSection);
+
+    // Section Chief: Only requests from their section/division
+    if (userRole === 'SECTION_CHIEF') {
+      if (userSection && reqSection) {
+        if (reqSection.trim().toLowerCase() !== userSection.trim().toLowerCase()) return false;
+      } else if (effectiveUserDivision && effectiveReqDivision) {
+        if (effectiveReqDivision.trim().toLowerCase() !== effectiveUserDivision.trim().toLowerCase()) return false;
+      }
+      return true;
+    }
+
+    // Division Chief: Only requests from their division that have reached Step 2 or later
+    if (userRole === 'DIVISION_CHIEF') {
+      if (effectiveUserDivision && effectiveReqDivision) {
+        if (effectiveReqDivision.trim().toLowerCase() !== effectiveUserDivision.trim().toLowerCase()) return false;
+      }
+
+      const step1 = r.approvalSteps?.find((s: any) => s.order === 1);
+      const isStep1Approved = step1?.action === 'APPROVED';
+      const step2 = r.approvalSteps?.find((s: any) => s.order === 2);
+      const isStep2Actioned = step2 && step2.action !== 'PENDING';
+
+      const reachedDivChief = isStep1Approved || isStep2Actioned || [
+        'PENDING_DIVISION_CHIEF',
+        'PENDING_HEAD_PENRO',
+        'APPROVED',
+        'REJECTED_MANUAL',
+        'REJECTED_OVERDUE',
+      ].includes(r.status);
+
+      if (r.status === 'PENDING_SECTION_CHIEF' && !isStep1Approved) return false;
+      return reachedDivChief;
+    }
+
+    // Head of PENRO: Only requests that have reached Step 3 or later
+    if (userRole === 'HEAD_PENRO') {
+      const step2 = r.approvalSteps?.find((s: any) => s.order === 2);
+      const isStep2Approved = step2?.action === 'APPROVED';
+      const step3 = r.approvalSteps?.find((s: any) => s.order === 3);
+      const isStep3Actioned = step3 && step3.action !== 'PENDING';
+
+      const reachedPenro = isStep2Approved || isStep3Actioned || [
+        'PENDING_HEAD_PENRO',
+        'APPROVED',
+      ].includes(r.status);
+
+      if ((r.status === 'PENDING_SECTION_CHIEF' || r.status === 'PENDING_DIVISION_CHIEF') && !isStep2Approved) return false;
+      if (r.status === 'REJECTED_MANUAL' && !isStep2Approved) return false;
+      return reachedPenro;
+    }
+
+    return true;
+  });
+
+  // 2. Pending Approvals: Requests currently waiting for THIS verifier's action
+  const pendingRequests = scopedRequests.filter((r) => {
+    const pendingStatusForRole: Record<string, string> = {
+      SECTION_CHIEF: 'PENDING_SECTION_CHIEF',
+      DIVISION_CHIEF: 'PENDING_DIVISION_CHIEF',
+      HEAD_PENRO: 'PENDING_HEAD_PENRO',
+    };
+    const myPendingStatus = pendingStatusForRole[userRole];
+
+    const myStepObj = r.approvalSteps?.find((s: any) => s.order === myRoleOrder);
+    const prevStepsApproved = (r.approvalSteps || [])
+      .filter((s: any) => s.order < myRoleOrder)
+      .every((s: any) => s.action === 'APPROVED');
+
+    const isPendingForMyRole = (
+      r.status === myPendingStatus ||
+      (myStepObj?.action === 'PENDING' && (myRoleOrder === 1 || prevStepsApproved) && r.status !== 'REJECTED_MANUAL' && r.status !== 'REJECTED_OVERDUE' && r.status !== 'APPROVED')
+    );
+
+    return isPendingForMyRole;
+  });
+
+  // 3. Approval History: Archive of requests this verifier has processed or that passed their step
+  const historyRequests = scopedRequests.filter((r) => {
+    if (myRoleOrder === 0) return true; // ADMIN
+
+    const myStep = r.approvalSteps?.find((s: any) => s.order === myRoleOrder);
+    const hasActed = myStep && myStep.action !== 'PENDING' && myStep.actionDate;
+
+    const stepOrder: Record<string, number> = {
+      PENDING_SECTION_CHIEF: 1,
+      PENDING_DIVISION_CHIEF: 2,
+      PENDING_HEAD_PENRO: 3,
+    };
+    const currentStepNum = stepOrder[r.status] ?? (r.status === 'APPROVED' ? 4 : 0);
+
+    // If currently waiting for this verifier's review, keep in Pending Approvals, not History
+    const isPendingMyAction = currentStepNum === myRoleOrder && myStep?.action === 'PENDING' && r.status !== 'REJECTED_MANUAL';
+    if (isPendingMyAction) return false;
+
+    return hasActed || (currentStepNum > myRoleOrder) || r.status === 'APPROVED';
+  });
+
+  // 4. Dashboard Activity: Prioritize pending items requiring action, followed by recently processed requests
+  const dashboardActivityRequests = [
+    ...pendingRequests,
+    ...historyRequests.filter((hr) => !pendingRequests.some((pr) => pr.id === hr.id)),
+  ];
+
+  // 5. Filtered Requests for Approval History Tab
+  const filteredRequests = historyRequests.filter((r) => {
     const query = searchQuery.toLowerCase();
     const matchesSearch =
       r.trackingNumber?.toLowerCase().includes(query) ||
@@ -378,57 +511,15 @@ function StaffDashboardContent() {
     return matchesSearch && matchesStatus && matchesDateRange;
   });
 
-  // Role-based pending queue: Only show requests that currently require THIS verifier role's action
-  const pendingRequests = displayList.filter((r) => {
-    const pendingStatusForRole: Record<string, string> = {
-      SECTION_CHIEF: 'PENDING_SECTION_CHIEF',
-      DIVISION_CHIEF: 'PENDING_DIVISION_CHIEF',
-      HEAD_PENRO: 'PENDING_HEAD_PENRO',
-    };
-    const myPendingStatus = pendingStatusForRole[userRole];
-
-    const stepRoleMap: Record<string, number> = {
-      SECTION_CHIEF: 1,
-      DIVISION_CHIEF: 2,
-      HEAD_PENRO: 3,
-    };
-    const myRoleOrder = stepRoleMap[userRole] ?? 0;
-    const myStepObj = r.approvalSteps?.find((s: any) => s.order === myRoleOrder);
-    const prevStepsApproved = (r.approvalSteps || [])
-      .filter((s: any) => s.order < myRoleOrder)
-      .every((s: any) => s.action === 'APPROVED');
-
-    const isPendingForMyRole = (
-      r.status === myPendingStatus ||
-      (myStepObj?.action === 'PENDING' && (myRoleOrder === 1 || prevStepsApproved) && r.status !== 'REJECTED_MANUAL' && r.status !== 'REJECTED_OVERDUE' && r.status !== 'APPROVED')
-    );
-
-    if (!isPendingForMyRole) return false;
-
-    // Scoped hierarchical routing check:
-    // If current verifier is a Section Chief, only show requests from their specific section
-    if (userRole === 'SECTION_CHIEF' && userSection && r.createdBy?.section) {
-      if (r.createdBy.section.trim().toLowerCase() !== userSection.trim().toLowerCase()) {
-        return false;
-      }
-    }
-
-    const effectiveUserDivision = userDivision || getDivisionForSection(userSection);
-    const effectiveReqDivision = r.createdBy?.division || getDivisionForSection(r.createdBy?.section);
-
-    // If current verifier is a Division Chief, only show requests from their specific division
-    if (userRole === 'DIVISION_CHIEF' && effectiveUserDivision && effectiveReqDivision) {
-      if (effectiveReqDivision.trim().toLowerCase() !== effectiveUserDivision.trim().toLowerCase()) {
-        return false;
-      }
-    }
-
-    return true;
-  });
-
-  const approvedCount = displayList.filter((r) => r.status === 'APPROVED').length;
+  // 6. Stat Counters
+  const totalCount = dashboardActivityRequests.length;
+  const approvedCount = scopedRequests.filter((r) => r.status === 'APPROVED' || (r.approvalSteps?.find((s: any) => s.order === myRoleOrder)?.action === 'APPROVED')).length;
   const pendingCount = pendingRequests.length;
-  const ongoingCount = displayList.filter((r) => r.status === 'DRAFT').length;
+  const ongoingCount = scopedRequests.filter((r) => {
+    const myStep = r.approvalSteps?.find((s: any) => s.order === myRoleOrder);
+    const myEndorsed = myStep?.action === 'APPROVED';
+    return myEndorsed && (r.status === 'PENDING_DIVISION_CHIEF' || r.status === 'PENDING_HEAD_PENRO');
+  }).length;
 
   /* -------------------------------------------------------------------------- */
   /* REVIEW TA REQUEST DETAIL VIEW (Strictly Matching PDF Pages 4, 5 & 6)       */
@@ -1142,7 +1233,7 @@ function StaffDashboardContent() {
             </svg>
             <div>
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total</p>
-              <h3 className="text-2xl font-black text-slate-900 mt-0.5">{displayList.length}</h3>
+              <h3 className="text-2xl font-black text-slate-900 mt-0.5">{totalCount}</h3>
             </div>
           </div>
 
@@ -1207,35 +1298,43 @@ function StaffDashboardContent() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs">
-                  {displayList.map((req, idx) => (
-                    <tr key={req.id || idx} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-4 font-bold text-slate-900">
-                        <div>{req.createdBy?.name || 'Maria Santos'}</div>
-                        {(req.createdBy?.section || req.createdBy?.division) && (
-                          <div className="text-[10px] text-slate-400 font-normal mt-0.5">
-                            {[req.createdBy?.division, req.createdBy?.section].filter(Boolean).join(' • ')}
-                          </div>
-                        )}
-                      </td>
-                      <td className="py-4 max-w-xs">
-                        <p className="font-bold text-slate-800 truncate">{req.destination}</p>
-                        <p className="text-[11px] text-slate-500 truncate mt-0.5">{req.purpose}</p>
-                      </td>
-                      <td className="py-4 text-slate-600 font-medium">
-                        {formatDateRangeShort(req.startDate, req.endDate)}
-                      </td>
-                      <td className="py-4 text-slate-400 font-medium">{formatDateDisplay(req.createdAt)}</td>
-                      <td className="py-4">{renderStatusBadge(req.status)}</td>
-                      <td className="py-4 text-right">
-                        <button
-                          onClick={() => setReviewRequest(req)}
-                          className="text-xs font-bold text-[#0F4C2E] hover:underline"
-                        >
-                          View
-                        </button>
+                  {dashboardActivityRequests.length > 0 ? (
+                    dashboardActivityRequests.map((req, idx) => (
+                      <tr key={req.id || idx} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="py-4 font-bold text-slate-900">
+                          <div>{req.createdBy?.name || 'Maria Santos'}</div>
+                          {(req.createdBy?.section || req.createdBy?.division) && (
+                            <div className="text-[10px] text-slate-400 font-normal mt-0.5">
+                              {[req.createdBy?.division, req.createdBy?.section].filter(Boolean).join(' • ')}
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-4 max-w-xs">
+                          <p className="font-bold text-slate-800 truncate">{req.destination}</p>
+                          <p className="text-[11px] text-slate-500 truncate mt-0.5">{req.purpose}</p>
+                        </td>
+                        <td className="py-4 text-slate-600 font-medium">
+                          {formatDateRangeShort(req.startDate, req.endDate)}
+                        </td>
+                        <td className="py-4 text-slate-400 font-medium">{formatDateDisplay(req.createdAt)}</td>
+                        <td className="py-4">{renderStatusBadge(req.status)}</td>
+                        <td className="py-4 text-right">
+                          <button
+                            onClick={() => setReviewRequest(req)}
+                            className="text-xs font-bold text-[#0F4C2E] hover:underline"
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={6} className="py-12 text-center text-slate-400 font-medium">
+                        No recent approval activity in your unit.
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
