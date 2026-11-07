@@ -785,39 +785,44 @@ function AdminPortalContent() {
     mapCustomTo,
   ]);
 
-  // Helper to render Status Badges (Clean, text-based semantic dot style)
+  // Helper to render Status Badges (macOS HIG semantic badge style)
   const renderStatusBadge = (status: string) => {
     if (status === 'APPROVED') {
       return (
-        <span className="text-xs font-semibold text-emerald-700 inline-flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span> Approved
+        <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
+          Approved
         </span>
       );
     }
     if (status === 'PENDING_SECTION_CHIEF' || status === 'PENDING') {
       return (
-        <span className="text-xs font-semibold text-amber-700 inline-flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span> Pending
+        <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-amber-50 text-amber-700 border border-amber-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+          Pending
         </span>
       );
     }
     if (status === 'PENDING_DIVISION_CHIEF' || status === 'PENDING_HEAD_PENRO') {
       return (
-        <span className="text-xs font-semibold text-sky-700 inline-flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-sky-600 shrink-0"></span> On Process
+        <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-sky-50 text-sky-700 border border-sky-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-600 shrink-0" />
+          On Process
         </span>
       );
     }
     if (status.startsWith('REJECTED')) {
       return (
-        <span className="text-xs font-semibold text-rose-700 inline-flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-600 shrink-0"></span> Cancelled
+        <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-rose-50 text-rose-700 border border-rose-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-600 shrink-0" />
+          Cancelled
         </span>
       );
     }
     return (
-      <span className="text-xs font-semibold text-slate-600 inline-flex items-center gap-1.5">
-        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span> Draft
+      <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-slate-100 text-slate-600 border border-slate-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0" />
+        Draft
       </span>
     );
   };
@@ -851,37 +856,37 @@ function AdminPortalContent() {
   const renderHomeTab = () => (
     <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
       {/* Header Banner */}
-      <div className="bg-white p-5 rounded-lg border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-gradient-to-r from-[#0F4C2E] to-[#1B4332] text-white p-5 rounded-[8px] border border-emerald-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Admin Dashboard</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <h2 className="text-[22px] font-bold tracking-tight text-white">Admin Dashboard</h2>
+          <p className="text-[13px] text-emerald-100/90 mt-0.5">
             Travel Order Processing System (TOPS) — DENR-PENRO Agusan del Norte
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs font-medium text-slate-600 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-200">
+        <div className="flex items-center gap-2 text-[12px] font-medium text-emerald-100 bg-white/10 px-3 py-1.5 rounded-[6px] border border-white/20">
           <span>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</span>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white p-3.5 rounded-lg border border-slate-200/90 shadow-2xs space-y-2.5">
+      <div className="bg-white p-3.5 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-[#1B4332] shadow-xs space-y-2.5">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600 shrink-0">
-            <span>Date From:</span>
+          <div className="flex flex-wrap items-center gap-2 text-[13px] font-normal text-slate-600 shrink-0">
+            <span className="font-medium text-[#1B4332]">Date From:</span>
             <input
               type="date"
               value={dateFrom}
               onChange={(e) => handleDateFromChange(e.target.value)}
-              className={`h-8 px-2.5 bg-slate-50 border rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600 ${
+              className={`h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] ${
                 isDateRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
               }`}
             />
-            <span>To:</span>
+            <span className="font-medium text-[#1B4332]">To:</span>
             <input
               type="date"
               value={dateTo}
               onChange={(e) => handleDateToChange(e.target.value)}
-              className={`h-8 px-2.5 bg-slate-50 border rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600 ${
+              className={`h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] ${
                 isDateRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
               }`}
             />
@@ -890,7 +895,7 @@ function AdminPortalContent() {
             <select
               value={selectedMonthPreset}
               onChange={(e) => handleSelectMonthPreset(e.target.value)}
-              className="h-8 px-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium text-slate-700 outline-none focus:border-emerald-600 cursor-pointer"
+              className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border border-slate-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] cursor-pointer"
             >
               <option value="">Month Preset...</option>
               <option value="ALL">All Dates (Clear)</option>
@@ -902,7 +907,7 @@ function AdminPortalContent() {
             {(dateFrom || dateTo || searchQuery) && (
               <button
                 onClick={handleResetFilters}
-                className="h-8 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md text-xs font-medium transition-colors cursor-pointer"
+                className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-colors cursor-pointer"
                 title="Reset all filters"
               >
                 Reset
@@ -917,9 +922,9 @@ function AdminPortalContent() {
                 placeholder="Search TA number, employee, or destination..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-8 px-3 pl-8 bg-slate-50 border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600"
+                className="w-full h-8 px-2.5 pl-8 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border border-slate-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
               />
-              <svg className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 text-[#1B4332] absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -928,7 +933,7 @@ function AdminPortalContent() {
             <div className="relative">
               <button
                 onClick={() => setShowExportMenu(!showExportMenu)}
-                className="h-8 px-3 bg-[#1B4332] hover:bg-[#143326] text-white rounded-md text-xs font-medium flex items-center gap-1.5 shadow-2xs transition-colors shrink-0 cursor-pointer"
+                className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#1B4332] hover:bg-[#0F4C2E] text-white transition-colors shrink-0 cursor-pointer"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -942,20 +947,20 @@ function AdminPortalContent() {
               {showExportMenu && (
                 <>
                   <div className="fixed inset-0 z-30" onClick={() => setShowExportMenu(false)} />
-                  <div className="absolute right-0 mt-1.5 w-56 bg-white rounded-lg shadow-xl border border-slate-200 p-1.5 z-40 text-xs animate-fade-in space-y-1">
+                  <div className="absolute right-0 mt-1.5 w-60 bg-white rounded-[8px] shadow-xl border border-emerald-200 p-1.5 z-40 text-[13px] animate-fade-in space-y-1">
                     <button
                       onClick={() => {
                         setShowExportMenu(false);
                         handlePrintReport();
                       }}
-                      className="w-full px-3 py-2 text-left rounded-md hover:bg-emerald-50 text-slate-700 hover:text-[#1B4332] flex items-center gap-2.5 transition-colors cursor-pointer"
+                      className="w-full px-3 py-2 text-left rounded-[6px] hover:bg-emerald-50 text-[#1D1D1F] hover:text-[#1B4332] flex items-center gap-2.5 transition-colors cursor-pointer"
                     >
                       <svg className="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                       </svg>
                       <div>
-                        <div className="font-semibold text-slate-800">Print / Save as PDF</div>
-                        <div className="text-[10px] text-slate-400">Official printable summary report</div>
+                        <div className="font-semibold text-[#1D1D1F] text-[13px]">Print / Save as PDF</div>
+                        <div className="text-[11px] text-[#86868B]">Official printable summary report</div>
                       </div>
                     </button>
                     <button
@@ -963,14 +968,14 @@ function AdminPortalContent() {
                         setShowExportMenu(false);
                         handleExportCSV();
                       }}
-                      className="w-full px-3 py-2 text-left rounded-md hover:bg-emerald-50 text-slate-700 hover:text-[#1B4332] flex items-center gap-2.5 transition-colors cursor-pointer"
+                      className="w-full px-3 py-2 text-left rounded-[6px] hover:bg-emerald-50 text-[#1D1D1F] hover:text-[#1B4332] flex items-center gap-2.5 transition-colors cursor-pointer"
                     >
                       <svg className="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                       </svg>
                       <div>
-                        <div className="font-semibold text-slate-800">Export to CSV / Excel</div>
-                        <div className="text-[10px] text-slate-400">Download spreadsheet file</div>
+                        <div className="font-semibold text-[#1D1D1F] text-[13px]">Export to CSV / Excel</div>
+                        <div className="text-[11px] text-[#86868B]">Download spreadsheet file</div>
                       </div>
                     </button>
                   </div>
@@ -982,7 +987,7 @@ function AdminPortalContent() {
 
         {/* Invalid Date Range Warning */}
         {isDateRangeInvalid && (
-          <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-md flex items-center justify-between text-xs text-rose-800 animate-fade-in">
+          <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-[6px] flex items-center justify-between text-[13px] text-rose-800 animate-fade-in">
             <div className="flex items-center gap-1.5">
               <svg className="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -991,7 +996,7 @@ function AdminPortalContent() {
             </div>
             <button
               onClick={() => { setDateFrom(''); setDateTo(''); }}
-              className="text-xs font-semibold text-rose-900 underline hover:text-rose-700 cursor-pointer"
+              className="text-[12px] font-semibold text-rose-900 underline hover:text-rose-700 cursor-pointer"
             >
               Reset
             </button>
@@ -1001,55 +1006,63 @@ function AdminPortalContent() {
 
       {/* 4 Clean Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs flex items-center justify-between">
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-[#1B4332] shadow-xs flex items-center justify-between">
           <div>
             <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">TOTAL TRAVEL AUTHORITIES</p>
-            <p className="text-2xl font-semibold text-slate-900 mt-1 tracking-tight">{stats.total}</p>
+            <p className="text-[24px] font-bold tracking-tight text-[#1B4332] mt-1">{stats.total}</p>
           </div>
-          <svg className="w-6 h-6 text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
+          <div className="w-9 h-9 rounded-[6px] bg-emerald-50 text-[#1B4332] border border-emerald-200 flex items-center justify-center shrink-0">
+            <svg className="w-5 h-5 text-[#1B4332]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs flex items-center justify-between">
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-amber-500 shadow-xs flex items-center justify-between">
           <div>
             <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">PENDING / ON PROCESS</p>
-            <p className="text-2xl font-semibold text-amber-700 mt-1 tracking-tight">{stats.pending}</p>
+            <p className="text-[24px] font-bold tracking-tight text-amber-700 mt-1">{stats.pending}</p>
           </div>
-          <svg className="w-6 h-6 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <div className="w-9 h-9 rounded-[6px] bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center shrink-0">
+            <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs flex items-center justify-between">
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-emerald-500 shadow-xs flex items-center justify-between">
           <div>
             <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">APPROVED ORDERS</p>
-            <p className="text-2xl font-semibold text-emerald-800 mt-1 tracking-tight">{stats.approved}</p>
+            <p className="text-[24px] font-bold tracking-tight text-emerald-800 mt-1">{stats.approved}</p>
           </div>
-          <svg className="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <div className="w-9 h-9 rounded-[6px] bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center shrink-0">
+            <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs flex items-center justify-between">
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-rose-500 shadow-xs flex items-center justify-between">
           <div>
             <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">CANCELLED / RETURNED</p>
-            <p className="text-2xl font-semibold text-rose-700 mt-1 tracking-tight">{stats.cancelled}</p>
+            <p className="text-[24px] font-bold tracking-tight text-rose-700 mt-1">{stats.cancelled}</p>
           </div>
-          <svg className="w-6 h-6 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <div className="w-9 h-9 rounded-[6px] bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center shrink-0">
+            <svg className="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
         </div>
       </div>
 
       {/* 3 Analytics Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Chart 1: Donut Chart - Status Breakdown */}
-        <div className="bg-white p-5 rounded-lg border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+        <div className="bg-white p-5 rounded-[8px] border border-[#E5E5E7] border-t-4 border-t-[#1B4332] shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
-              <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Status Distribution</h3>
-              <span className="text-[11px] text-slate-400 font-medium">{stats.total} total</span>
+            <div className="flex items-center justify-between pb-2.5 border-b border-emerald-100">
+              <h3 className="text-[14px] font-semibold text-[#1B4332]">Status Distribution</h3>
+              <span className="h-5 inline-flex items-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-[#1B4332] border border-emerald-200">{stats.total} total</span>
             </div>
             <div className="h-44 flex items-center justify-center my-2 relative">
               <svg className="w-36 h-36 transform -rotate-90" viewBox="0 0 36 36">
@@ -1112,12 +1125,12 @@ function AdminPortalContent() {
                 )}
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="text-xl font-semibold text-slate-900 tracking-tight">{stats.total}</span>
-                <span className="text-[10px] text-slate-400 font-medium uppercase">Requests</span>
+                <span className="text-[24px] font-bold tracking-tight text-[#1B4332]">{stats.total}</span>
+                <span className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Requests</span>
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2 pt-2.5 text-[11px] font-medium text-slate-600 border-t border-slate-100">
+          <div className="grid grid-cols-2 gap-2 pt-2.5 text-[12px] font-medium text-slate-700 border-t border-slate-100">
             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> Approved ({stats.approved})</span>
             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-sky-600"></span> On Process ({stats.onProcess})</span>
             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500"></span> Pending ({stats.pendingOnly})</span>
@@ -1126,50 +1139,50 @@ function AdminPortalContent() {
         </div>
 
         {/* Chart 2: Vertical Bar Chart - Within AOR vs Outside AOR */}
-        <div className="bg-white p-5 rounded-lg border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+        <div className="bg-white p-5 rounded-[8px] border border-[#E5E5E7] border-t-4 border-t-emerald-600 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
-              <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">AOR Jurisdiction</h3>
-              <span className="text-[11px] text-slate-400 font-medium">Coverage</span>
+            <div className="flex items-center justify-between pb-2.5 border-b border-emerald-100">
+              <h3 className="text-[14px] font-semibold text-[#1B4332]">AOR Jurisdiction</h3>
+              <span className="h-5 inline-flex items-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">Coverage</span>
             </div>
             <div className="h-44 flex items-end justify-center gap-10 pt-4 pb-2">
               <div className="flex flex-col items-center gap-1.5 w-16">
-                <span className="text-xs font-semibold text-slate-800">{stats.withinAOR}</span>
+                <span className="text-[13px] font-semibold text-[#1B4332]">{stats.withinAOR}</span>
                 <div
                   style={{ height: `${Math.max(16, (stats.withinAOR / (stats.total || 1)) * 120)}px` }}
                   className="w-full bg-[#1B4332] rounded-t transition-all hover:opacity-90"
                 />
-                <span className="text-[11px] font-medium text-slate-600 text-center">Within AOR</span>
+                <span className="text-[12px] font-medium text-slate-600 text-center">Within AOR</span>
               </div>
               <div className="flex flex-col items-center gap-1.5 w-16">
-                <span className="text-xs font-semibold text-slate-800">{stats.outsideAOR}</span>
+                <span className="text-[13px] font-semibold text-[#40916C]">{stats.outsideAOR}</span>
                 <div
                   style={{ height: `${Math.max(16, (stats.outsideAOR / (stats.total || 1)) * 120)}px` }}
                   className="w-full bg-[#40916C] rounded-t transition-all hover:opacity-90"
                 />
-                <span className="text-[11px] font-medium text-slate-600 text-center">Outside AOR</span>
+                <span className="text-[12px] font-medium text-slate-600 text-center">Outside AOR</span>
               </div>
             </div>
           </div>
-          <div className="pt-2 text-center text-[11px] text-slate-400 border-t border-slate-100">
+          <div className="pt-2 text-center text-[12px] text-slate-500 border-t border-slate-100">
             Regional Area of Responsibility Breakdown
           </div>
         </div>
 
         {/* Chart 3: Horizontal Bar Chart - Transportation Mode */}
-        <div className="bg-white p-5 rounded-lg border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+        <div className="bg-white p-5 rounded-[8px] border border-[#E5E5E7] border-t-4 border-t-sky-600 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
-              <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Transportation Mode</h3>
-              <span className="text-[11px] text-slate-400 font-medium">Breakdown</span>
+            <div className="flex items-center justify-between pb-2.5 border-b border-sky-100">
+              <h3 className="text-[14px] font-semibold text-[#1B4332]">Transportation Mode</h3>
+              <span className="h-5 inline-flex items-center px-2 text-[10px] font-semibold rounded-[4px] bg-sky-50 text-sky-700 border border-sky-200">Breakdown</span>
             </div>
             <div className="h-44 flex flex-col justify-center space-y-3 py-1">
               <div className="space-y-1">
-                <div className="flex justify-between text-xs font-medium">
+                <div className="flex justify-between text-[13px] font-normal">
                   <span className="text-slate-700">Government Vehicle</span>
-                  <span className="font-semibold text-slate-900">{stats.govVehicle}</span>
+                  <span className="font-semibold text-[#1B4332]">{stats.govVehicle}</span>
                 </div>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-emerald-100/60 rounded-full overflow-hidden">
                   <div
                     style={{ width: `${(stats.govVehicle / (stats.total || 1)) * 100}%` }}
                     className="h-full bg-[#1B4332] rounded-full"
@@ -1178,11 +1191,11 @@ function AdminPortalContent() {
               </div>
 
               <div className="space-y-1">
-                <div className="flex justify-between text-xs font-medium">
+                <div className="flex justify-between text-[13px] font-normal">
                   <span className="text-slate-700">Public Transport</span>
-                  <span className="font-semibold text-slate-900">{stats.pubTransport}</span>
+                  <span className="font-semibold text-emerald-700">{stats.pubTransport}</span>
                 </div>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-emerald-100/60 rounded-full overflow-hidden">
                   <div
                     style={{ width: `${(stats.pubTransport / (stats.total || 1)) * 100}%` }}
                     className="h-full bg-[#40916C] rounded-full"
@@ -1191,11 +1204,11 @@ function AdminPortalContent() {
               </div>
 
               <div className="space-y-1">
-                <div className="flex justify-between text-xs font-medium">
+                <div className="flex justify-between text-[13px] font-normal">
                   <span className="text-slate-700">Commercial Airline</span>
-                  <span className="font-semibold text-slate-900">{stats.airline}</span>
+                  <span className="font-semibold text-sky-700">{stats.airline}</span>
                 </div>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-sky-100/60 rounded-full overflow-hidden">
                   <div
                     style={{ width: `${(stats.airline / (stats.total || 1)) * 100}%` }}
                     className="h-full bg-sky-600 rounded-full"
@@ -1204,14 +1217,14 @@ function AdminPortalContent() {
               </div>
             </div>
           </div>
-          <div className="pt-2 text-center text-[11px] text-slate-400 border-t border-slate-100">
+          <div className="pt-2 text-center text-[12px] text-slate-500 border-t border-slate-100">
             Vehicular and Transit Distribution
           </div>
         </div>
       </div>
 
       {/* Bottom Alert Banner */}
-      <div className="p-3.5 bg-amber-50/90 border border-amber-200 rounded-lg flex items-center justify-between text-xs text-amber-900">
+      <div className="p-3.5 bg-amber-50/90 border border-amber-200 border-l-4 border-l-amber-500 rounded-[8px] flex items-center justify-between text-[13px] text-amber-900">
         <div className="flex items-center gap-2">
           <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -1220,7 +1233,7 @@ function AdminPortalContent() {
         </div>
         <button
           onClick={() => router.push('/admin?tab=cancelled')}
-          className="text-xs font-semibold text-amber-900 hover:underline"
+          className="text-[13px] font-semibold text-amber-900 hover:underline"
         >
           View Cancelled Requests →
         </button>
@@ -1233,64 +1246,64 @@ function AdminPortalContent() {
   /* -------------------------------------------------------------------------- */
   const renderDataTab = () => (
     <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-gradient-to-r from-[#0F4C2E] to-[#1B4332] text-white p-5 rounded-[8px] border border-emerald-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Travel Order Data</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Card-based overview of active and archived Travel Orders</p>
+          <h2 className="text-[22px] font-bold tracking-tight text-white">Travel Order Data</h2>
+          <p className="text-[13px] text-emerald-100/90 mt-0.5">Card-based overview of active and archived Travel Orders</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={handlePrintReport}
-            className="h-8 px-3 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 hover:bg-slate-50 shadow-2xs flex items-center gap-1.5 shrink-0 transition-colors"
+            className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-colors shrink-0"
             title="Print Monthly / Filtered Report"
           >
-            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2z" />
             </svg>
             <span>Print Report</span>
           </button>
           <button
             onClick={handleExportCSV}
-            className="h-8 px-3 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 hover:bg-slate-50 shadow-2xs flex items-center gap-1.5 shrink-0 transition-colors"
+            className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-colors shrink-0"
             title="Export CSV / Excel"
           >
-            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             <span>Export CSV</span>
           </button>
-          <span className="text-xs text-slate-500 font-medium pl-1">
+          <span className="text-[12px] text-emerald-100 font-medium bg-white/10 px-2.5 py-1 rounded-[6px] border border-white/20">
             Showing {filteredRecords.length} of {taRecords.length} records
           </span>
         </div>
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-white p-3.5 rounded-lg border border-slate-200/90 shadow-2xs space-y-3">
+      <div className="bg-white p-3.5 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-[#1B4332] shadow-xs space-y-3">
         {/* Date Filter Row */}
-        <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600">
-          <span>Date From:</span>
+        <div className="flex flex-wrap items-center gap-2 text-[13px] font-normal text-slate-600">
+          <span className="font-medium text-[#1B4332]">Date From:</span>
           <input
             type="date"
             value={dateFrom}
             onChange={(e) => handleDateFromChange(e.target.value)}
-            className={`h-8 px-2.5 bg-slate-50 border rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600 ${
+            className={`h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] ${
               isDateRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
             }`}
           />
-          <span>To:</span>
+          <span className="font-medium text-[#1B4332]">To:</span>
           <input
             type="date"
             value={dateTo}
             onChange={(e) => handleDateToChange(e.target.value)}
-            className={`h-8 px-2.5 bg-slate-50 border rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600 ${
+            className={`h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] ${
               isDateRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
             }`}
           />
           <select
             value={selectedMonthPreset}
             onChange={(e) => handleSelectMonthPreset(e.target.value)}
-            className="h-8 px-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium text-slate-700 outline-none focus:border-emerald-600 cursor-pointer"
+            className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border border-slate-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] cursor-pointer"
           >
             <option value="">Month Preset...</option>
             <option value="ALL">All Dates (Clear)</option>
@@ -1301,7 +1314,7 @@ function AdminPortalContent() {
           {(dateFrom || dateTo || searchQuery || filterStatus !== 'ALL' || filterOffice !== 'ALL' || filterAor !== 'ALL') && (
             <button
               onClick={handleResetFilters}
-              className="h-8 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md text-xs font-medium transition-colors cursor-pointer"
+              className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-colors cursor-pointer"
               title="Reset all filters"
             >
               Reset
@@ -1311,7 +1324,7 @@ function AdminPortalContent() {
 
         {/* Invalid Date Range Warning */}
         {isDateRangeInvalid && (
-          <div className="p-2 bg-rose-50 border border-rose-200 rounded-md text-xs text-rose-800 flex items-center gap-1.5">
+          <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-[6px] text-[13px] text-rose-800 flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -1327,7 +1340,7 @@ function AdminPortalContent() {
               placeholder="Search by TA#, employee, destination..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-8 px-3 bg-slate-50 border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600"
+              className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border border-slate-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
             />
           </div>
 
@@ -1335,7 +1348,7 @@ function AdminPortalContent() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium outline-none"
+              className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border border-slate-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
             >
               <option value="ALL">All Status</option>
               <option value="APPROVED">Approved</option>
@@ -1348,7 +1361,7 @@ function AdminPortalContent() {
             <select
               value={filterOffice}
               onChange={(e) => setFilterOffice(e.target.value)}
-              className="w-full h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium outline-none"
+              className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border border-slate-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
             >
               <option value="ALL">All Offices</option>
               <option value="CENRO Rosario">CENRO Rosario</option>
@@ -1361,7 +1374,7 @@ function AdminPortalContent() {
             <select
               value={filterAor}
               onChange={(e) => setFilterAor(e.target.value)}
-              className="w-full h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium outline-none"
+              className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border border-slate-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
             >
               <option value="ALL">All AOR</option>
               <option value="Within AOR">Within AOR</option>
@@ -1374,12 +1387,12 @@ function AdminPortalContent() {
       {/* 2-Column Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {filteredRecords.length === 0 ? (
-          <div className="col-span-full py-12 text-center bg-white rounded-lg border border-slate-200/90 shadow-2xs p-8">
-            <svg className="w-10 h-10 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="col-span-full py-12 text-center bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs p-8">
+            <svg className="w-10 h-10 text-[#86868B] mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p className="font-semibold text-slate-700 text-sm">No Travel Authorities match the selected criteria</p>
-            <p className="text-slate-400 text-xs mt-1">
+            <p className="font-semibold text-[#1D1D1F] text-[14px]">No Travel Authorities match the selected criteria</p>
+            <p className="text-[#86868B] text-[13px] mt-1">
               {(dateFrom || dateTo)
                 ? `No travel records found within ${dateFrom && dateTo ? `${formatDateDisplay(dateFrom)} to ${formatDateDisplay(dateTo)}` : 'the selected date range'}.`
                 : 'Try adjusting your search query, status, office, or AOR filters.'}
@@ -1387,7 +1400,7 @@ function AdminPortalContent() {
             {(dateFrom || dateTo || searchQuery || filterStatus !== 'ALL' || filterOffice !== 'ALL' || filterAor !== 'ALL') && (
               <button
                 onClick={handleResetFilters}
-                className="mt-3 px-3 py-1.5 text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-md hover:bg-emerald-100 transition-colors"
+                className="mt-3 h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#1B4332] hover:bg-[#0F4C2E] text-white transition-colors"
               >
                 Reset All Filters
               </button>
@@ -1398,15 +1411,23 @@ function AdminPortalContent() {
             <div
               key={req.id}
               onClick={() => setSelectedRecord(req)}
-              className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-all cursor-pointer space-y-3"
+              className={`bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 ${
+                req.status === 'APPROVED'
+                  ? 'border-l-emerald-500'
+                  : req.status.startsWith('REJECTED')
+                  ? 'border-l-rose-500'
+                  : req.status === 'PENDING_DIVISION_CHIEF' || req.status === 'PENDING_HEAD_PENRO'
+                  ? 'border-l-sky-500'
+                  : 'border-l-amber-500'
+              } shadow-xs hover:bg-emerald-50/40 hover:border-emerald-300 transition-colors cursor-pointer space-y-3`}
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <span className="font-mono text-xs font-semibold text-[#1B4332] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  <span className="font-mono text-[12px] font-semibold text-[#1B4332] bg-emerald-50 px-2 py-0.5 rounded-[4px] border border-emerald-200">
                     {req.trackingNumber}
                   </span>
-                  <h4 className="text-sm font-semibold text-slate-900 mt-1.5">{req.createdBy?.name || 'Juan Dela Cruz'}</h4>
-                  <p className="text-[11px] text-slate-500">{req.employeePosition} — {req.office}</p>
+                  <h4 className="text-[14px] font-semibold text-[#1D1D1F] mt-1.5">{req.createdBy?.name || 'Juan Dela Cruz'}</h4>
+                  <p className="text-[12px] text-slate-500">{req.employeePosition} — {req.office}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -1415,10 +1436,10 @@ function AdminPortalContent() {
                       e.stopPropagation();
                       setEditingRecord(req);
                     }}
-                    className="px-2 py-0.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-[#1B4332] rounded text-[11px] font-semibold transition-colors flex items-center gap-1 shadow-2xs"
+                    className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-[#1B4332] transition-colors"
                     title="Edit Travel Order"
                   >
-                    <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3 h-3 text-[#1B4332]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                     <span>Edit</span>
@@ -1427,32 +1448,32 @@ function AdminPortalContent() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-2.5 border-t border-slate-100 text-xs">
+              <div className="grid grid-cols-2 gap-3 pt-2.5 border-t border-slate-100 text-[13px]">
                 <div>
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Destination</span>
-                  <span className="font-medium text-slate-800 line-clamp-1">{req.destination}</span>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Destination</span>
+                  <span className="font-medium text-[#1D1D1F] line-clamp-1">{req.destination}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Travel Date</span>
-                  <span className="font-medium text-slate-800">
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Travel Date</span>
+                  <span className="font-normal text-[#1D1D1F]">
                     {req.endDate && toCalendarDateString(req.startDate) !== toCalendarDateString(req.endDate)
                       ? `${formatDateDisplay(req.startDate)} – ${formatDateDisplay(req.endDate)}`
                       : formatDateDisplay(req.startDate)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">AOR Scope</span>
-                  <span className="font-medium text-slate-800">{req.aorType}</span>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">AOR Scope</span>
+                  <span className="font-medium text-[#1B4332]">{req.aorType}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Transportation</span>
-                  <span className="font-medium text-slate-800">{req.transportation}</span>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Transportation</span>
+                  <span className="font-normal text-[#1D1D1F]">{req.transportation}</span>
                 </div>
               </div>
 
               <div className="pt-1">
-                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Purpose</span>
-                <p className="text-xs text-slate-600 line-clamp-2 mt-0.5">{req.purpose}</p>
+                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Purpose</span>
+                <p className="text-[13px] font-normal text-slate-700 line-clamp-2 mt-0.5">{req.purpose}</p>
               </div>
             </div>
           ))
@@ -1470,28 +1491,28 @@ function AdminPortalContent() {
 
     return (
       <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-gradient-to-r from-[#0F4C2E] to-[#1B4332] text-white p-5 rounded-[8px] border border-emerald-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Travel Order Records</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Master tabular registry of all Travel Orders</p>
+            <h2 className="text-[22px] font-bold tracking-tight text-white">Travel Order Records</h2>
+            <p className="text-[13px] text-emerald-100/90 mt-0.5">Master tabular registry of all Travel Orders</p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrintReport}
-              className="h-8 px-3 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 hover:bg-slate-50 shadow-2xs flex items-center gap-1.5 shrink-0"
+              className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-colors shrink-0"
               title="Print Monthly / Filtered Report"
             >
-              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2z" />
               </svg>
               <span>Print Report</span>
             </button>
             <button
               onClick={handleExportCSV}
-              className="h-8 px-3 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 hover:bg-slate-50 shadow-2xs flex items-center gap-1.5 shrink-0"
+              className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-colors shrink-0"
               title="Export CSV / Excel"
             >
-              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               <span>Export CSV</span>
@@ -1500,31 +1521,31 @@ function AdminPortalContent() {
         </div>
 
         {/* Date Filter Bar */}
-        <div className="bg-white p-3.5 rounded-lg border border-slate-200/90 shadow-2xs space-y-2.5">
+        <div className="bg-white p-3.5 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-[#1B4332] shadow-xs space-y-2.5">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600 shrink-0">
-              <span>Date From:</span>
+            <div className="flex flex-wrap items-center gap-2 text-[13px] font-normal text-slate-600 shrink-0">
+              <span className="font-medium text-[#1B4332]">Date From:</span>
               <input
                 type="date"
                 value={dateFrom}
                 onChange={(e) => handleDateFromChange(e.target.value)}
-                className={`h-8 px-2.5 bg-slate-50 border rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600 ${
+                className={`h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] ${
                   isDateRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
                 }`}
               />
-              <span>To:</span>
+              <span className="font-medium text-[#1B4332]">To:</span>
               <input
                 type="date"
                 value={dateTo}
                 onChange={(e) => handleDateToChange(e.target.value)}
-                className={`h-8 px-2.5 bg-slate-50 border rounded-md text-xs text-slate-800 outline-none focus:border-emerald-600 ${
+                className={`h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] ${
                   isDateRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
                 }`}
               />
               <select
                 value={selectedMonthPreset}
                 onChange={(e) => handleSelectMonthPreset(e.target.value)}
-                className="h-8 px-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium text-slate-700 outline-none focus:border-emerald-600 cursor-pointer"
+                className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border border-slate-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] cursor-pointer"
               >
                 <option value="">Month Preset...</option>
                 <option value="ALL">All Dates (Clear)</option>
@@ -1535,7 +1556,7 @@ function AdminPortalContent() {
               {(dateFrom || dateTo || searchQuery) && (
                 <button
                   onClick={handleResetFilters}
-                  className="h-8 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md text-xs font-medium transition-colors cursor-pointer"
+                  className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition-colors cursor-pointer"
                   title="Reset all filters"
                 >
                   Reset
@@ -1548,9 +1569,9 @@ function AdminPortalContent() {
                 placeholder="Search records..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-8 px-3 pl-8 bg-slate-50 border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600"
+                className="w-full h-8 px-2.5 pl-8 text-[13px] text-[#1D1D1F] bg-slate-50/70 focus:bg-white border border-slate-200 rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
               />
-              <svg className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 text-[#1B4332] absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -1558,7 +1579,7 @@ function AdminPortalContent() {
 
           {/* Invalid Date Range Warning */}
           {isDateRangeInvalid && (
-            <div className="p-2 bg-rose-50 border border-rose-200 rounded-md text-xs text-rose-800 flex items-center gap-1.5">
+            <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-[6px] text-[13px] text-rose-800 flex items-center gap-1.5">
               <svg className="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -1568,30 +1589,30 @@ function AdminPortalContent() {
         </div>
 
         {/* Tabular Registry */}
-        <div className="bg-white rounded-lg border border-slate-200/90 shadow-2xs overflow-hidden">
+        <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
-                  <th className="py-2.5 px-4">TA Number</th>
-                  <th className="py-2.5 px-4">Employee</th>
-                  <th className="py-2.5 px-4">Destination</th>
-                  <th className="py-2.5 px-4">Travel Date</th>
-                  <th className="py-2.5 px-4">Status</th>
-                  <th className="py-2.5 px-4">Submitted</th>
-                  <th className="py-2.5 px-4 text-right">Actions</th>
+              <thead className="bg-emerald-950/[0.04] border-b border-emerald-900/10">
+                <tr>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#1B4332] whitespace-nowrap text-left">TA Number</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#1B4332] whitespace-nowrap text-left">Employee</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#1B4332] whitespace-nowrap text-left">Destination</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#1B4332] whitespace-nowrap text-left">Travel Date</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#1B4332] whitespace-nowrap text-center">Status</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#1B4332] whitespace-nowrap text-left">Submitted</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#1B4332] whitespace-nowrap text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-xs">
+              <tbody>
                 {paginated.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-slate-500">
+                    <td colSpan={7} className="py-12 px-3 text-center text-[#86868B]">
                       <div className="flex flex-col items-center justify-center gap-1.5">
-                        <svg className="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-8 h-8 text-[#86868B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <p className="font-semibold text-slate-700 text-sm">No Travel Order records found</p>
-                        <p className="text-slate-400 text-xs">
+                        <p className="font-semibold text-[#1D1D1F] text-[14px]">No Travel Order records found</p>
+                        <p className="text-[#86868B] text-[13px]">
                           {dateFrom || dateTo || searchQuery || filterStatus !== 'ALL'
                             ? 'No records match the current date range or search criteria.'
                             : 'No records exist in the database.'}
@@ -1599,7 +1620,7 @@ function AdminPortalContent() {
                         {(dateFrom || dateTo || searchQuery) && (
                           <button
                             onClick={handleResetFilters}
-                            className="mt-2 px-3 py-1 text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-md hover:bg-emerald-100"
+                            className="mt-2 h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-emerald-50 hover:bg-emerald-100 text-[#1B4332] border border-emerald-200 transition-colors"
                           >
                             Clear Filters
                           </button>
@@ -1609,29 +1630,33 @@ function AdminPortalContent() {
                   </tr>
                 ) : (
                   paginated.map((req) => (
-                    <tr key={req.id} className="hover:bg-slate-50/60 transition-colors">
-                      <td className="py-3 px-4 font-mono font-medium text-[#1B4332]">{req.trackingNumber}</td>
-                      <td className="py-3 px-4">
-                        <p className="font-semibold text-slate-900">{req.createdBy?.name || 'Juan Dela Cruz'}</p>
-                        <p className="text-[11px] text-slate-500">{req.employeePosition}</p>
+                    <tr key={req.id} className="h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors">
+                      <td className="px-3 py-1.5 text-[13px] align-middle text-left">
+                        <span className="font-mono text-[12px] font-semibold text-[#1B4332] bg-emerald-50 px-2 py-0.5 rounded-[4px] border border-emerald-200">
+                          {req.trackingNumber}
+                        </span>
                       </td>
-                      <td className="py-3 px-4 text-slate-700">{req.destination}</td>
-                      <td className="py-3 px-4 text-slate-600">
+                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">
+                        <p className="font-medium text-[#1D1D1F]">{req.createdBy?.name || 'Juan Dela Cruz'}</p>
+                        <p className="text-[12px] text-slate-500">{req.employeePosition}</p>
+                      </td>
+                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">{req.destination}</td>
+                      <td className="px-3 py-1.5 text-[13px] text-slate-600 align-middle text-left">
                         {formatDateDisplay(req.startDate)}
                       </td>
-                      <td className="py-3 px-4">{renderStatusBadge(req.status)}</td>
-                      <td className="py-3 px-4 text-slate-500">{formatDateDisplay(req.createdAt)}</td>
-                      <td className="py-3 px-4 text-right space-x-1.5">
+                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">{renderStatusBadge(req.status)}</td>
+                      <td className="px-3 py-1.5 text-[13px] text-slate-500 align-middle text-left">{formatDateDisplay(req.createdAt)}</td>
+                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-right space-x-1.5 whitespace-nowrap">
                         <button
                           onClick={() => setSelectedRecord(req)}
-                          className="px-2 py-1 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium text-[11px] transition-colors"
+                          className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-[#1B4332] transition-colors"
                           title="View Details"
                         >
                           View
                         </button>
                         <button
                           onClick={() => setEditingRecord(req)}
-                          className="px-2 py-1 rounded border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-[#1B4332] font-medium text-[11px] transition-colors"
+                          className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-[#1B4332] hover:bg-[#0F4C2E] text-white transition-colors"
                           title="Edit TA"
                         >
                           Edit
@@ -1645,7 +1670,7 @@ function AdminPortalContent() {
           </div>
 
           {/* Table Footer */}
-          <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50">
+          <div className="px-3 py-2.5 border-t border-emerald-900/10 flex items-center justify-between text-[12px] text-slate-600 bg-emerald-950/[0.02]">
             <span>
               Showing {filteredRecords.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredRecords.length)} of {filteredRecords.length} entries
             </span>
@@ -1653,7 +1678,7 @@ function AdminPortalContent() {
               <button
                 disabled={currentPage === 1 || filteredRecords.length === 0}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="px-2 py-1 rounded border border-slate-200 bg-white text-slate-600 disabled:opacity-40 text-xs"
+                className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 border border-slate-200 bg-white hover:bg-emerald-50 text-slate-700 disabled:opacity-40 transition-colors"
               >
                 Previous
               </button>
@@ -1661,8 +1686,10 @@ function AdminPortalContent() {
                 <button
                   key={pg}
                   onClick={() => setCurrentPage(pg)}
-                  className={`w-6 h-6 rounded text-xs font-semibold ${
-                    currentPage === pg ? 'bg-[#1B4332] text-white' : 'border border-slate-200 bg-white text-slate-600'
+                  className={`h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors ${
+                    currentPage === pg
+                      ? 'bg-[#1B4332] text-white'
+                      : 'border border-slate-200 bg-white hover:bg-emerald-50 text-slate-700'
                   }`}
                 >
                   {pg}
@@ -1671,7 +1698,7 @@ function AdminPortalContent() {
               <button
                 disabled={currentPage === totalPages || filteredRecords.length === 0}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="px-2 py-1 rounded border border-slate-200 bg-white text-slate-600 disabled:opacity-40 text-xs"
+                className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 border border-slate-200 bg-white hover:bg-emerald-50 text-slate-700 disabled:opacity-40 transition-colors"
               >
                 Next
               </button>
@@ -1691,49 +1718,49 @@ function AdminPortalContent() {
     return (
       <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Cancelled Travel Authorities</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Records of rejected, withdrawn, or expired Travel Authorities</p>
+          <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">Cancelled Travel Authorities</h2>
+          <p className="text-[13px] text-[#86868B] mt-0.5">Records of rejected, withdrawn, or expired Travel Authorities</p>
         </div>
 
         {/* Count Card */}
-        <div className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs flex items-center gap-3">
-          <div className="w-9 h-9 rounded-md bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center font-bold text-sm">
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs flex items-center gap-3">
+          <div className="w-9 h-9 rounded-[6px] bg-red-50 text-red-700 border border-red-200 flex items-center justify-center font-bold text-sm">
             ✕
           </div>
           <div>
-            <p className="text-2xl font-semibold text-slate-900 tracking-tight">{cancelledList.length}</p>
-            <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Total Cancelled Records</p>
+            <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F]">{cancelledList.length}</p>
+            <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">Total Cancelled Records</p>
           </div>
         </div>
 
         {/* Cancelled List */}
         <div className="space-y-3">
           {cancelledList.map((req) => (
-            <div key={req.id} className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <div key={req.id} className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-[#E5E5E7] pb-2.5">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono font-semibold text-slate-900 text-xs">{req.trackingNumber}</span>
-                  <span className="px-2 py-0.5 bg-rose-50 text-rose-800 text-[10px] font-semibold rounded border border-rose-200">
+                  <span className="font-mono font-semibold text-[#1D1D1F] text-[13px]">{req.trackingNumber}</span>
+                  <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-red-50 text-red-700 border border-red-200">
                     Cancelled
                   </span>
                 </div>
-                <span className="text-[11px] text-slate-400">Date: {new Date(req.updatedAt).toLocaleDateString()}</span>
+                <span className="text-[12px] text-[#86868B]">Date: {new Date(req.updatedAt).toLocaleDateString()}</span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-[13px]">
                 <div>
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Employee</span>
-                  <p className="font-semibold text-slate-900">{req.createdBy?.name || 'DENR Personnel'}</p>
-                  <p className="text-[11px] text-slate-500">{req.employeePosition} — {req.office}</p>
+                  <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Employee</span>
+                  <p className="font-semibold text-[#1D1D1F]">{req.createdBy?.name || 'DENR Personnel'}</p>
+                  <p className="text-[12px] text-[#86868B]">{req.employeePosition} — {req.office}</p>
                 </div>
                 <div>
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Destination</span>
-                  <p className="font-semibold text-slate-900">{req.destination}</p>
-                  <p className="text-[11px] text-slate-500">Travel Date: {new Date(req.startDate).toLocaleDateString()}</p>
+                  <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Destination</span>
+                  <p className="font-semibold text-[#1D1D1F]">{req.destination}</p>
+                  <p className="text-[12px] text-[#86868B]">Travel Date: {new Date(req.startDate).toLocaleDateString()}</p>
                 </div>
                 <div>
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Cancellation Reason</span>
-                  <p className="text-xs text-rose-900 bg-rose-50/70 p-2 rounded border border-rose-200/60 leading-relaxed font-normal mt-0.5">
+                  <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Cancellation Reason</span>
+                  <p className="text-[12px] text-red-700 bg-red-50 p-2 rounded-[6px] border border-red-200 leading-relaxed font-normal mt-0.5">
                     {req.status === 'REJECTED_OVERDUE'
                       ? 'Expired automatically — departure date passed before final signatory approval.'
                       : 'Inspection rescheduled due to administrative priorities or weather advisories.'}
@@ -1742,13 +1769,13 @@ function AdminPortalContent() {
               </div>
 
               {/* History Bar */}
-              <div className="pt-2 border-t border-slate-100 text-xs flex items-center gap-2 text-[11px] text-slate-600 flex-wrap">
-                <span className="text-slate-400 font-medium">History:</span>
-                <span className="px-2 py-0.5 bg-slate-100 rounded">Submitted ({new Date(req.createdAt).toLocaleDateString()})</span>
+              <div className="pt-2 border-t border-[#E5E5E7] flex items-center gap-2 text-[12px] text-[#86868B] flex-wrap">
+                <span className="text-[#86868B] font-medium">History:</span>
+                <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-[#F5F5F7] text-[#86868B] border border-[#E5E5E7]">Submitted ({new Date(req.createdAt).toLocaleDateString()})</span>
                 <span>→</span>
-                <span className="px-2 py-0.5 bg-slate-100 rounded">Section Chief Review</span>
+                <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-[#F5F5F7] text-[#86868B] border border-[#E5E5E7]">Section Chief Review</span>
                 <span>→</span>
-                <span className="px-2 py-0.5 bg-rose-50 text-rose-800 rounded font-medium">Cancelled ({new Date(req.updatedAt).toLocaleDateString()})</span>
+                <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-red-50 text-red-700 border border-red-200">Cancelled ({new Date(req.updatedAt).toLocaleDateString()})</span>
               </div>
             </div>
           ))}
@@ -1763,22 +1790,22 @@ function AdminPortalContent() {
   const renderSearchTab = () => (
     <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
       <div>
-        <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Search by ID</h2>
-        <p className="text-xs text-slate-500 mt-0.5">Find a specific Travel Order by its unique reference tracking number</p>
+        <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">Search by ID</h2>
+        <p className="text-[13px] text-[#86868B] mt-0.5">Find a specific Travel Order by its unique reference tracking number</p>
       </div>
 
-      <form onSubmit={handleSearchById} className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs space-y-3">
+      <form onSubmit={handleSearchById} className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs space-y-3">
         <div className="flex gap-2">
           <input
             type="text"
             placeholder="Enter complete TA number (e.g., TA-2025-0001)..."
             value={searchIdInput}
             onChange={(e) => setSearchIdInput(e.target.value)}
-            className="flex-1 h-9 px-3 bg-slate-50 border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600"
+            className="flex-1 h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
           />
           <button
             type="submit"
-            className="h-9 px-5 bg-[#1B4332] hover:bg-[#143326] text-white font-medium text-xs rounded-md shadow-2xs transition-colors"
+            className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#1B4332] hover:bg-[#143225] text-white transition-colors"
           >
             Search
           </button>
@@ -1786,41 +1813,41 @@ function AdminPortalContent() {
       </form>
 
       {searchIdResult && (
-        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-2xs space-y-4 animate-fade-in">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="bg-white p-5 rounded-[8px] border border-[#E5E5E7] shadow-xs space-y-4 animate-fade-in">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E5E5E7]">
             <div>
-              <span className="px-2 py-0.5 bg-emerald-50 text-[#1B4332] font-mono font-semibold text-xs rounded border border-emerald-200">
+              <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold font-mono rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">
                 {searchIdResult.trackingNumber}
               </span>
-              <h3 className="text-sm font-semibold text-slate-900 mt-1.5">{searchIdResult.destination}</h3>
-              <p className="text-xs text-slate-500">{searchIdResult.purpose}</p>
+              <h3 className="text-[14px] font-semibold text-[#1D1D1F] mt-1.5">{searchIdResult.destination}</h3>
+              <p className="text-[13px] text-[#86868B]">{searchIdResult.purpose}</p>
             </div>
             <div>{renderStatusBadge(searchIdResult.status)}</div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div className="p-2.5 bg-slate-50 rounded border border-slate-100">
-              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Employee</span>
-              <span className="font-semibold text-slate-800">{searchIdResult.createdBy?.name || 'Juan Dela Cruz'}</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[13px]">
+            <div className="p-2.5 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+              <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Employee</span>
+              <span className="font-semibold text-[#1D1D1F]">{searchIdResult.createdBy?.name || 'Juan Dela Cruz'}</span>
             </div>
-            <div className="p-2.5 bg-slate-50 rounded border border-slate-100">
-              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Station</span>
-              <span className="font-semibold text-slate-800">{searchIdResult.office}</span>
+            <div className="p-2.5 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+              <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Station</span>
+              <span className="font-semibold text-[#1D1D1F]">{searchIdResult.office}</span>
             </div>
-            <div className="p-2.5 bg-slate-50 rounded border border-slate-100">
-              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Travel Date</span>
-              <span className="font-semibold text-slate-800">{new Date(searchIdResult.startDate).toLocaleDateString()}</span>
+            <div className="p-2.5 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+              <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Travel Date</span>
+              <span className="font-semibold text-[#1D1D1F]">{new Date(searchIdResult.startDate).toLocaleDateString()}</span>
             </div>
-            <div className="p-2.5 bg-slate-50 rounded border border-slate-100">
-              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Transportation</span>
-              <span className="font-semibold text-slate-800">{searchIdResult.transportation}</span>
+            <div className="p-2.5 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+              <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Transportation</span>
+              <span className="font-semibold text-[#1D1D1F]">{searchIdResult.transportation}</span>
             </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
             <button
               onClick={() => setSelectedRecord(searchIdResult)}
-              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs rounded transition-colors"
+              className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#F5F5F7] hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors"
             >
               View Document Details →
             </button>
@@ -1836,33 +1863,33 @@ function AdminPortalContent() {
   const renderEditTab = () => (
     <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
       <div>
-        <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Edit Travel Order</h2>
-        <p className="text-xs text-slate-500 mt-0.5">Search and modify permitted Travel Order records</p>
+        <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">Edit Travel Order</h2>
+        <p className="text-[13px] text-[#86868B] mt-0.5">Search and modify permitted Travel Order records</p>
       </div>
 
       {editSuccessMsg && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-md text-xs font-semibold text-emerald-900">
+        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-[6px] text-[13px] font-semibold text-emerald-700">
           ✓ {editSuccessMsg}
         </div>
       )}
 
       {/* Find Box */}
-      <div className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs space-y-2.5">
-        <span className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider block">FIND TRAVEL AUTHORITY</span>
+      <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs space-y-2.5">
+        <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">FIND TRAVEL AUTHORITY</span>
         <div className="flex gap-2">
           <input
             type="text"
             placeholder="Enter TA Number (e.g., TA-2025-0001)..."
             value={searchIdInput}
             onChange={(e) => setSearchIdInput(e.target.value)}
-            className="flex-1 h-9 px-3 bg-slate-50 border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600"
+            className="flex-1 h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
           />
           <button
             onClick={() => {
               const f = taRecords.find((r) => r.trackingNumber.toLowerCase() === searchIdInput.trim().toLowerCase());
               if (f) setEditingRecord(f);
             }}
-            className="h-9 px-5 bg-[#1B4332] hover:bg-[#143326] text-white font-medium text-xs rounded-md shadow-2xs transition-colors"
+            className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#1B4332] hover:bg-[#143225] text-white transition-colors"
           >
             Find
           </button>
@@ -1870,23 +1897,23 @@ function AdminPortalContent() {
       </div>
 
       {/* Quick Select List */}
-      <div className="bg-white rounded-lg border border-slate-200/90 shadow-2xs p-4 space-y-3">
+      <div className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs p-4 space-y-3">
         <div>
-          <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Quick Select — Recent Travel Authorities</h3>
-          <p className="text-[11px] text-slate-400 mt-0.5">Select a record to load for modification</p>
+          <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Quick Select — Recent Travel Authorities</h3>
+          <p className="text-[12px] text-[#86868B] mt-0.5">Select a record to load for modification</p>
         </div>
 
-        <div className="divide-y divide-slate-100 text-xs">
+        <div className="divide-y divide-[#E5E5E7] text-[13px]">
           {taRecords.slice(0, 6).map((req) => (
-            <div key={req.id} className="py-2.5 flex items-center justify-between hover:bg-slate-50/60 px-1 rounded transition-colors">
+            <div key={req.id} className="h-[42px] flex items-center justify-between hover:bg-[#F2F2F7] px-2 rounded-[6px] transition-colors">
               <div className="flex items-center gap-3">
                 <span className="font-mono font-medium text-[#1B4332]">{req.trackingNumber}</span>
-                <span className="font-medium text-slate-800">{req.createdBy?.name || 'Juan Dela Cruz'}</span>
-                <span className="text-slate-500 hidden sm:inline">{req.destination}</span>
+                <span className="font-normal text-[#1D1D1F]">{req.createdBy?.name || 'Juan Dela Cruz'}</span>
+                <span className="text-[#86868B] hidden sm:inline">{req.destination}</span>
               </div>
               <button
                 onClick={() => setEditingRecord(req)}
-                className="text-xs font-semibold text-[#1B4332] hover:underline"
+                className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white hover:bg-[#F2F2F7] border border-[#E5E5E7] text-[#1B4332] transition-colors"
               >
                 Edit →
               </button>
@@ -1903,25 +1930,25 @@ function AdminPortalContent() {
   const renderApprovalMonitoringTab = () => (
     <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
       <div>
-        <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Approval Monitoring</h2>
-        <p className="text-xs text-slate-500 mt-0.5">Track Travel Authority requests through the hierarchical approval workflow</p>
+        <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">Approval Monitoring</h2>
+        <p className="text-[13px] text-[#86868B] mt-0.5">Track Travel Authority requests through the hierarchical approval workflow</p>
       </div>
 
       {/* 5-Stage Pipeline Stepper */}
-      <div className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs space-y-3">
-        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">APPROVAL PIPELINE STAGES</span>
+      <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs space-y-3">
+        <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">APPROVAL PIPELINE STAGES</span>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
           {[
-            { step: '1', label: 'Employee', count: 2, sub: 'Submitted' },
-            { step: '2', label: 'Section Chief', count: 3, sub: 'Verification' },
-            { step: '3', label: 'Division Chief', count: 2, sub: 'Verification' },
-            { step: '4', label: 'PENRO Head', count: 1, sub: 'Final Signatory' },
-            { step: '5', label: 'Completed', count: stats.approved, sub: 'Approved' },
+            { step: '1', label: 'Employee', count: 2, sub: 'Submitted', color: 'bg-emerald-50/70 border-emerald-200/80' },
+            { step: '2', label: 'Section Chief', count: 3, sub: 'Verification', color: 'bg-amber-50/70 border-amber-200/80' },
+            { step: '3', label: 'Division Chief', count: 2, sub: 'Verification', color: 'bg-sky-50/70 border-sky-200/80' },
+            { step: '4', label: 'PENRO Head', count: 1, sub: 'Final Signatory', color: 'bg-purple-50/70 border-purple-200/80' },
+            { step: '5', label: 'Completed', count: stats.approved, sub: 'Approved', color: 'bg-emerald-100/70 border-emerald-300/80' },
           ].map((st) => (
-            <div key={st.step} className="p-3 bg-slate-50/70 rounded-md border border-slate-100 text-center">
-              <span className="text-xl font-semibold text-slate-900 block">{st.count}</span>
-              <span className="text-xs font-semibold text-slate-700 block mt-0.5">{st.label}</span>
-              <span className="text-[10px] text-slate-400 font-normal">{st.sub}</span>
+            <div key={st.step} className={`p-3 rounded-[6px] border text-center ${st.color}`}>
+              <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F] block">{st.count}</span>
+              <span className="text-[13px] font-semibold text-[#1D1D1F] block mt-0.5">{st.label}</span>
+              <span className="text-[12px] text-[#86868B] font-normal">{st.sub}</span>
             </div>
           ))}
         </div>
@@ -1929,52 +1956,52 @@ function AdminPortalContent() {
 
       {/* Status Counters */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-        <div className="p-3 bg-white rounded-lg border border-slate-200 text-center shadow-2xs">
-          <span className="text-lg font-semibold text-slate-800">4</span>
-          <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">PENDING</p>
+        <div className="p-4 bg-white rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-slate-400 text-center shadow-xs">
+          <span className="text-[24px] font-bold tracking-tight text-slate-800">4</span>
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mt-0.5">PENDING</p>
         </div>
-        <div className="p-3 bg-white rounded-lg border border-slate-200 text-center shadow-2xs">
-          <span className="text-lg font-semibold text-sky-700">3</span>
-          <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">IN REVIEW</p>
+        <div className="p-4 bg-white rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-sky-500 text-center shadow-xs">
+          <span className="text-[24px] font-bold tracking-tight text-sky-700">3</span>
+          <p className="text-[11px] font-semibold text-sky-700 uppercase tracking-wider mt-0.5">IN REVIEW</p>
         </div>
-        <div className="p-3 bg-white rounded-lg border border-slate-200 text-center shadow-2xs">
-          <span className="text-lg font-semibold text-emerald-800">{stats.approved}</span>
-          <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">APPROVED</p>
+        <div className="p-4 bg-white rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-emerald-500 text-center shadow-xs">
+          <span className="text-[24px] font-bold tracking-tight text-emerald-700">{stats.approved}</span>
+          <p className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider mt-0.5">APPROVED</p>
         </div>
-        <div className="p-3 bg-white rounded-lg border border-slate-200 text-center shadow-2xs">
-          <span className="text-lg font-semibold text-rose-700">{stats.cancelled}</span>
-          <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">RETURNED</p>
+        <div className="p-4 bg-white rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-rose-500 text-center shadow-xs">
+          <span className="text-[24px] font-bold tracking-tight text-rose-700">{stats.cancelled}</span>
+          <p className="text-[11px] font-semibold text-rose-700 uppercase tracking-wider mt-0.5">RETURNED</p>
         </div>
-        <div className="p-3 bg-white rounded-lg border border-slate-200 text-center shadow-2xs">
-          <span className="text-lg font-semibold text-amber-700">3</span>
-          <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">OVERDUE</p>
+        <div className="p-4 bg-white rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-amber-500 text-center shadow-xs">
+          <span className="text-[24px] font-bold tracking-tight text-amber-700">3</span>
+          <p className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider mt-0.5">OVERDUE</p>
         </div>
       </div>
 
       {/* Turnaround & Bottleneck Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs">
-          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1">Average Processing Time</span>
-          <p className="text-3xl font-semibold text-slate-900 tracking-tight">2.4 <span className="text-sm font-normal text-slate-500">days</span></p>
-          <p className="text-xs text-slate-400 mt-1">Average time from employee submission to final approval</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-[#0F4C2E] shadow-xs">
+          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-1">Average Processing Time</span>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F]">2.4 <span className="text-[13px] font-normal text-[#86868B]">days</span></p>
+          <p className="text-[12px] text-[#86868B] mt-1">Average time from employee submission to final approval</p>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border border-slate-200/90 shadow-2xs">
-          <span className="text-[11px] font-semibold text-amber-800 uppercase tracking-wider block mb-1">Current Bottleneck Stage</span>
-          <p className="text-xl font-semibold text-slate-900">Section Chief Review</p>
-          <p className="text-xs text-slate-500 mt-1">3 requests pending at this stage — avg. wait 4.7 days</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-amber-500 shadow-xs">
+          <span className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider block mb-1">Current Bottleneck Stage</span>
+          <p className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Section Chief Review</p>
+          <p className="text-[12px] text-[#86868B] mt-1">3 requests pending at this stage — avg. wait 4.7 days</p>
         </div>
       </div>
 
       {/* Overdue Warning */}
-      <div className="p-3.5 bg-rose-50/80 border border-rose-200 rounded-lg text-xs text-rose-900 space-y-0.5">
+      <div className="p-3.5 bg-red-50 border border-red-200 rounded-[8px] text-[13px] text-red-700 space-y-0.5">
         <p className="font-semibold flex items-center gap-1.5">
-          <svg className="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           3 Overdue Approvals Detected
         </p>
-        <p className="text-rose-800 text-[11px]">
+        <p className="text-red-700 text-[12px]">
           TA-2025-0003, TA-2025-0008, TA-2025-0015 — waiting 5+ days at current verification stage.
         </p>
       </div>
@@ -1987,48 +2014,48 @@ function AdminPortalContent() {
   const renderTravelAnalyticsTab = () => (
     <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
       <div>
-        <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Travel Analytics</h2>
-        <p className="text-xs text-slate-500 mt-0.5">Institutional travel patterns, volume metrics, and destination distribution</p>
+        <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">Travel Analytics</h2>
+        <p className="text-[13px] text-[#86868B] mt-0.5">Institutional travel patterns, volume metrics, and destination distribution</p>
       </div>
 
       {/* 4 Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3.5">
-        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">TOTAL REQUESTS</p>
-          <p className="text-2xl font-semibold text-slate-900 mt-1">{stats.total}</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">TOTAL REQUESTS</p>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">{stats.total}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">WITHIN AOR</p>
-          <p className="text-2xl font-semibold text-[#1B4332] mt-1">{stats.withinAOR}</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">WITHIN AOR</p>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">{stats.withinAOR}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">OUTSIDE AOR</p>
-          <p className="text-2xl font-semibold text-[#40916C] mt-1">{stats.outsideAOR}</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">OUTSIDE AOR</p>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">{stats.outsideAOR}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">TRANSPORT TYPES</p>
-          <p className="text-2xl font-semibold text-sky-800 mt-1">3</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">TRANSPORT TYPES</p>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">3</p>
         </div>
       </div>
 
       {/* Row 1 Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-2xs">
-          <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-3">Within AOR vs Outside AOR</h3>
+        <div className="bg-white p-5 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <h3 className="text-[14px] font-semibold text-[#1D1D1F] mb-3">Within AOR vs Outside AOR</h3>
           <div className="h-44 flex items-center justify-center">
             <svg className="w-36 h-36 transform -rotate-90" viewBox="0 0 36 36">
               <circle cx="18" cy="18" r="14" fill="transparent" stroke="#0284C7" strokeWidth="4" strokeDasharray="27 100" strokeDashoffset="0" />
               <circle cx="18" cy="18" r="14" fill="transparent" stroke="#10B981" strokeWidth="4" strokeDasharray="73 100" strokeDashoffset="-27" />
             </svg>
           </div>
-          <div className="flex justify-center gap-6 text-xs font-medium text-slate-600 pt-2 border-t border-slate-100">
+          <div className="flex justify-center gap-6 text-[12px] font-normal text-[#1D1D1F] pt-2 border-t border-[#E5E5E7]">
             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> Within AOR ({stats.withinAOR})</span>
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-sky-600"></span> Outside AOR ({stats.outsideAOR})</span>
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-600"></span> Outside AOR ({stats.outsideAOR})</span>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-2xs">
-          <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-3">Travel Request Trends</h3>
+        <div className="bg-white p-5 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <h3 className="text-[14px] font-semibold text-[#1D1D1F] mb-3">Travel Request Trends</h3>
           <div className="h-44 flex items-end justify-between px-4 pb-2 pt-4">
             {[
               { month: 'Oct', count: 8 },
@@ -2037,20 +2064,20 @@ function AdminPortalContent() {
               { month: 'Jan', count: 15 },
             ].map((m) => (
               <div key={m.month} className="flex flex-col items-center gap-1 flex-1">
-                <span className="text-xs font-semibold text-slate-700">{m.count}</span>
+                <span className="text-[13px] font-semibold text-[#1D1D1F]">{m.count}</span>
                 <div style={{ height: `${m.count * 8}px` }} className="w-7 bg-[#1B4332] rounded-t" />
-                <span className="text-[11px] text-slate-500">{m.month}</span>
+                <span className="text-[12px] text-[#86868B]">{m.month}</span>
               </div>
             ))}
           </div>
-          <p className="text-center text-[10px] text-slate-400 border-t border-slate-100 pt-2">Monthly Request Volume</p>
+          <p className="text-center text-[12px] text-[#86868B] border-t border-[#E5E5E7] pt-2">Monthly Request Volume</p>
         </div>
       </div>
 
       {/* Row 2 Destination Breakdown */}
-      <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-2xs space-y-3">
-        <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Frequently Visited Destinations</h3>
-        <div className="space-y-2 text-xs">
+      <div className="bg-white p-5 rounded-[8px] border border-[#E5E5E7] shadow-xs space-y-3">
+        <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Frequently Visited Destinations</h3>
+        <div className="space-y-2 text-[13px]">
           {[
             { name: 'Baguio City', count: 5, color: '#1B4332' },
             { name: 'San Fernando City, La Union', count: 4, color: '#2D6A4F' },
@@ -2059,11 +2086,11 @@ function AdminPortalContent() {
             { name: 'Pugo, La Union', count: 2, color: '#74C69D' },
           ].map((d) => (
             <div key={d.name} className="space-y-0.5">
-              <div className="flex justify-between text-xs font-medium">
-                <span className="text-slate-700">{d.name}</span>
-                <span className="font-semibold text-slate-900">{d.count} requests</span>
+              <div className="flex justify-between text-[13px] font-normal">
+                <span className="text-[#1D1D1F]">{d.name}</span>
+                <span className="font-semibold text-[#1D1D1F]">{d.count} requests</span>
               </div>
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 bg-[#F5F5F7] rounded-full overflow-hidden">
                 <div style={{ width: `${(d.count / 5) * 100}%`, backgroundColor: d.color }} className="h-full rounded-full" />
               </div>
             </div>
@@ -2080,23 +2107,23 @@ function AdminPortalContent() {
     <div className="space-y-4 animate-fade-in w-full max-w-[1600px] mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Destination Map</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Geographic distribution of travel destinations based on real Travel Authorities</p>
+          <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">Destination Map</h2>
+          <p className="text-[13px] text-[#86868B] mt-0.5">Geographic distribution of travel destinations based on real Travel Authorities</p>
         </div>
         <div className="flex items-center gap-2">
           {mapDateMode !== 'ALL' && (
-            <span className="px-2 py-0.5 bg-slate-100 text-slate-600 border border-slate-200 rounded text-xs font-medium">
+            <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-[#F5F5F7] text-[#86868B] border border-[#E5E5E7]">
               Filter: {mapDateMode === 'DAY' ? 'Single Day' : mapDateMode === 'WEEK' ? 'Week' : 'Custom Range'}
             </span>
           )}
-          <span className="px-2.5 py-1 bg-emerald-50 text-[#1B4332] border border-emerald-200 rounded text-xs font-semibold">
+          <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">
             {mapItems.length} {mapItems.length === 1 ? 'Destination' : 'Destinations'} on map
           </span>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white p-3 rounded-lg border border-slate-200/90 shadow-2xs space-y-2.5">
+      <div className="bg-white p-3.5 rounded-[8px] border border-[#E5E5E7] shadow-xs space-y-2.5">
         <div className="flex flex-wrap items-center gap-2.5">
           <div className="flex-1 min-w-[200px] relative">
             <input
@@ -2104,9 +2131,9 @@ function AdminPortalContent() {
               placeholder="Search destination name, tracking #, employee..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-8 px-3 pl-8 bg-slate-50 border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600 focus:bg-white transition-colors"
+              className="w-full h-8 px-2.5 pl-8 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
             />
-            <svg className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 text-[#86868B] absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
@@ -2114,7 +2141,7 @@ function AdminPortalContent() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium outline-none text-slate-700 focus:border-emerald-600 focus:bg-white"
+            className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
           >
             <option value="ALL">All Status</option>
             <option value="APPROVED">Approved</option>
@@ -2125,7 +2152,7 @@ function AdminPortalContent() {
           <select
             value={filterAor}
             onChange={(e) => setFilterAor(e.target.value)}
-            className="h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium outline-none text-slate-700 focus:border-emerald-600 focus:bg-white"
+            className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
           >
             <option value="ALL">All AOR</option>
             <option value="Within AOR">Within AOR</option>
@@ -2133,14 +2160,14 @@ function AdminPortalContent() {
           </select>
 
           {/* Period Selector Tabs (All Dates, Day, Week, Custom Range) */}
-          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-md border border-slate-200">
+          <div className="flex items-center gap-1 bg-[#F5F5F7] p-0.5 rounded-[6px] border border-[#E5E5E7]">
             <button
               type="button"
               onClick={() => setMapDateMode('ALL')}
-              className={`h-7 px-2.5 rounded text-xs font-semibold transition-all ${
+              className={`h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors ${
                 mapDateMode === 'ALL'
-                  ? 'bg-emerald-700 text-white shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
+                  ? 'bg-[#1B4332] text-white'
+                  : 'text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F2F2F7]'
               }`}
             >
               All Dates
@@ -2148,10 +2175,10 @@ function AdminPortalContent() {
             <button
               type="button"
               onClick={() => setMapDateMode('DAY')}
-              className={`h-7 px-2.5 rounded text-xs font-semibold transition-all ${
+              className={`h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors ${
                 mapDateMode === 'DAY'
-                  ? 'bg-emerald-700 text-white shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
+                  ? 'bg-[#1B4332] text-white'
+                  : 'text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F2F2F7]'
               }`}
             >
               Day
@@ -2159,10 +2186,10 @@ function AdminPortalContent() {
             <button
               type="button"
               onClick={() => setMapDateMode('WEEK')}
-              className={`h-7 px-2.5 rounded text-xs font-semibold transition-all ${
+              className={`h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors ${
                 mapDateMode === 'WEEK'
-                  ? 'bg-emerald-700 text-white shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
+                  ? 'bg-[#1B4332] text-white'
+                  : 'text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F2F2F7]'
               }`}
             >
               Week
@@ -2170,10 +2197,10 @@ function AdminPortalContent() {
             <button
               type="button"
               onClick={() => setMapDateMode('CUSTOM')}
-              className={`h-7 px-2.5 rounded text-xs font-semibold transition-all ${
+              className={`h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors ${
                 mapDateMode === 'CUSTOM'
-                  ? 'bg-emerald-700 text-white shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
+                  ? 'bg-[#1B4332] text-white'
+                  : 'text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F2F2F7]'
               }`}
             >
               Custom Range
@@ -2182,7 +2209,7 @@ function AdminPortalContent() {
 
           <button
             onClick={handleResetMapFilters}
-            className="h-8 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-medium transition-colors"
+            className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#F5F5F7] hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors"
           >
             Reset
           </button>
@@ -2190,15 +2217,15 @@ function AdminPortalContent() {
 
         {/* Dynamic Controls based on selected Period */}
         {mapDateMode !== 'ALL' && (
-          <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="pt-2 border-t border-[#E5E5E7] flex flex-wrap items-center justify-between gap-3 text-[13px]">
             {mapDateMode === 'DAY' && (
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-semibold text-slate-700">Selected Day:</span>
+                <span className="font-semibold text-[#1D1D1F]">Selected Day:</span>
                 <button
                   type="button"
                   title="Previous Day"
                   onClick={handlePrevDay}
-                  className="h-7 w-7 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs"
+                  className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-[#F5F5F7] hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors"
                 >
                   ◀
                 </button>
@@ -2206,65 +2233,65 @@ function AdminPortalContent() {
                   type="date"
                   value={mapSelectedDay}
                   onChange={(e) => setMapSelectedDay(e.target.value)}
-                  className="h-7 px-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium outline-none focus:border-emerald-600 focus:bg-white"
+                  className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                 />
                 <button
                   type="button"
                   title="Next Day"
                   onClick={handleNextDay}
-                  className="h-7 w-7 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs"
+                  className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-[#F5F5F7] hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors"
                 >
                   ▶
                 </button>
                 <button
                   type="button"
                   onClick={handleTodayDay}
-                  className="h-7 px-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded font-semibold text-xs transition-colors"
+                  className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-[#1B4332] hover:bg-[#143225] text-white transition-colors"
                 >
                   Today
                 </button>
-                <span className="text-[11px] text-slate-500 ml-1">
-                  Showing destinations active on <strong className="text-slate-700">{formatDateDisplay(mapSelectedDay)}</strong>
+                <span className="text-[12px] text-[#86868B] ml-1">
+                  Showing destinations active on <strong className="text-[#1D1D1F]">{formatDateDisplay(mapSelectedDay)}</strong>
                 </span>
               </div>
             )}
 
             {mapDateMode === 'WEEK' && (
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-semibold text-slate-700">Selected Week:</span>
+                <span className="font-semibold text-[#1D1D1F]">Selected Week:</span>
                 <button
                   type="button"
                   title="Previous Week"
                   onClick={handlePrevWeek}
-                  className="h-7 w-7 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs"
+                  className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-[#F5F5F7] hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors"
                 >
                   ◀
                 </button>
-                <span className="h-7 px-2.5 bg-emerald-50 text-[#1B4332] border border-emerald-200 rounded font-semibold text-xs flex items-center">
+                <span className="h-7 px-2.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-[6px] font-semibold text-xs inline-flex items-center">
                   📅 {mapWeekInfo.label}
                 </span>
                 <button
                   type="button"
                   title="Next Week"
                   onClick={handleNextWeek}
-                  className="h-7 w-7 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs"
+                  className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-[#F5F5F7] hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors"
                 >
                   ▶
                 </button>
                 <button
                   type="button"
                   onClick={handleThisWeek}
-                  className="h-7 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-medium text-xs transition-colors"
+                  className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-[#F5F5F7] hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors"
                 >
                   This Week
                 </button>
-                <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200">
-                  <span className="text-[11px] text-slate-500">Jump to date:</span>
+                <div className="flex items-center gap-1.5 pl-2 border-l border-[#E5E5E7]">
+                  <span className="text-[12px] text-[#86868B]">Jump to date:</span>
                   <input
                     type="date"
                     value={mapSelectedWeekRef}
                     onChange={(e) => setMapSelectedWeekRef(e.target.value)}
-                    className="h-7 px-2 bg-slate-50 border border-slate-200 rounded text-xs font-medium outline-none focus:border-emerald-600 focus:bg-white"
+                    className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                   />
                 </div>
               </div>
@@ -2272,36 +2299,36 @@ function AdminPortalContent() {
 
             {mapDateMode === 'CUSTOM' && (
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-semibold text-slate-700">Custom Date Range:</span>
+                <span className="font-semibold text-[#1D1D1F]">Custom Date Range:</span>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] text-slate-500">From</span>
+                  <span className="text-[12px] text-[#86868B]">From</span>
                   <input
                     type="date"
                     value={mapCustomFrom}
                     onChange={(e) => setMapCustomFrom(e.target.value)}
-                    className={`h-7 px-2 bg-slate-50 border rounded text-xs font-medium outline-none focus:border-emerald-600 focus:bg-white ${
-                      isMapCustomRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
+                    className={`h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] ${
+                      isMapCustomRangeInvalid ? 'border-red-400 bg-red-50/50' : 'border-[#E5E5E7]'
                     }`}
                   />
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] text-slate-500">To</span>
+                  <span className="text-[12px] text-[#86868B]">To</span>
                   <input
                     type="date"
                     value={mapCustomTo}
                     onChange={(e) => setMapCustomTo(e.target.value)}
-                    className={`h-7 px-2 bg-slate-50 border rounded text-xs font-medium outline-none focus:border-emerald-600 focus:bg-white ${
-                      isMapCustomRangeInvalid ? 'border-rose-400 bg-rose-50/50' : 'border-slate-200'
+                    className={`h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] ${
+                      isMapCustomRangeInvalid ? 'border-red-400 bg-red-50/50' : 'border-[#E5E5E7]'
                     }`}
                   />
                 </div>
                 {isMapCustomRangeInvalid ? (
-                  <span className="text-[11px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                  <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-red-50 text-red-700 border border-red-200">
                     ⚠️ Date From cannot be after Date To
                   </span>
                 ) : (
                   (mapCustomFrom || mapCustomTo) && (
-                    <span className="text-[11px] text-slate-500">
+                    <span className="text-[12px] text-[#86868B]">
                       Showing destinations active within selected window
                     </span>
                   )
@@ -2309,7 +2336,7 @@ function AdminPortalContent() {
               </div>
             )}
 
-            <div className="text-[11px] text-slate-500">
+            <div className="text-[12px] text-[#86868B]">
               {mapItems.length === 1 ? '1 destination found' : `${mapItems.length} destinations found`}
             </div>
           </div>
@@ -2318,11 +2345,11 @@ function AdminPortalContent() {
 
       {/* No destinations matching notice */}
       {mapItems.length === 0 && (
-        <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-center justify-between animate-fade-in">
+        <div className="p-3 bg-amber-50 border border-amber-200 rounded-[8px] text-[13px] text-amber-700 flex items-center justify-between animate-fade-in">
           <span>No travel destinations found matching your selected period and criteria.</span>
           <button
             onClick={handleResetMapFilters}
-            className="font-semibold underline hover:text-amber-900"
+            className="font-semibold underline hover:text-amber-800"
           >
             Reset Filters
           </button>
@@ -2330,15 +2357,15 @@ function AdminPortalContent() {
       )}
 
       {/* Map Container */}
-      <div className="relative rounded-lg overflow-hidden border border-slate-200">
+      <div className="relative rounded-[8px] overflow-hidden border border-[#E5E5E7] shadow-xs">
         <DynamicAdminDestinationMap items={mapItems} onSelectItem={(item) => {
           const matched = taRecords.find((r) => r.id === item.id);
           if (matched) setSelectedRecord(matched);
         }} />
 
         {/* Legend */}
-        <div className="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-xs p-3 rounded-md border border-slate-200 shadow-sm text-xs space-y-1 font-medium text-slate-700">
-          <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">LEGEND</span>
+        <div className="absolute bottom-4 left-4 z-10 bg-white/95 backdrop-blur-xs p-3 rounded-[8px] border border-[#E5E5E7] shadow-xs text-[12px] space-y-1 font-normal text-[#1D1D1F]">
+          <span className="text-[11px] text-[#86868B] uppercase tracking-wider block font-semibold">LEGEND</span>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#1B4332]"></span> Active TA
           </div>
@@ -2359,38 +2386,38 @@ function AdminPortalContent() {
   const renderApprovalAnalyticsTab = () => (
     <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
       <div>
-        <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Approval Analytics</h2>
-        <p className="text-xs text-slate-500 mt-0.5">Turnaround rates, stage duration benchmarks, and approval performance</p>
+        <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">Approval Analytics</h2>
+        <p className="text-[13px] text-[#86868B] mt-0.5">Turnaround rates, stage duration benchmarks, and approval performance</p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-        <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">APPROVAL RATE</p>
-          <p className="text-xl font-semibold text-emerald-800 mt-0.5">38.5%</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">APPROVAL RATE</p>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">38.5%</p>
         </div>
-        <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">PENDING</p>
-          <p className="text-xl font-semibold text-amber-700 mt-0.5">7</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">PENDING</p>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">7</p>
         </div>
-        <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">COMPLETED</p>
-          <p className="text-xl font-semibold text-[#1B4332] mt-0.5">5</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">COMPLETED</p>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">5</p>
         </div>
-        <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">RETURNED</p>
-          <p className="text-xl font-semibold text-rose-700 mt-0.5">1</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">RETURNED</p>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">1</p>
         </div>
-        <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">OVERDUE</p>
-          <p className="text-xl font-semibold text-amber-800 mt-0.5">3</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">OVERDUE</p>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">3</p>
         </div>
       </div>
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-2xs">
-          <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-3">Approval Status Distribution</h3>
+        <div className="bg-white p-5 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <h3 className="text-[14px] font-semibold text-[#1D1D1F] mb-3">Approval Status Distribution</h3>
           <div className="h-44 flex items-center justify-center">
             <svg className="w-36 h-36 transform -rotate-90" viewBox="0 0 36 36">
               <circle cx="18" cy="18" r="14" fill="transparent" stroke="#10B981" strokeWidth="4" strokeDasharray="38 100" strokeDashoffset="0" />
@@ -2398,43 +2425,43 @@ function AdminPortalContent() {
               <circle cx="18" cy="18" r="14" fill="transparent" stroke="#EF4444" strokeWidth="4" strokeDasharray="8 100" strokeDashoffset="-92" />
             </svg>
           </div>
-          <div className="flex justify-center gap-4 text-[11px] font-medium text-slate-600 pt-2 border-t border-slate-100">
-            <span>● Approved</span>
-            <span>● Pending</span>
-            <span>● Returned</span>
+          <div className="flex justify-center gap-4 text-[12px] font-normal text-[#1D1D1F] pt-2 border-t border-[#E5E5E7]">
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> Approved</span>
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500"></span> Pending</span>
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-500"></span> Returned</span>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-2xs">
-          <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-3">Stage Performance Benchmarks</h3>
+        <div className="bg-white p-5 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <h3 className="text-[14px] font-semibold text-[#1D1D1F] mb-3">Stage Performance Benchmarks</h3>
           <div className="space-y-3.5 pt-1">
             <div>
-              <div className="flex justify-between text-xs font-medium mb-1">
-                <span>Section Chief</span>
-                <span className="text-slate-500">1.2 days avg — 4 requests</span>
+              <div className="flex justify-between text-[13px] font-normal mb-1">
+                <span className="text-[#1D1D1F]">Section Chief</span>
+                <span className="text-[#86868B] text-[12px]">1.2 days avg — 4 requests</span>
               </div>
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 bg-[#F5F5F7] rounded-full overflow-hidden">
                 <div className="w-[45%] h-full bg-[#1B4332] rounded-full" />
               </div>
             </div>
 
             <div>
-              <div className="flex justify-between text-xs font-medium mb-1">
-                <span>Division Chief</span>
-                <span className="text-slate-500">2.1 days avg — 3 requests</span>
+              <div className="flex justify-between text-[13px] font-normal mb-1">
+                <span className="text-[#1D1D1F]">Division Chief</span>
+                <span className="text-[#86868B] text-[12px]">2.1 days avg — 3 requests</span>
               </div>
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 bg-[#F5F5F7] rounded-full overflow-hidden">
                 <div className="w-[75%] h-full bg-[#40916C] rounded-full" />
               </div>
             </div>
 
             <div>
-              <div className="flex justify-between text-xs font-medium mb-1">
-                <span>PENRO Head</span>
-                <span className="text-slate-500">0.8 days avg — 2 requests</span>
+              <div className="flex justify-between text-[13px] font-normal mb-1">
+                <span className="text-[#1D1D1F]">PENRO Head</span>
+                <span className="text-[#86868B] text-[12px]">0.8 days avg — 2 requests</span>
               </div>
-              <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div className="w-[30%] h-full bg-sky-600 rounded-full" />
+              <div className="h-2 bg-[#F5F5F7] rounded-full overflow-hidden">
+                <div className="w-[30%] h-full bg-blue-600 rounded-full" />
               </div>
             </div>
           </div>
@@ -2449,35 +2476,35 @@ function AdminPortalContent() {
   const renderProcessingPerformanceTab = () => (
     <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
       <div>
-        <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Processing Performance</h2>
-        <p className="text-xs text-slate-500 mt-0.5">Turnaround duration diagnostics and workflow bottlenecks</p>
+        <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">Processing Performance</h2>
+        <p className="text-[13px] text-[#86868B] mt-0.5">Turnaround duration diagnostics and workflow bottlenecks</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3.5">
-        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">AVG PROCESSING TIME</p>
-          <p className="text-2xl font-semibold text-slate-900 mt-1">2.4 <span className="text-xs font-normal text-slate-500">days</span></p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">AVG PROCESSING TIME</p>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">2.4 <span className="text-[13px] font-normal text-[#86868B]">days</span></p>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">FASTEST PROCESSING</p>
-          <p className="text-2xl font-semibold text-emerald-800 mt-1">1 <span className="text-xs font-normal text-slate-500">day</span></p>
-          <p className="text-[10px] text-slate-400">TA-2025-0007</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">FASTEST PROCESSING</p>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">1 <span className="text-[13px] font-normal text-[#86868B]">day</span></p>
+          <p className="text-[12px] text-[#86868B]">TA-2025-0007</p>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">LONGEST PROCESSING</p>
-          <p className="text-2xl font-semibold text-rose-700 mt-1">7 <span className="text-xs font-normal text-slate-500">days</span></p>
-          <p className="text-[10px] text-slate-400">TA-2025-0008</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">LONGEST PROCESSING</p>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">7 <span className="text-[13px] font-normal text-[#86868B]">days</span></p>
+          <p className="text-[12px] text-[#86868B]">TA-2025-0008</p>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-2xs">
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">OVERDUE REQUESTS</p>
-          <p className="text-2xl font-semibold text-amber-700 mt-1">3</p>
-          <p className="text-[10px] text-slate-400">Waiting 5+ days</p>
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">OVERDUE REQUESTS</p>
+          <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">3</p>
+          <p className="text-[12px] text-[#86868B]">Waiting 5+ days</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-2xs">
-          <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-3">Average Time per Stage</h3>
+        <div className="bg-white p-5 rounded-[8px] border border-[#E5E5E7] shadow-xs">
+          <h3 className="text-[14px] font-semibold text-[#1D1D1F] mb-3">Average Time per Stage</h3>
           <div className="h-44 flex items-end justify-between px-3 pb-1">
             {[
               { stage: 'Submission', days: 0 },
@@ -2486,38 +2513,38 @@ function AdminPortalContent() {
               { stage: 'PENRO Head', days: 0.8 },
             ].map((st) => (
               <div key={st.stage} className="flex flex-col items-center gap-1.5 flex-1">
-                <span className="text-xs font-semibold text-slate-700">{st.days}d</span>
+                <span className="text-[13px] font-semibold text-[#1D1D1F]">{st.days}d</span>
                 <div style={{ height: `${Math.max(6, st.days * 55)}px` }} className="w-7 bg-[#1B4332] rounded-t" />
-                <span className="text-[10px] text-slate-500 text-center">{st.stage}</span>
+                <span className="text-[12px] text-[#86868B] text-center">{st.stage}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-2xs space-y-3">
-          <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Bottleneck Diagnostics</h3>
-          <div className="p-3 bg-amber-50 rounded border border-amber-200">
-            <span className="text-[10px] font-semibold text-amber-800 uppercase tracking-wider block">CURRENT BOTTLENECK</span>
-            <p className="text-sm font-semibold text-amber-950 mt-0.5">Section Chief Review</p>
-            <p className="text-xs text-amber-800">Avg wait: 4.7 days</p>
+        <div className="bg-white p-5 rounded-[8px] border border-[#E5E5E7] shadow-xs space-y-3">
+          <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Bottleneck Diagnostics</h3>
+          <div className="p-3 bg-amber-50 rounded-[6px] border border-amber-200">
+            <span className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider block">CURRENT BOTTLENECK</span>
+            <p className="text-[14px] font-semibold text-[#1D1D1F] mt-0.5">Section Chief Review</p>
+            <p className="text-[12px] text-amber-700">Avg wait: 4.7 days</p>
           </div>
 
-          <div className="space-y-1.5 text-xs">
-            <div className="flex justify-between py-1 border-b border-slate-100">
-              <span className="text-slate-600">Employee Submission</span>
-              <span className="font-medium text-slate-800">Instant</span>
+          <div className="space-y-1.5 text-[13px]">
+            <div className="flex justify-between py-1.5 border-b border-[#E5E5E7]">
+              <span className="text-[#86868B]">Employee Submission</span>
+              <span className="font-medium text-[#1D1D1F]">Instant</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-100 font-semibold text-amber-900">
+            <div className="flex justify-between py-1.5 border-b border-[#E5E5E7] font-semibold text-amber-700">
               <span>Section Chief Review</span>
               <span>1.2 days →</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-100">
-              <span className="text-slate-600">Division Chief Review</span>
-              <span className="font-medium text-slate-800">2.1 days →</span>
+            <div className="flex justify-between py-1.5 border-b border-[#E5E5E7]">
+              <span className="text-[#86868B]">Division Chief Review</span>
+              <span className="font-medium text-[#1D1D1F]">2.1 days →</span>
             </div>
-            <div className="flex justify-between py-1">
-              <span className="text-slate-600">PENRO Head Approval</span>
-              <span className="font-medium text-slate-800">0.8 days</span>
+            <div className="flex justify-between py-1.5">
+              <span className="text-[#86868B]">PENRO Head Approval</span>
+              <span className="font-medium text-[#1D1D1F]">0.8 days</span>
             </div>
           </div>
         </div>
@@ -2546,48 +2573,48 @@ function AdminPortalContent() {
     return (
       <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900 tracking-tight">User Management</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Directory of personnel accounts and signatory privileges</p>
+          <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">User Management</h2>
+          <p className="text-[13px] text-[#86868B] mt-0.5">Directory of personnel accounts and signatory privileges</p>
         </div>
 
         {/* 5 KPI Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-          <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-            <span className="text-xl font-semibold text-slate-900">{employees.length}</span>
-            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">EMPLOYEES</p>
+          <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-[#0F4C2E] shadow-xs">
+            <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F]">{employees.length}</span>
+            <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mt-0.5">EMPLOYEES</p>
           </div>
-          <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-            <span className="text-xl font-semibold text-[#1B4332]">{staff.length}</span>
-            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">STAFF/SIGNATORIES</p>
+          <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-blue-500 shadow-xs">
+            <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F]">{staff.length}</span>
+            <p className="text-[11px] font-semibold text-blue-700 uppercase tracking-wider mt-0.5">STAFF/SIGNATORIES</p>
           </div>
-          <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-            <span className="text-xl font-semibold text-emerald-700">{users.filter((u) => u.status === 'ACTIVE').length}</span>
-            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">ACTIVE</p>
+          <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-emerald-500 shadow-xs">
+            <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F]">{users.filter((u) => u.status === 'ACTIVE').length}</span>
+            <p className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider mt-0.5">ACTIVE</p>
           </div>
-          <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-            <span className="text-xl font-semibold text-slate-500">1</span>
-            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">INACTIVE</p>
+          <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-amber-500 shadow-xs">
+            <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F]">1</span>
+            <p className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider mt-0.5">INACTIVE</p>
           </div>
-          <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-            <span className="text-xl font-semibold text-rose-700">1</span>
-            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">LOCKED</p>
+          <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-rose-500 shadow-xs">
+            <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F]">1</span>
+            <p className="text-[11px] font-semibold text-rose-700 uppercase tracking-wider mt-0.5">LOCKED</p>
           </div>
         </div>
 
         {/* Tabs: Employee vs Staff */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-md w-fit">
+        <div className="flex items-center gap-1 bg-[#F5F5F7] p-1 rounded-[6px] border border-[#E5E5E7] w-fit">
           <button
             onClick={() => setUserTab('employees')}
-            className={`px-3 py-1 text-xs font-semibold rounded transition-all ${
-              userTab === 'employees' ? 'bg-white text-[#1B4332] shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+            className={`h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors cursor-pointer ${
+              userTab === 'employees' ? 'bg-[#0F4C2E] text-white shadow-xs' : 'text-[#86868B] hover:text-[#1D1D1F]'
             }`}
           >
             Employee Accounts
           </button>
           <button
             onClick={() => setUserTab('staff')}
-            className={`px-3 py-1 text-xs font-semibold rounded transition-all ${
-              userTab === 'staff' ? 'bg-white text-[#1B4332] shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+            className={`h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors cursor-pointer ${
+              userTab === 'staff' ? 'bg-[#0F4C2E] text-white shadow-xs' : 'text-[#86868B] hover:text-[#1D1D1F]'
             }`}
           >
             Staff / Signatory Accounts
@@ -2595,18 +2622,18 @@ function AdminPortalContent() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white p-3 rounded-lg border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row gap-2.5">
+        <div className="bg-white p-3.5 rounded-[8px] border border-[#E5E5E7] shadow-xs flex flex-col sm:flex-row gap-2.5">
           <input
             type="text"
             placeholder="Search name, position, email..."
             value={userSearch}
             onChange={(e) => setUserSearch(e.target.value)}
-            className="flex-1 h-8 px-3 bg-slate-50 border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600"
+            className="flex-1 h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
           />
           <select
             value={userStatusFilter}
             onChange={(e) => setUserStatusFilter(e.target.value)}
-            className="h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium outline-none"
+            className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
           >
             <option value="ALL">All Status</option>
             <option value="ACTIVE">Active</option>
@@ -2616,7 +2643,7 @@ function AdminPortalContent() {
           <select
             value={userSectionFilter}
             onChange={(e) => setUserSectionFilter(e.target.value)}
-            className="h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium outline-none"
+            className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
           >
             <option value="ALL">All Sections</option>
             <option value="CENRO Rosario">CENRO Rosario</option>
@@ -2626,35 +2653,37 @@ function AdminPortalContent() {
         </div>
 
         {/* User Table */}
-        <div className="bg-white rounded-lg border border-slate-200/90 shadow-2xs overflow-hidden">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
-                <th className="py-2.5 px-4">Employee Name</th>
-                <th className="py-2.5 px-4">Position / Designation</th>
-                <th className="py-2.5 px-4">Section / Office</th>
-                <th className="py-2.5 px-4">Email</th>
-                <th className="py-2.5 px-4">Last Login</th>
-                <th className="py-2.5 px-4 text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-xs">
-              {filteredUsers.map((u) => (
-                <tr key={u.id} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="py-2.5 px-4 font-semibold text-slate-900">{u.name}</td>
-                  <td className="py-2.5 px-4 text-slate-600">{u.position || u.role}</td>
-                  <td className="py-2.5 px-4 text-slate-600">{u.section || 'PENRO La Union'}</td>
-                  <td className="py-2.5 px-4 font-mono text-slate-500 text-[11px]">{u.email}</td>
-                  <td className="py-2.5 px-4 text-slate-400 text-[11px]">{u.lastLogin || '2025-01-28 08:00'}</td>
-                  <td className="py-2.5 px-4 text-right">
-                    <span className="px-2 py-0.5 text-[10px] font-semibold rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      Active
-                    </span>
-                  </td>
+        <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-emerald-950/[0.04] border-b border-[#E5E5E7]">
+                <tr>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Employee Name</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Position / Designation</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Section / Office</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Email</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Last Login</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredUsers.map((u) => (
+                  <tr key={u.id} className="h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors">
+                    <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle font-medium text-left">{u.name}</td>
+                    <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">{u.position || u.role}</td>
+                    <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">{u.section || 'PENRO La Union'}</td>
+                    <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle font-mono text-left">{u.email}</td>
+                    <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left">{u.lastLogin || '2025-01-28 08:00'}</td>
+                    <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">
+                      <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        Active
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     );
@@ -2678,37 +2707,37 @@ function AdminPortalContent() {
     return (
       <div className="space-y-5 animate-fade-in w-full max-w-[1600px] mx-auto">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Audit Logs</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Chronological system security trail of actions, approvals, and events</p>
+          <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">Audit Logs</h2>
+          <p className="text-[13px] text-[#86868B] mt-0.5">Chronological system security trail of actions, approvals, and events</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-            <span className="text-xl font-semibold text-slate-900">{auditLogs.length}</span>
-            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">TOTAL LOG ENTRIES</p>
+          <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-[#0F4C2E] shadow-xs">
+            <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F]">{auditLogs.length}</span>
+            <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mt-0.5">TOTAL LOG ENTRIES</p>
           </div>
-          <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-            <span className="text-xl font-semibold text-[#1B4332]">{filteredLogs.length}</span>
-            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">FILTERED RESULTS</p>
+          <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-emerald-500 shadow-xs">
+            <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F]">{filteredLogs.length}</span>
+            <p className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider mt-0.5">FILTERED RESULTS</p>
           </div>
-          <div className="bg-white p-3.5 rounded-lg border border-slate-200 shadow-2xs">
-            <span className="text-xs font-semibold text-slate-800">{new Date().toLocaleString()}</span>
-            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-0.5">LATEST ACTIVITY</p>
+          <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-blue-500 shadow-xs">
+            <span className="text-[14px] font-semibold text-[#1D1D1F]">{new Date().toLocaleString()}</span>
+            <p className="text-[11px] font-semibold text-blue-700 uppercase tracking-wider mt-0.5">LATEST ACTIVITY</p>
           </div>
         </div>
 
-        <div className="bg-white p-3 rounded-lg border border-slate-200 shadow-2xs flex flex-col sm:flex-row gap-2.5">
+        <div className="bg-white p-3.5 rounded-[8px] border border-[#E5E5E7] shadow-xs flex flex-col sm:flex-row gap-2.5">
           <input
             type="text"
             placeholder="Search log records by TA#, user, or details..."
             value={auditSearch}
             onChange={(e) => setAuditSearch(e.target.value)}
-            className="flex-1 h-8 px-3 bg-slate-50 border border-slate-200 rounded-md text-xs outline-none focus:border-emerald-600"
+            className="flex-1 h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
           />
           <select
             value={auditActionFilter}
             onChange={(e) => setAuditActionFilter(e.target.value)}
-            className="h-8 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium outline-none"
+            className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
           >
             <option value="ALL">All Actions</option>
             <option value="Approved">Approved</option>
@@ -2720,51 +2749,53 @@ function AdminPortalContent() {
           </select>
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-200/90 shadow-2xs overflow-hidden">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
-                <th className="py-2.5 px-4">Timestamp</th>
-                <th className="py-2.5 px-4">User</th>
-                <th className="py-2.5 px-4">Role</th>
-                <th className="py-2.5 px-4">Action</th>
-                <th className="py-2.5 px-4">Target</th>
-                <th className="py-2.5 px-4">TA Reference</th>
-                <th className="py-2.5 px-4">IP Address</th>
-                <th className="py-2.5 px-4">Details</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-xs">
-              {filteredLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="py-2.5 px-4 text-slate-500 font-mono text-[11px]">
-                    {new Date(log.timestamp).toLocaleDateString()} {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </td>
-                  <td className="py-2.5 px-4 font-semibold text-slate-900">{log.user}</td>
-                  <td className="py-2.5 px-4 text-slate-600">{log.role}</td>
-                  <td className="py-2.5 px-4">
-                    <span
-                      className={`px-2 py-0.5 text-[10px] font-semibold rounded ${
-                        log.action === 'Approved'
-                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                          : log.action === 'Cancelled'
-                          ? 'bg-rose-50 text-rose-800 border border-rose-200'
-                          : log.action === 'Submitted'
-                          ? 'bg-sky-50 text-sky-800 border border-sky-200'
-                          : 'bg-slate-100 text-slate-700'
-                      }`}
-                    >
-                      {log.action}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-4 text-slate-600">{log.target}</td>
-                  <td className="py-2.5 px-4 font-mono font-medium text-[#1B4332]">{log.trackingNumber}</td>
-                  <td className="py-2.5 px-4 font-mono text-slate-400 text-[11px]">{log.ipAddress}</td>
-                  <td className="py-2.5 px-4 text-slate-700 text-[11px] max-w-xs">{log.details}</td>
+        <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-emerald-950/[0.04] border-b border-[#E5E5E7]">
+                <tr>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Timestamp</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">User</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Role</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">Action</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Target</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">TA Reference</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">IP Address</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Details</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredLogs.map((log) => (
+                  <tr key={log.id} className="h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors">
+                    <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle font-mono text-left">
+                      {new Date(log.timestamp).toLocaleDateString()} {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle font-medium text-left">{log.user}</td>
+                    <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">{log.role}</td>
+                    <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">
+                      <span
+                        className={`h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] ${
+                          log.action === 'Approved'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : log.action === 'Cancelled'
+                            ? 'bg-red-50 text-red-700 border border-red-200'
+                            : log.action === 'Submitted' || log.action === 'Endorsed' || log.action === 'Reviewed'
+                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                            : 'bg-[#F5F5F7] text-[#86868B] border border-[#E5E5E7]'
+                        }`}
+                      >
+                        {log.action}
+                      </span>
+                    </td>
+                    <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">{log.target}</td>
+                    <td className="px-3 py-1.5 text-[13px] text-[#1B4332] align-middle font-mono font-medium text-left">{log.trackingNumber}</td>
+                    <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle font-mono text-left">{log.ipAddress}</td>
+                    <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle max-w-xs text-left">{log.details}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     );
@@ -2808,56 +2839,56 @@ function AdminPortalContent() {
 
       {/* View Record Details Modal */}
       {selectedRecord && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl overflow-hidden border border-slate-200 flex flex-col max-h-[85vh]">
-            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
-              <span className="font-mono font-semibold text-[#1B4332] bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200 text-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white w-full max-w-2xl border border-[#E5E5E7] rounded-[10px] shadow-xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div className="bg-[#F5F5F7] border-b border-[#E5E5E7] px-5 py-3.5 flex items-center justify-between">
+              <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold font-mono rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">
                 {selectedRecord.trackingNumber}
               </span>
               <button
                 onClick={() => setSelectedRecord(null)}
-                className="w-7 h-7 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs"
+                className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white hover:bg-[#F2F2F7] border border-[#E5E5E7] text-[#1D1D1F] transition-colors"
               >
                 ✕
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto space-y-4">
+            <div className="p-5 overflow-y-auto space-y-4">
               <div>
-                <h3 className="text-base font-semibold text-slate-900">{selectedRecord.destination}</h3>
-                <p className="text-xs text-slate-600 mt-0.5">{selectedRecord.purpose}</p>
+                <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">{selectedRecord.destination}</h3>
+                <p className="text-[13px] text-[#86868B] mt-0.5">{selectedRecord.purpose}</p>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-                <div className="p-3 bg-slate-50 rounded border border-slate-100">
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Employee</span>
-                  <span className="font-semibold text-slate-800">{selectedRecord.createdBy?.name || 'Juan Dela Cruz'}</span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-[13px]">
+                <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                  <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Employee</span>
+                  <span className="font-semibold text-[#1D1D1F]">{selectedRecord.createdBy?.name || 'Juan Dela Cruz'}</span>
                 </div>
-                <div className="p-3 bg-slate-50 rounded border border-slate-100">
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Station</span>
-                  <span className="font-semibold text-slate-800">{selectedRecord.office}</span>
+                <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                  <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Station</span>
+                  <span className="font-semibold text-[#1D1D1F]">{selectedRecord.office}</span>
                 </div>
-                <div className="p-3 bg-slate-50 rounded border border-slate-100">
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider block">Travel Date</span>
-                  <span className="font-semibold text-slate-800">{new Date(selectedRecord.startDate).toLocaleDateString()}</span>
+                <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                  <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Travel Date</span>
+                  <span className="font-semibold text-[#1D1D1F]">{new Date(selectedRecord.startDate).toLocaleDateString()}</span>
                 </div>
               </div>
 
               {/* Signatories */}
-              <div className="bg-slate-50 p-4 rounded border border-slate-100 space-y-2">
-                <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider block">Approval Trail</span>
-                <div className="space-y-1.5 text-xs">
-                  <div className="flex items-center justify-between p-2 bg-white rounded border border-slate-200">
-                    <span className="font-medium text-slate-800">1. Section Chief (Verifier)</span>
-                    <span className="font-semibold text-emerald-800">Irene O. Cadiz ✓</span>
+              <div className="bg-[#F5F5F7] p-4 rounded-[8px] border border-[#E5E5E7] space-y-2">
+                <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Approval Trail</span>
+                <div className="space-y-1.5 text-[13px]">
+                  <div className="flex items-center justify-between p-2.5 bg-white rounded-[6px] border border-[#E5E5E7]">
+                    <span className="font-normal text-[#1D1D1F]">1. Section Chief (Verifier)</span>
+                    <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">Irene O. Cadiz ✓</span>
                   </div>
-                  <div className="flex items-center justify-between p-2 bg-white rounded border border-slate-200">
-                    <span className="font-medium text-slate-800">2. Division Chief (Verifier)</span>
-                    <span className="font-semibold text-emerald-800">Luis P. Gonzaga ✓</span>
+                  <div className="flex items-center justify-between p-2.5 bg-white rounded-[6px] border border-[#E5E5E7]">
+                    <span className="font-normal text-[#1D1D1F]">2. Division Chief (Verifier)</span>
+                    <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">Luis P. Gonzaga ✓</span>
                   </div>
-                  <div className="flex items-center justify-between p-2 bg-white rounded border border-slate-200">
-                    <span className="font-medium text-slate-800">3. Head of PENRO (Final Signatory)</span>
-                    <span className="font-medium text-slate-500">Pending</span>
+                  <div className="flex items-center justify-between p-2.5 bg-white rounded-[6px] border border-[#E5E5E7]">
+                    <span className="font-normal text-[#1D1D1F]">3. Head of PENRO (Final Signatory)</span>
+                    <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-amber-50 text-amber-700 border border-amber-200">Pending</span>
                   </div>
                 </div>
               </div>
@@ -2868,52 +2899,57 @@ function AdminPortalContent() {
 
       {/* Edit Record Modal */}
       {editingRecord && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white w-full max-w-xl rounded-lg shadow-xl overflow-hidden border border-slate-200 flex flex-col max-h-[85vh]">
-            <div className="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
-              <h3 className="font-semibold text-xs text-slate-900">Edit Travel Authority — {editingRecord.trackingNumber}</h3>
-              <button onClick={() => setEditingRecord(null)} className="w-7 h-7 rounded bg-slate-100 text-slate-600 text-xs">✕</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white w-full max-w-xl border border-[#E5E5E7] rounded-[10px] shadow-xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div className="bg-[#F5F5F7] border-b border-[#E5E5E7] px-5 py-3.5 flex items-center justify-between">
+              <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Edit Travel Authority — {editingRecord.trackingNumber}</h3>
+              <button
+                onClick={() => setEditingRecord(null)}
+                className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white hover:bg-[#F2F2F7] border border-[#E5E5E7] text-[#1D1D1F] transition-colors"
+              >
+                ✕
+              </button>
             </div>
 
-            <form onSubmit={handleSaveEdit} className="p-5 space-y-3 text-xs overflow-y-auto">
+            <form onSubmit={handleSaveEdit} className="p-5 space-y-3 text-[13px] overflow-y-auto">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1 uppercase text-[10px]">Destination</label>
+                <label className="block font-semibold text-[#86868B] mb-1 uppercase text-[11px] tracking-wider">Destination</label>
                 <input
                   type="text"
                   value={editingRecord.destination}
                   onChange={(e) => setEditingRecord({ ...editingRecord, destination: e.target.value })}
-                  className="w-full h-8 px-3 bg-slate-50 border border-slate-200 rounded text-xs outline-none focus:border-emerald-600"
+                  className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1 uppercase text-[10px]">Purpose</label>
+                <label className="block font-semibold text-[#86868B] mb-1 uppercase text-[11px] tracking-wider">Purpose</label>
                 <textarea
                   rows={2}
                   value={editingRecord.purpose}
                   onChange={(e) => setEditingRecord({ ...editingRecord, purpose: e.target.value })}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded text-xs outline-none focus:border-emerald-600"
+                  className="w-full p-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1 uppercase text-[10px]">AOR Scope</label>
+                  <label className="block font-semibold text-[#86868B] mb-1 uppercase text-[11px] tracking-wider">AOR Scope</label>
                   <select
                     value={editingRecord.aorType}
                     onChange={(e) => setEditingRecord({ ...editingRecord, aorType: e.target.value as any })}
-                    className="w-full h-8 px-2.5 bg-slate-50 border border-slate-200 rounded text-xs outline-none"
+                    className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                   >
                     <option value="Within AOR">Within AOR</option>
                     <option value="Outside AOR">Outside AOR</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1 uppercase text-[10px]">Transportation Mode</label>
+                  <label className="block font-semibold text-[#86868B] mb-1 uppercase text-[11px] tracking-wider">Transportation Mode</label>
                   <select
                     value={editingRecord.transportation}
                     onChange={(e) => setEditingRecord({ ...editingRecord, transportation: e.target.value as any })}
-                    className="w-full h-8 px-2.5 bg-slate-50 border border-slate-200 rounded text-xs outline-none"
+                    className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                   >
                     <option value="Government Vehicle">Government Vehicle</option>
                     <option value="Public Transport">Public Transport</option>
@@ -2922,17 +2958,17 @@ function AdminPortalContent() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+              <div className="flex justify-end gap-2 pt-3 border-t border-[#E5E5E7]">
                 <button
                   type="button"
                   onClick={() => setEditingRecord(null)}
-                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded text-xs"
+                  className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#F5F5F7] hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-[#1B4332] hover:bg-[#143326] text-white font-medium rounded text-xs shadow-2xs"
+                  className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#1B4332] hover:bg-[#143225] text-white transition-colors"
                 >
                   Save Changes
                 </button>
@@ -2947,7 +2983,7 @@ function AdminPortalContent() {
 
 export default function AdminDashboardPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading TOPS Admin Portal...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-[13px] text-[#86868B]">Loading TOPS Admin Portal...</div>}>
       <AdminPortalContent />
     </Suspense>
   );

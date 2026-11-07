@@ -135,11 +135,11 @@ function DualMonthCalendarPicker({
         cellDate.getDate() === retObj.getDate();
       const inRange = depObj && retObj && cellDate > depObj && cellDate < retObj;
 
-      let cellStyle = 'hover:bg-slate-100 text-slate-700 font-medium rounded-lg';
+      let cellStyle = 'hover:bg-emerald-50/60 text-slate-700 font-medium rounded-[6px]';
       if (isPast) {
         cellStyle = 'text-slate-300/80 bg-slate-50/50 cursor-not-allowed pointer-events-none line-through decoration-slate-300';
       } else if (isDeparture || isReturn) {
-        cellStyle = 'bg-[#0F4C2E] text-white font-bold rounded-lg shadow-xs';
+        cellStyle = 'bg-[#0F4C2E] text-white font-semibold rounded-[6px] shadow-xs';
       } else if (inRange) {
         cellStyle = 'bg-emerald-100/70 text-emerald-900 font-semibold rounded-none';
       }
@@ -150,7 +150,7 @@ function DualMonthCalendarPicker({
           type="button"
           disabled={isPast}
           onClick={() => handleDayClick(year, month, day)}
-          className={`py-2 text-xs transition-all flex items-center justify-center h-8 w-8 mx-auto ${cellStyle}`}
+          className={`py-1.5 text-[12px] transition-colors flex items-center justify-center h-8 w-8 mx-auto ${cellStyle}`}
         >
           {day}
         </button>
@@ -168,44 +168,44 @@ function DualMonthCalendarPicker({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-      <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-6 shadow-2xs">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      <div className="lg:col-span-8 bg-white rounded-[8px] border border-[#E5E5E7] p-5 shadow-xs">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#E5E5E7]">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handlePrevMonth}
-              className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors font-bold"
+              className="h-7 w-7 inline-flex items-center justify-center text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-[6px] transition-colors font-semibold"
             >
               ‹
             </button>
-            <span className="text-xs font-bold text-slate-800">
+            <span className="text-[13px] font-semibold text-[#1D1D1F]">
               {monthNames[month1Month]} {month1Year}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-800">
+            <span className="text-[13px] font-semibold text-[#1D1D1F]">
               {monthNames[month2Month]} {month2Year}
             </span>
             <button
               type="button"
               onClick={handleNextMonth}
-              className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors font-bold"
+              className="h-7 w-7 inline-flex items-center justify-center text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-[6px] transition-colors font-semibold"
             >
               ›
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="text-xs font-bold text-slate-700 text-center mb-3">
+            <h4 className="text-[13px] font-semibold text-[#1D1D1F] text-center mb-2.5">
               {monthNames[month1Month]} {month1Year}
             </h4>
             <div className="grid grid-cols-7 gap-1 text-center">
               {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, idx) => (
-                <div key={idx} className="text-[10px] font-bold text-slate-400 py-1">
+                <div key={idx} className="text-[11px] font-semibold text-[#86868B] py-1">
                   {d}
                 </div>
               ))}
@@ -214,12 +214,12 @@ function DualMonthCalendarPicker({
           </div>
 
           <div>
-            <h4 className="text-xs font-bold text-slate-700 text-center mb-3">
+            <h4 className="text-[13px] font-semibold text-[#1D1D1F] text-center mb-2.5">
               {monthNames[month2Month]} {month2Year}
             </h4>
             <div className="grid grid-cols-7 gap-1 text-center">
               {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, idx) => (
-                <div key={idx} className="text-[10px] font-bold text-slate-400 py-1">
+                <div key={idx} className="text-[11px] font-semibold text-[#86868B] py-1">
                   {d}
                 </div>
               ))}
@@ -229,29 +229,29 @@ function DualMonthCalendarPicker({
         </div>
       </div>
 
-      <div className="lg:col-span-4 bg-[#F3F4F8] p-6 rounded-2xl space-y-6">
+      <div className="lg:col-span-4 bg-[#F3F4F8] p-5 rounded-[8px] border border-slate-200/80 space-y-5">
         <div>
-          <h4 className="text-xs font-bold text-slate-800 mb-4">Selected Dates</h4>
+          <h4 className="text-[14px] font-semibold text-[#1D1D1F] mb-3">Selected Dates</h4>
 
-          <div className="space-y-3">
-            <div className="bg-white p-4 rounded-xl border border-slate-200/60 shadow-2xs flex items-center justify-between">
+          <div className="space-y-2.5">
+            <div className="bg-white p-3.5 rounded-[6px] border border-slate-200/80 shadow-2xs flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block mb-0.5">
                   Departure
                 </span>
-                <span className={`text-xs font-bold ${departureDate ? 'text-slate-900' : 'text-slate-400'}`}>
+                <span className={`text-[13px] font-semibold ${departureDate ? 'text-[#1D1D1F]' : 'text-[#86868B]'}`}>
                   {formatDateDisplay(departureDate)}
                 </span>
               </div>
               <span className={`w-2.5 h-2.5 rounded-full ${departureDate ? 'bg-[#0F4C2E]' : 'bg-slate-300'}`}></span>
             </div>
 
-            <div className="bg-white p-4 rounded-xl border border-slate-200/60 shadow-2xs flex items-center justify-between">
+            <div className="bg-white p-3.5 rounded-[6px] border border-slate-200/80 shadow-2xs flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block mb-0.5">
                   Return
                 </span>
-                <span className={`text-xs font-bold ${returnDate ? 'text-slate-900' : 'text-slate-400'}`}>
+                <span className={`text-[13px] font-semibold ${returnDate ? 'text-[#1D1D1F]' : 'text-[#86868B]'}`}>
                   {formatDateDisplay(returnDate)}
                 </span>
               </div>
@@ -260,9 +260,9 @@ function DualMonthCalendarPicker({
           </div>
         </div>
 
-        <div className="space-y-1.5 pt-2">
-          <span className="text-[11px] font-bold text-slate-600 block">Instructions:</span>
-          <ol className="text-[11px] text-slate-500 space-y-1 pl-4 list-decimal leading-relaxed">
+        <div className="space-y-1.5 pt-1">
+          <span className="text-[12px] font-semibold text-[#1D1D1F] block">Instructions:</span>
+          <ol className="text-[12px] text-[#86868B] space-y-1 pl-4 list-decimal leading-relaxed">
             <li>Click on the calendar to select your departure date</li>
             <li>Then select your return date</li>
             <li>The duration will be calculated automatically</li>
@@ -409,7 +409,7 @@ function AccountManagerContent() {
     switch (type) {
       case 'user':
         return (
-          <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-[#0F4C2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
         );
@@ -434,7 +434,7 @@ function AccountManagerContent() {
       case 'building':
       default:
         return (
-          <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
           </svg>
         );
@@ -909,11 +909,11 @@ function AccountManagerContent() {
   });
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto space-y-6 animate-fade-in">
+    <div className="w-full max-w-[1600px] mx-auto space-y-5 animate-fade-in">
       {/* Toast Banner */}
       {toastMessage && (
         <div
-          className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl shadow-2xl font-semibold text-xs flex items-center gap-2 border animate-bounce ${
+          className={`fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-[8px] shadow-2xl font-medium text-[13px] flex items-center gap-2 border ${
             toastMessage.type === 'success'
               ? 'bg-emerald-900 text-emerald-100 border-emerald-500'
               : 'bg-rose-900 text-rose-100 border-rose-500'
@@ -934,30 +934,30 @@ function AccountManagerContent() {
 
       {/* TAB 1: DASHBOARD OVERVIEW */}
       {activeTab === 'dashboard' && (
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80">
+        <div className="space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white p-5 rounded-[8px] shadow-sm">
             <div>
-              <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Dashboard</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Overview of TOPS account management and user administration</p>
+              <h2 className="text-[22px] font-bold tracking-tight text-white">Dashboard</h2>
+              <p className="text-[13px] text-emerald-100/90 mt-0.5">Overview of TOPS account management and user administration</p>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => router.push('/account-manager?tab=pending-accounts')}
-                className="px-4 py-2.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-emerald-800/80 hover:bg-emerald-700 text-emerald-100 border border-emerald-600/50 cursor-pointer shadow-xs"
               >
                 <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
                 <span>Pending Accounts</span>
                 {counts.pending > 0 && (
-                  <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-900 text-[10px] font-black">
+                  <span className="h-5 px-2 inline-flex items-center justify-center rounded-[4px] bg-amber-400 text-[#1D1D1F] text-[10px] font-semibold">
                     {counts.pending}
                   </span>
                 )}
               </button>
               <button
                 onClick={() => router.push('/account-manager?tab=create-travel')}
-                className="px-4 py-2.5 bg-emerald-100 text-[#0F4C2E] hover:bg-emerald-200 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border border-emerald-300"
+                className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-emerald-100 hover:bg-emerald-200 text-[#0F4C2E] border border-emerald-300 cursor-pointer"
               >
                 <svg className="w-4 h-4 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -968,127 +968,138 @@ function AccountManagerContent() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-[#0F4C2E] shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Accounts</p>
-                <p className="text-2xl font-black text-slate-900 mt-1">{counts.total || users.length || 12}</p>
-                <span className="text-[10px] font-bold text-emerald-700 mt-1 inline-block">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B]">Total Accounts</p>
+                <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">{counts.total || users.length || 12}</p>
+                <span className="text-[12px] font-medium text-emerald-700 mt-0.5 inline-block">
                   +2 this month
                 </span>
               </div>
-              <svg className="w-7 h-7 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
+              <div className="w-9 h-9 rounded-[6px] bg-emerald-50 text-[#0F4C2E] border border-emerald-100 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-emerald-500 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Active Users</p>
-                <p className="text-2xl font-black text-slate-900 mt-1">{counts.active || 8}</p>
-                <span className="text-[10px] font-bold text-emerald-700 mt-1 inline-block">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B]">Active Users</p>
+                <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">{counts.active || 8}</p>
+                <span className="text-[12px] font-medium text-emerald-700 mt-0.5 inline-block">
                   {counts.total > 0 ? Math.round((counts.active / counts.total) * 100) : 67}% of total
                 </span>
               </div>
-              <svg className="w-7 h-7 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <div className="w-9 h-9 rounded-[6px] bg-emerald-100 text-[#0F4C2E] border border-emerald-200 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-blue-500 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Staff Accounts</p>
-                <p className="text-2xl font-black text-slate-900 mt-1">{counts.staff || 5}</p>
-                <span className="text-[10px] font-bold text-slate-500 mt-1 inline-block">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B]">Staff Accounts</p>
+                <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">{counts.staff || 5}</p>
+                <span className="text-[12px] font-normal text-[#86868B] mt-0.5 inline-block">
                   With elevated access
                 </span>
               </div>
-              <svg className="w-7 h-7 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
+              <div className="w-9 h-9 rounded-[6px] bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-amber-500 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Employee Accounts</p>
-                <p className="text-2xl font-black text-slate-900 mt-1">{counts.employee || 4}</p>
-                <span className="text-[10px] font-bold text-amber-700 mt-1 inline-block">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B]">Employee Accounts</p>
+                <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">{counts.employee || 4}</p>
+                <span className="text-[12px] font-medium text-amber-700 mt-0.5 inline-block">
                   +{counts.pending} pending review
                 </span>
               </div>
-              <svg className="w-7 h-7 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <div className="w-9 h-9 rounded-[6px] bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6">
-              <div className="flex items-center justify-between mb-5 border-b pb-4 border-slate-100">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div className="lg:col-span-2 bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3.5 bg-emerald-950/[0.04] border-b border-[#E5E5E7]">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">Recent Account Activities</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">Audit log of system user modifications and activations</p>
+                  <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Recent Account Activities</h3>
+                  <p className="text-[12px] text-[#86868B] mt-0.5">Audit log of system user modifications and activations</p>
                 </div>
                 <button
                   onClick={() => router.push('/account-manager?tab=accounts')}
-                  className="text-xs font-bold text-[#0F4C2E] hover:underline flex items-center gap-1"
+                  className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-emerald-50 hover:bg-emerald-100 text-[#0F4C2E] border border-emerald-200 cursor-pointer"
                 >
                   <span>View All</span>
                   <span>↗</span>
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="divide-y divide-[#E5E5E7]">
                 {activityLogs.map((log) => (
-                  <div key={log.id} className="flex items-start justify-between p-3.5 rounded-xl hover:bg-slate-50 transition-colors border border-slate-100/60">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5 shrink-0">
+                  <div key={log.id} className="flex items-center justify-between px-5 py-3 hover:bg-emerald-50/40 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-7 h-7 rounded-[6px] border flex items-center justify-center shrink-0 ${
+                          log.type === 'key'
+                            ? 'bg-amber-50 border-amber-100'
+                            : log.type === 'ban'
+                            ? 'bg-rose-50 border-rose-100'
+                            : log.type === 'building'
+                            ? 'bg-blue-50 border-blue-100'
+                            : 'bg-emerald-50 border-emerald-100'
+                        }`}
+                      >
                         {renderActivityIcon(log.type)}
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-900">
+                        <p className="text-[13px] font-normal text-[#1D1D1F]">
                           {log.action} — <span className="text-[#0F4C2E] font-semibold">{log.target}</span>
                         </p>
-                        <p className="text-[11px] text-slate-500 mt-0.5">by {log.actor}</p>
+                        <p className="text-[12px] text-[#86868B]">by {log.actor}</p>
                       </div>
                     </div>
-                    <span className="text-[10px] font-medium text-slate-400 shrink-0">{log.time}</span>
+                    <span className="text-[12px] text-[#86868B] shrink-0">{log.time}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6">
-              <div className="flex items-center justify-between mb-5 border-b pb-4 border-slate-100">
-                <h3 className="text-sm font-bold text-slate-900">Newest Accounts</h3>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Live</span>
+            <div className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3.5 bg-emerald-950/[0.04] border-b border-[#E5E5E7]">
+                <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Newest Accounts</h3>
+                <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-100 text-[#0F4C2E] border border-emerald-200 uppercase">
+                  Live
+                </span>
               </div>
 
-              <div className="space-y-3.5">
+              <div className="divide-y divide-[#E5E5E7]">
                 {users.slice(0, 5).map((u) => (
-                  <div key={u.id} className="p-3 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between">
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-900 leading-tight">{u.name}</h4>
-                      <p className="text-[10px] font-mono text-slate-400 mt-0.5">{u.email}</p>
+                  <div key={u.id} className="px-5 py-3 hover:bg-emerald-50/40 transition-colors flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <h4 className="text-[13px] font-medium text-[#1D1D1F] leading-tight truncate">{u.name}</h4>
+                      <p className="text-[12px] font-mono text-[#86868B] mt-0.5 truncate">{u.email}</p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right shrink-0">
                       <span
-                        className={`text-xs font-bold uppercase inline-flex items-center gap-1.5 ${
+                        className={`h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] uppercase ${
                           u.status === 'ACTIVE'
-                            ? 'text-emerald-700'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                             : u.status === 'PENDING_REVIEW'
-                            ? 'text-amber-700'
-                            : 'text-rose-700'
+                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200'
                         }`}
                       >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                            u.status === 'ACTIVE'
-                              ? 'bg-emerald-600'
-                              : u.status === 'PENDING_REVIEW'
-                              ? 'bg-amber-500'
-                              : 'bg-rose-600'
-                          }`}
-                        />
                         {u.status === 'PENDING_REVIEW' ? 'Pending' : u.status}
                       </span>
                     </div>
@@ -1102,41 +1113,47 @@ function AccountManagerContent() {
 
       {/* TAB 2: VIEW ACCOUNTS */}
       {activeTab === 'accounts' && (
-        <div className="space-y-6">
-          <div className="bg-[#0F4C2E] text-white p-6 rounded-2xl shadow-md flex items-center justify-between">
+        <div className="space-y-5">
+          <div className="bg-[#0F4C2E] text-white p-5 rounded-[8px] shadow-md flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-extrabold text-white">View Accounts</h2>
-              <p className="text-xs text-emerald-200/90 mt-1">
+              <h2 className="text-[22px] font-bold tracking-tight text-white">View Accounts</h2>
+              <p className="text-[13px] text-emerald-100/90 mt-0.5">
                 Manage all TOPS users — employees, staff, reviewers, and signatories — from one place.
               </p>
             </div>
             <div className="text-right hidden sm:block">
-              <span className="text-3xl font-black text-white">{users.length}</span>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">Total Accounts</p>
+              <span className="text-[24px] font-bold tracking-tight text-white">{users.length}</span>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-200">Total Accounts</p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
+          <div className="flex flex-wrap items-center gap-1.5 border-b border-[#E5E5E7] pb-3">
             <button
               onClick={() => setRoleFilter('ALL')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                roleFilter === 'ALL' ? 'bg-[#0F4C2E] text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+              className={`h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+                roleFilter === 'ALL'
+                  ? 'bg-[#0F4C2E] text-white shadow-xs'
+                  : 'bg-white text-[#1D1D1F] hover:bg-emerald-50/50 border border-[#E5E5E7]'
               }`}
             >
               All Accounts ({counts.total})
             </button>
             <button
               onClick={() => setRoleFilter('EMPLOYEE')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                roleFilter === 'EMPLOYEE' ? 'bg-[#0F4C2E] text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+              className={`h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+                roleFilter === 'EMPLOYEE'
+                  ? 'bg-[#0F4C2E] text-white shadow-xs'
+                  : 'bg-white text-[#1D1D1F] hover:bg-emerald-50/50 border border-[#E5E5E7]'
               }`}
             >
               Employee Accounts ({counts.employee})
             </button>
             <button
               onClick={() => setRoleFilter('STAFF')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                roleFilter === 'STAFF' ? 'bg-[#0F4C2E] text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+              className={`h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+                roleFilter === 'STAFF'
+                  ? 'bg-[#0F4C2E] text-white shadow-xs'
+                  : 'bg-white text-[#1D1D1F] hover:bg-emerald-50/50 border border-[#E5E5E7]'
               }`}
             >
               Staff / Signatories ({counts.staff})
@@ -1144,45 +1161,45 @@ function AccountManagerContent() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-              <p className="text-[10px] font-bold uppercase text-slate-400">Total</p>
-              <p className="text-xl font-black text-slate-900 mt-0.5">{counts.total}</p>
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-[#0F4C2E] shadow-xs">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B]">Total</p>
+              <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-0.5">{counts.total}</p>
             </div>
-            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-              <p className="text-[10px] font-bold uppercase text-emerald-600">Active</p>
-              <p className="text-xl font-black text-slate-900 mt-0.5">{counts.active}</p>
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-emerald-500 shadow-xs">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700">Active</p>
+              <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-0.5">{counts.active}</p>
             </div>
-            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-              <p className="text-[10px] font-bold uppercase text-amber-600">Pending</p>
-              <p className="text-xl font-black text-slate-900 mt-0.5">{counts.pending}</p>
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-amber-500 shadow-xs">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-700">Pending</p>
+              <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-0.5">{counts.pending}</p>
             </div>
-            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-              <p className="text-[10px] font-bold uppercase text-rose-600">Inactive</p>
-              <p className="text-xl font-black text-slate-900 mt-0.5">{counts.inactive}</p>
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-rose-500 shadow-xs">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-rose-600">Inactive</p>
+              <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-0.5">{counts.inactive}</p>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-white p-3.5 rounded-[8px] border border-[#E5E5E7] shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="relative w-full sm:w-80">
               <input
                 type="text"
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
                 placeholder="Search by name, ID, email, or section..."
-                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                className="w-full pl-8 pr-2.5 h-8 text-[13px] text-[#1D1D1F] bg-slate-50 border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#0F4C2E]/20 focus:border-[#0F4C2E]"
               />
-              <svg className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-[#86868B] absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
 
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-bold w-full sm:w-auto overflow-x-auto">
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-[6px] border border-[#E5E5E7] w-full sm:w-auto overflow-x-auto">
               {['ALL', 'ACTIVE', 'DEACTIVATED', 'PENDING_REVIEW'].map((st) => (
                 <button
                   key={st}
                   onClick={() => setStatusFilter(st)}
-                  className={`px-3 py-1.5 rounded-lg transition-all ${
-                    statusFilter === st ? 'bg-white text-slate-900 shadow-xs font-extrabold' : 'text-slate-500 hover:text-slate-800'
+                  className={`h-7 px-2.5 text-xs font-medium rounded-[4px] inline-flex items-center justify-center gap-1 transition-colors cursor-pointer ${
+                    statusFilter === st ? 'bg-[#0F4C2E] text-white shadow-2xs font-semibold' : 'text-[#86868B] hover:text-[#1D1D1F]'
                   }`}
                 >
                   {st === 'ALL' ? 'All Statuses' : st === 'PENDING_REVIEW' ? 'Pending' : st}
@@ -1191,49 +1208,49 @@ function AccountManagerContent() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+          <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden">
             {loading ? (
-              <div className="p-12 text-center text-xs text-slate-500">Loading system accounts directory...</div>
+              <div className="p-12 text-center text-[13px] text-[#86868B]">Loading system accounts directory...</div>
             ) : filteredUsersList.length === 0 ? (
-              <div className="p-12 text-center text-slate-500">No accounts match your current filter parameters.</div>
+              <div className="p-12 text-center text-[13px] text-[#86868B]">No accounts match your current filter parameters.</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      <th className="py-3 px-4">Employee</th>
-                      <th className="py-3 px-4">Section / Division</th>
-                      <th className="py-3 px-4">Role</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4">Registration Date</th>
-                      <th className="py-3 px-4 text-right">Actions</th>
+                  <thead className="bg-emerald-950/[0.04] border-b border-[#E5E5E7]">
+                    <tr>
+                      <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Employee</th>
+                      <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Section / Division</th>
+                      <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">Role</th>
+                      <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">Status</th>
+                      <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Registration Date</th>
+                      <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 text-xs">
+                  <tbody className="divide-y divide-[#E5E5E7]">
                     {filteredUsersList.map((u) => (
-                      <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-[#C8E6C9] text-[#1B4332] font-bold text-xs flex items-center justify-center shrink-0">
+                      <tr key={u.id} className="h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors">
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-7 h-7 rounded-full bg-emerald-100 text-[#0F4C2E] font-semibold text-[12px] flex items-center justify-center shrink-0">
                               {u.name.substring(0, 1)}
                             </div>
                             <div>
                               <div className="flex items-center gap-1.5">
-                                <p className="font-bold text-slate-900">{u.name}</p>
+                                <p className="font-medium text-[#1D1D1F] text-[13px]">{u.name}</p>
                                 {u.username && (
-                                  <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200">
+                                  <span className="text-[11px] font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-[4px] border border-slate-200">
                                     @{u.username}
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[10px] text-slate-400 font-mono">{u.email}</p>
+                              <p className="text-[12px] text-[#86868B] font-mono">{u.email}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3.5 px-4">
-                          <p className="font-medium text-slate-800">{u.division || 'General Office'}</p>
-                          {u.section && <p className="text-[10px] text-slate-500 font-normal">{u.section}</p>}
-                          {u.position && <p className="text-[10px] text-slate-400 font-normal italic">{u.position}</p>}
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">
+                          <p className="font-normal text-[#1D1D1F] text-[13px]">{u.division || 'General Office'}</p>
+                          {u.section && <p className="text-[12px] text-[#86868B]">{u.section}</p>}
+                          {u.position && <p className="text-[12px] text-[#86868B] italic">{u.position}</p>}
                           <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                             {u.signatureUrl ? (
                               <button
@@ -1242,16 +1259,16 @@ function AccountManagerContent() {
                                   setSignatureModalUser(u);
                                   setSignatureDataInput(null);
                                 }}
-                                className="inline-flex items-center gap-1.5 text-[9px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300 transition-all cursor-pointer shadow-2xs group"
+                                className="h-5 inline-flex items-center justify-center gap-1 px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 transition-colors cursor-pointer group"
                                 title="Official e-signature on file. Click to view or update signature."
                               >
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
                                 <span>Signature on file</span>
-                                <span className="text-emerald-600 group-hover:text-emerald-900 font-semibold underline text-[9px] ml-0.5">Edit</span>
+                                <span className="underline ml-0.5 text-emerald-700">Edit</span>
                               </button>
                             ) : (
                               <div className="inline-flex items-center gap-1 flex-wrap">
-                                <span className="inline-flex items-center gap-1 text-[9px] font-medium text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200">
+                                <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-slate-100 text-slate-500 border border-slate-200">
                                   No signature
                                 </span>
                                 <button
@@ -1260,45 +1277,37 @@ function AccountManagerContent() {
                                     setSignatureModalUser(u);
                                     setSignatureDataInput(null);
                                   }}
-                                  className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-300 transition-all cursor-pointer shadow-2xs active:scale-95"
+                                  className="h-5 inline-flex items-center justify-center gap-1 px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 transition-colors cursor-pointer"
                                   title="Add official e-signature using stylus pen, board, or mouse"
                                 >
-                                  <span className="text-[11px] font-black leading-none text-emerald-600">+</span>
-                                  <span>Add signature</span>
+                                  <span>+ Add signature</span>
                                 </button>
                               </div>
                             )}
                           </div>
                         </td>
-                        <td className="py-3.5 px-4">
-                          <span className="text-xs font-semibold text-slate-700">
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">
+                          <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-blue-50 text-blue-700 border border-blue-200">
                             {roleDisplayNames[u.role] || (u.role ? u.role.replace(/_/g, ' ') : '')}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4">
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">
                           <span
-                            className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider ${
+                            className={`h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] uppercase ${
                               u.status === 'ACTIVE'
-                                ? 'text-emerald-700'
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                 : u.status === 'PENDING_REVIEW'
-                                ? 'text-amber-700'
-                                : 'text-rose-700'
+                                ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                : 'bg-rose-50 text-rose-700 border border-rose-200'
                             }`}
                           >
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                                u.status === 'ACTIVE'
-                                  ? 'bg-emerald-600'
-                                  : u.status === 'PENDING_REVIEW'
-                                  ? 'bg-amber-500'
-                                  : 'bg-rose-600'
-                              }`}
-                            />
                             {u.status === 'PENDING_REVIEW' ? 'PENDING' : u.status}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 text-slate-500">{new Date(u.createdAt).toLocaleDateString()}</td>
-                        <td className="py-3.5 px-4 text-right space-x-1.5">
+                        <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left">
+                          {new Date(u.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-right space-x-1.5 whitespace-nowrap">
                           {u.status === 'PENDING_REVIEW' && (
                             <button
                               onClick={() => {
@@ -1307,7 +1316,7 @@ function AccountManagerContent() {
                                 setActivationPosition(u.position || '');
                                 setActivationRole(u.role || 'EMPLOYEE');
                               }}
-                              className="px-2.5 py-1 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-lg text-[11px] font-bold shadow-xs cursor-pointer"
+                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-[#0F4C2E] hover:bg-[#165E3A] text-white cursor-pointer"
                             >
                               Activate
                             </button>
@@ -1315,7 +1324,7 @@ function AccountManagerContent() {
                           {u.status === 'ACTIVE' && (
                             <button
                               onClick={() => handleToggleStatus(u, 'DEACTIVATED')}
-                              className="px-2.5 py-1 bg-slate-100 hover:bg-rose-50 text-rose-700 border border-slate-200 rounded-lg text-[11px] font-semibold"
+                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 cursor-pointer"
                             >
                               Deactivate
                             </button>
@@ -1323,7 +1332,7 @@ function AccountManagerContent() {
                           {u.status === 'DEACTIVATED' && (
                             <button
                               onClick={() => handleToggleStatus(u, 'ACTIVE')}
-                              className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[11px] font-semibold"
+                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 cursor-pointer"
                             >
                               Enable
                             </button>
@@ -1333,14 +1342,14 @@ function AccountManagerContent() {
                               setSignatureModalUser(u);
                               setSignatureDataInput(null);
                             }}
-                            className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer"
+                            className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 cursor-pointer"
                             title="Manage official electronic signature"
                           >
                             Signature
                           </button>
                           <button
                             onClick={() => setResetUser(u)}
-                            className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-semibold border border-slate-200"
+                            className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 cursor-pointer"
                           >
                             Reset Password
                           </button>
@@ -1371,23 +1380,23 @@ function AccountManagerContent() {
         });
 
         return (
-          <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-12">
+          <div className="space-y-5 max-w-6xl mx-auto animate-fade-in pb-12">
             {/* Header Box */}
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 sm:p-7 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200/80 flex items-center justify-center shrink-0 shadow-2xs">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-10 h-10 rounded-[8px] bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
                 <div>
-                  <div className="flex items-center gap-2.5">
-                    <h2 className="text-lg font-black text-slate-900">Pending Accounts for Review</h2>
-                    <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-black">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">Pending Accounts for Review</h2>
+                    <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-amber-50 text-amber-700 border border-amber-200">
                       {pendingUsersList.length} Awaiting Activation
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-[13px] text-[#86868B] mt-0.5">
                     Review employee accounts submitted through portal registration. Verify position and section assignment to activate and generate login credentials.
                   </p>
                 </div>
@@ -1400,16 +1409,16 @@ function AccountManagerContent() {
                     value={pendingSearch}
                     onChange={(e) => setPendingSearch(e.target.value)}
                     placeholder="Search applicant name, email..."
-                    className="w-full pl-9 pr-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E] transition-all"
+                    className="w-full pl-8 pr-2.5 h-8 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                   />
-                  <svg className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-[#86868B] absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
                 <button
                   type="button"
                   onClick={fetchUsers}
-                  className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer border border-slate-200"
+                  className="h-8 w-8 inline-flex items-center justify-center text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-[6px] transition-colors cursor-pointer border border-[#E5E5E7] bg-white"
                   title="Refresh pending list"
                 >
                   <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1421,59 +1430,59 @@ function AccountManagerContent() {
 
             {/* List of Pending Applicants */}
             {loading ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {[1, 2, 3, 4].map((sk) => (
-                  <div key={`sk-${sk}`} className="bg-white rounded-2xl border border-slate-200/80 p-6 space-y-4 animate-pulse">
+                  <div key={`sk-${sk}`} className="bg-white rounded-[8px] border border-[#E5E5E7] p-5 space-y-4 animate-pulse">
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 bg-slate-200 rounded-2xl" />
-                      <div className="space-y-1 flex-1">
-                        <div className="h-4 bg-slate-200 rounded w-1/3" />
-                        <div className="h-3 bg-slate-100 rounded w-1/4" />
+                      <div className="w-10 h-10 bg-[#F5F5F7] rounded-full" />
+                      <div className="space-y-1.5 flex-1">
+                        <div className="h-4 bg-[#F5F5F7] rounded w-1/3" />
+                        <div className="h-3 bg-[#F5F5F7] rounded w-1/4" />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3 pt-2">
-                      <div className="h-3 bg-slate-100 rounded" />
-                      <div className="h-3 bg-slate-100 rounded" />
-                      <div className="h-3 bg-slate-100 rounded" />
-                      <div className="h-3 bg-slate-100 rounded" />
+                      <div className="h-3 bg-[#F5F5F7] rounded" />
+                      <div className="h-3 bg-[#F5F5F7] rounded" />
+                      <div className="h-3 bg-[#F5F5F7] rounded" />
+                      <div className="h-3 bg-[#F5F5F7] rounded" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : filteredPendingUsers.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-12 text-center max-w-xl mx-auto space-y-4">
-                <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-[#0F4C2E] border border-emerald-100 flex items-center justify-center mx-auto">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs p-10 text-center max-w-xl mx-auto space-y-4">
+                <div className="w-12 h-12 rounded-[8px] bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center mx-auto">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">
                     {pendingSearch ? 'No matching pending accounts found' : 'All Caught Up! No Pending Accounts'}
                   </h3>
-                  <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                  <p className="text-[13px] text-[#86868B] max-w-md mx-auto leading-relaxed">
                     {pendingSearch
                       ? `No pending applicant records match "${pendingSearch}". Try clearing your search filter.`
                       : 'There are currently no employee registrations waiting for review. When new employees submit an account registration via the portal, their records will appear here.'}
                   </p>
                 </div>
-                <div className="flex items-center justify-center gap-3 pt-2">
+                <div className="flex items-center justify-center gap-2.5 pt-2">
                   <button
                     onClick={() => router.push('/account-manager?tab=accounts')}
-                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] cursor-pointer"
                   >
                     View All Accounts
                   </button>
                   <button
                     onClick={() => setShowManualCreate(!showManualCreate)}
-                    className="px-4 py-2 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer"
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white cursor-pointer"
                   >
                     {showManualCreate ? 'Hide Form' : '+ Manual Registration'}
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {filteredPendingUsers.map((u) => {
                   const initials = u.name
                     .split(' ')
@@ -1485,72 +1494,71 @@ function AccountManagerContent() {
                   return (
                     <div
                       key={u.id}
-                      className="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all p-5 sm:p-6 flex flex-col justify-between space-y-4"
+                      className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden flex flex-col justify-between"
                     >
                       <div>
                         {/* Header: Avatar, Name, Status Badge */}
-                        <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-4">
+                        <div className="flex items-center justify-between gap-3 bg-[#F5F5F7] border-b border-[#E5E5E7] px-5 py-3.5">
                           <div className="flex items-center gap-3">
-                            <div className="w-11 h-11 rounded-2xl bg-emerald-100 text-[#0F4C2E] font-black text-sm flex items-center justify-center shrink-0 shadow-2xs">
+                            <div className="w-9 h-9 rounded-full bg-[#1B4332]/10 text-[#1B4332] font-semibold text-[13px] flex items-center justify-center shrink-0">
                               {initials}
                             </div>
                             <div>
-                              <h3 className="text-sm font-bold text-slate-900">{u.name}</h3>
-                              <p className="text-xs text-slate-500 font-medium">{u.position || 'Employee Applicant'}</p>
+                              <h3 className="text-[14px] font-semibold text-[#1D1D1F]">{u.name}</h3>
+                              <p className="text-[12px] text-[#86868B]">{u.position || 'Employee Applicant'}</p>
                             </div>
                           </div>
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold shrink-0">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                          <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-amber-50 text-amber-700 border border-amber-200 shrink-0">
                             PENDING REVIEW
                           </span>
                         </div>
 
                         {/* Submitted Information Details */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-3.5 text-xs">
+                        <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-[13px]">
                           <div className="space-y-0.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Email Address</span>
-                            <p className="font-semibold text-slate-800 font-mono text-[11px] truncate">{u.email}</p>
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block">Email Address</span>
+                            <p className="font-normal text-[#1D1D1F] font-mono text-[12px] truncate">{u.email}</p>
                           </div>
                           <div className="space-y-0.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Mobile Number</span>
-                            <p className="font-semibold text-slate-800 font-mono text-[11px]">{u.phoneNumber}</p>
-                            <span className="text-[9px] text-emerald-700 block font-medium">Receives SMS login credentials</span>
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block">Mobile Number</span>
+                            <p className="font-normal text-[#1D1D1F] font-mono text-[12px]">{u.phoneNumber}</p>
+                            <span className="text-[11px] text-emerald-700 block">Receives SMS login credentials</span>
                           </div>
                           <div className="space-y-0.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Requested Division</span>
-                            <p className="font-semibold text-emerald-800 truncate">{u.division || 'Not specified'}</p>
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block">Requested Division</span>
+                            <p className="font-medium text-[#1B4332] truncate">{u.division || 'Not specified'}</p>
                           </div>
                           <div className="space-y-0.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Requested Section</span>
-                            <p className="font-medium text-slate-700 truncate">{u.section || 'N/A'}</p>
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block">Requested Section</span>
+                            <p className="font-normal text-[#1D1D1F] truncate">{u.section || 'N/A'}</p>
                           </div>
                           <div className="space-y-0.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Registered Date</span>
-                            <p className="font-medium text-slate-700">
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block">Registered Date</span>
+                            <p className="font-normal text-[#1D1D1F]">
                               {new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </p>
                           </div>
                           {u.birthday && (
                             <div className="space-y-0.5">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Birthday</span>
-                              <p className="font-medium text-slate-700">{u.birthday}</p>
+                              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block">Birthday</span>
+                              <p className="font-normal text-[#1D1D1F]">{u.birthday}</p>
                             </div>
                           )}
                           {u.address && (
                             <div className="space-y-0.5 sm:col-span-2">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Home Address</span>
-                              <p className="font-medium text-slate-700 truncate">{u.address}</p>
+                              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block">Home Address</span>
+                              <p className="font-normal text-[#1D1D1F] truncate">{u.address}</p>
                             </div>
                           )}
                         </div>
                       </div>
 
                       {/* Card Footer: Action Buttons */}
-                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                      <div className="px-5 py-3 bg-[#F5F5F7]/60 border-t border-[#E5E5E7] flex items-center justify-between gap-2">
                         <button
                           type="button"
                           onClick={() => handleToggleStatus(u, 'DEACTIVATED')}
-                          className="px-3 py-2 bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-600 rounded-xl text-xs font-semibold transition-all border border-slate-200 cursor-pointer"
+                          className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 cursor-pointer"
                         >
                           Decline
                         </button>
@@ -1562,7 +1570,7 @@ function AccountManagerContent() {
                             setActivationPosition(u.position || '');
                             setActivationRole(u.role || 'EMPLOYEE');
                           }}
-                          className="px-4 py-2 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                          className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white cursor-pointer"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -1577,74 +1585,74 @@ function AccountManagerContent() {
             )}
 
             {/* Optional Manual Registration Accordion */}
-            <div className="mt-8 pt-6 border-t border-slate-200/80">
+            <div className="mt-6 pt-5 border-t border-[#E5E5E7]">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-xs font-bold text-slate-800">Need to directly register an employee?</h4>
-                  <p className="text-[11px] text-slate-500">Add an employee directly who cannot submit registration online.</p>
+                  <h4 className="text-[14px] font-semibold text-[#1D1D1F]">Need to directly register an employee?</h4>
+                  <p className="text-[12px] text-[#86868B]">Add an employee directly who cannot submit registration online.</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowManualCreate(!showManualCreate)}
-                  className="px-3.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+                  className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-white border border-[#E5E5E7] hover:bg-[#F2F2F7] text-[#1D1D1F] cursor-pointer"
                 >
                   {showManualCreate ? 'Hide Form' : '+ Manual Registration Form'}
                 </button>
               </div>
 
               {showManualCreate && (
-                <div className="mt-4 bg-white rounded-2xl border border-slate-200/80 shadow-md p-6 sm:p-7 space-y-4 animate-fade-in">
-                  <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                    <h3 className="text-sm font-bold text-slate-900">Manual Employee Registration</h3>
+                <div className="mt-4 bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden animate-fade-in">
+                  <div className="px-5 py-3.5 bg-[#F5F5F7] border-b border-[#E5E5E7] flex items-center gap-2">
+                    <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Manual Employee Registration</h3>
                   </div>
 
-                  <form onSubmit={handleCreateAccountSubmit} className="space-y-5">
+                  <form onSubmit={handleCreateAccountSubmit} className="p-5 space-y-5">
                     {/* Section 1: Employee Information */}
                     <div>
-                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">1. Employee Information</h4>
+                      <h4 className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] mb-3">1. Employee Information</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
+                          <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">Full Name *</label>
                           <input
                             type="text"
                             required
                             value={newAccountData.name}
                             onChange={(e) => setNewAccountData({ ...newAccountData, name: e.target.value })}
                             placeholder="e.g. Maria Clara Santos"
-                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                            className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">Email Address *</label>
+                          <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">Email Address *</label>
                           <input
                             type="email"
                             required
                             value={newAccountData.email}
                             onChange={(e) => setNewAccountData({ ...newAccountData, email: e.target.value })}
                             placeholder="name@denr.gov.ph"
-                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                            className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number *</label>
+                          <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">Phone Number *</label>
                           <input
                             type="text"
                             required
                             value={newAccountData.phoneNumber}
                             onChange={(e) => setNewAccountData({ ...newAccountData, phoneNumber: e.target.value })}
                             placeholder="09170000000"
-                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                            className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">Role *</label>
+                          <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">Role *</label>
                           <select
                             value={newAccountData.role}
                             onChange={(e) => setNewAccountData({ ...newAccountData, role: e.target.value })}
-                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                            className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                           >
                             <option value="EMPLOYEE">Employee</option>
                             <option value="SECTION_CHIEF">Section Chief (Signatory)</option>
@@ -1658,25 +1666,25 @@ function AccountManagerContent() {
                     </div>
 
                     {/* Section 2: Organizational Assignment */}
-                    <div className="pt-2 border-t border-slate-100">
-                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">2. Organizational Assignment</h4>
+                    <div className="pt-3 border-t border-[#E5E5E7]">
+                      <h4 className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] mb-3">2. Organizational Assignment</h4>
                       {newAccountData.role === 'HEAD_PENRO' ? (
                         <div className="space-y-4">
-                          <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-950 flex items-start gap-2.5">
+                          <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-[8px] text-[12px] text-emerald-900 flex items-start gap-2.5">
                             <svg className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                             </svg>
                             <div>
-                              <p className="font-bold text-emerald-900">PENRO Executive Office (Head of Office)</p>
-                              <p className="mt-0.5 text-emerald-800 text-[11px] leading-relaxed">
+                              <p className="font-semibold text-emerald-900">PENRO Executive Office (Head of Office)</p>
+                              <p className="mt-0.5 text-emerald-800 leading-relaxed">
                                 As the Head of Office and Final Approving Authority, the Head of PENRO oversees all operations across both Management Services Division and Technical Services Division. Division and Section selections are not required.
                               </p>
                             </div>
                           </div>
 
                           <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
-                              Position * <span className="text-slate-400 font-normal">(Official Designation)</span>
+                            <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">
+                              Position * <span className="text-[#86868B] font-normal">(Official Designation)</span>
                             </label>
                             <input
                               type="text"
@@ -1684,14 +1692,14 @@ function AccountManagerContent() {
                               value={newAccountData.position}
                               onChange={(e) => setNewAccountData({ ...newAccountData, position: e.target.value })}
                               placeholder="e.g. Provincial Environment and Natural Resources Officer"
-                              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                              className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                             />
                           </div>
                         </div>
                       ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">Division *</label>
+                            <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">Division *</label>
                             <select
                               required
                               value={newAccountData.division}
@@ -1703,7 +1711,7 @@ function AccountManagerContent() {
                                   section: '', // Clear dependent section on division switch
                                 }));
                               }}
-                              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                              className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                             >
                               <option value="">Select Division...</option>
                               {orgDivisions.map((div) => (
@@ -1715,12 +1723,12 @@ function AccountManagerContent() {
                           </div>
 
                           <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                            <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">
                               Section {(() => {
                                 const selDiv = orgDivisions.find((d) => d.name === newAccountData.division);
-                                if (!newAccountData.division) return <span className="text-slate-400 font-normal">(Select Division first)</span>;
+                                if (!newAccountData.division) return <span className="text-[#86868B] font-normal">(Select Division first)</span>;
                                 if (selDiv && (!selDiv.sections || selDiv.sections.length === 0)) return <span className="text-emerald-700 font-normal">(No section required)</span>;
-                                return <span className="text-rose-500">*</span>;
+                                return <span className="text-red-600">*</span>;
                               })()}
                             </label>
                             {(() => {
@@ -1732,7 +1740,7 @@ function AccountManagerContent() {
                                   disabled={!newAccountData.division || !divHasSections}
                                   value={newAccountData.section}
                                   onChange={(e) => setNewAccountData({ ...newAccountData, section: e.target.value })}
-                                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#0F4C2E] disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   <option value="">
                                     {!newAccountData.division
@@ -1752,8 +1760,8 @@ function AccountManagerContent() {
                           </div>
 
                           <div className="sm:col-span-2">
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
-                              Position * <span className="text-slate-400 font-normal">(Manually entered)</span>
+                            <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">
+                              Position * <span className="text-[#86868B] font-normal">(Manually entered)</span>
                             </label>
                             <input
                               type="text"
@@ -1761,7 +1769,7 @@ function AccountManagerContent() {
                               value={newAccountData.position}
                               onChange={(e) => setNewAccountData({ ...newAccountData, position: e.target.value })}
                               placeholder="e.g. Environmental Specialist / Forest Ranger / Administrative Officer"
-                              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                              className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                             />
                           </div>
                         </div>
@@ -1769,19 +1777,19 @@ function AccountManagerContent() {
                     </div>
 
                     {/* Section 3: E-Signature Capture */}
-                    <div className="pt-2 border-t border-slate-100">
-                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">3. E-Signature Authorization</h4>
+                    <div className="pt-3 border-t border-[#E5E5E7]">
+                      <h4 className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] mb-3">3. E-Signature Authorization</h4>
                       <SignaturePad
                         onChange={(sig) => setNewAccountData((prev) => ({ ...prev, signatureData: sig }))}
                       />
 
-                      <div className="mt-3 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
-                        <label className="flex items-start gap-2.5 text-xs text-slate-700 cursor-pointer">
+                      <div className="mt-3 bg-[#F5F5F7] p-3.5 rounded-[6px] border border-[#E5E5E7]">
+                        <label className="flex items-start gap-2.5 text-[12px] text-[#1D1D1F] cursor-pointer">
                           <input
                             type="checkbox"
                             checked={newAccountData.consent}
                             onChange={(e) => setNewAccountData((prev) => ({ ...prev, consent: e.target.checked }))}
-                            className="mt-0.5 rounded border-slate-300 text-[#0F4C2E] focus:ring-[#0F4C2E]"
+                            className="mt-0.5 rounded border-[#E5E5E7] text-[#1B4332] focus:ring-[#1B4332]"
                           />
                           <span className="leading-relaxed">
                             I verify that the employee is physically present for walk-in registration, and authorizes the recording of this electronic signature for use on official <strong>DENR Travel Orders</strong> pursuant to the Electronic Commerce Act (RA 8792).
@@ -1790,18 +1798,18 @@ function AccountManagerContent() {
                       </div>
                     </div>
 
-                    <div className="pt-2 flex justify-end gap-3 border-t border-slate-100">
+                    <div className="pt-3 flex justify-end gap-2.5 border-t border-[#E5E5E7]">
                       <button
                         type="button"
                         onClick={() => setShowManualCreate(false)}
-                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer"
+                        className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] cursor-pointer"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
                         disabled={createAccountLoading}
-                        className="px-5 py-2 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold shadow-xs disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+                        className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white disabled:opacity-50 cursor-pointer"
                       >
                         {createAccountLoading ? (
                           <>
@@ -1823,17 +1831,17 @@ function AccountManagerContent() {
 
             {/* Bottom Guideline Info Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-1">
-                <h4 className="text-xs font-bold text-slate-900">Registration Review</h4>
-                <p className="text-[11px] text-slate-500">Applicant credentials require HRMO review and approval before system activation.</p>
+              <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs space-y-1">
+                <h4 className="text-[14px] font-semibold text-[#1D1D1F]">Registration Review</h4>
+                <p className="text-[12px] text-[#86868B]">Applicant credentials require HRMO review and approval before system activation.</p>
               </div>
-              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-1">
-                <h4 className="text-xs font-bold text-slate-900">Role & Unit Assignment</h4>
-                <p className="text-[11px] text-slate-500">Confirm or adjust position, section, and signatory scope during the review step.</p>
+              <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs space-y-1">
+                <h4 className="text-[14px] font-semibold text-[#1D1D1F]">Role & Unit Assignment</h4>
+                <p className="text-[12px] text-[#86868B]">Confirm or adjust position, section, and signatory scope during the review step.</p>
               </div>
-              <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs space-y-1">
-                <h4 className="text-xs font-bold text-slate-900">Automated SMS Credentials</h4>
-                <p className="text-[11px] text-slate-500">Approved users receive immediate SMS login instructions with generated credentials.</p>
+              <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs space-y-1">
+                <h4 className="text-[14px] font-semibold text-[#1D1D1F]">Automated SMS Credentials</h4>
+                <p className="text-[12px] text-[#86868B]">Approved users receive immediate SMS login instructions with generated credentials.</p>
               </div>
             </div>
           </div>
@@ -1842,95 +1850,98 @@ function AccountManagerContent() {
 
       {/* TAB 4: PASSWORD MANAGEMENT */}
       {activeTab === 'password-management' && (
-        <div className="space-y-6">
+        <div className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-amber-500 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Pending Resets</p>
-                <p className="text-2xl font-black text-slate-900 mt-1">2</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-amber-700">Pending Resets</p>
+                <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">2</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 rounded-[8px] bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-emerald-500 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Recovered This Month</p>
-                <p className="text-2xl font-black text-slate-900 mt-1">5</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700">Recovered This Month</p>
+                <p className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1">5</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 rounded-[8px] bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-blue-500 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Password Policy</p>
-                <p className="text-sm font-bold text-slate-800 mt-1">8+ chars enforced</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-700">Password Policy</p>
+                <p className="text-[14px] font-semibold text-[#1D1D1F] mt-1">8+ chars enforced</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 rounded-[8px] bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 space-y-4">
-            <div className="flex items-center justify-between border-b pb-4 border-slate-100">
-              <h3 className="text-sm font-bold text-slate-900">Password & Recovery Actions</h3>
+          <div className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-3.5 bg-slate-100/90 border-b border-[#E5E5E7]">
+              <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Password & Recovery Actions</h3>
               <input
                 type="text"
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
                 placeholder="Search users..."
-                className="px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
               />
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
-                    <th className="py-3 px-4">User</th>
-                    <th className="py-3 px-4">Role</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
+                <thead className="bg-emerald-950/[0.04] border-b border-[#E5E5E7]">
+                  <tr>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">User</th>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">Role</th>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">Status</th>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-xs">
+                <tbody className="divide-y divide-[#E5E5E7]">
                   {filteredUsersList.map((u) => (
-                    <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3.5 px-4 font-bold text-slate-900">
+                    <tr key={u.id} className="h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors">
+                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">
                         <div>
-                          <p>{u.name}</p>
-                          <p className="text-[10px] text-slate-400 font-mono">{u.email}</p>
+                          <p className="font-medium text-[#1D1D1F]">{u.name}</p>
+                          <p className="text-[12px] text-[#86868B] font-mono">{u.email}</p>
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-slate-700">{roleDisplayNames[u.role] || (u.role ? u.role.replace(/_/g, ' ') : '')}</td>
-                      <td className="py-3.5 px-4">
-                        <span
-                          className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider ${
-                            u.status === 'ACTIVE' ? 'text-emerald-700' : 'text-amber-700'
-                          }`}
-                        >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                              u.status === 'ACTIVE' ? 'bg-emerald-600' : 'bg-amber-500'
-                            }`}
-                          />
-                          {u.status}
+                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">
+                        <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-blue-50 text-blue-700 border border-blue-200">
+                          {roleDisplayNames[u.role] || (u.role ? u.role.replace(/_/g, ' ') : '')}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">
+                        <span
+                          className={`h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] uppercase ${
+                            u.status === 'ACTIVE'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : u.status === 'PENDING_REVIEW'
+                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                              : 'bg-[#F5F5F7] text-[#86868B] border border-[#E5E5E7]'
+                          }`}
+                        >
+                          {u.status === 'PENDING_REVIEW' ? 'PENDING' : u.status}
+                        </span>
+                      </td>
+                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-right">
                         <button
                           onClick={() => setResetUser(u)}
-                          className="px-3 py-1.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-lg font-bold text-[11px] shadow-xs"
+                          className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white cursor-pointer"
                         >
                           Reset Password
                         </button>
@@ -1946,30 +1957,32 @@ function AccountManagerContent() {
 
       {/* TAB 5: CONFIGURATION */}
       {activeTab === 'configuration' && (
-        <div className="space-y-6 max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-md p-6 sm:p-8 space-y-6">
-            <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-              <svg className="w-6 h-6 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+        <div className="space-y-5 max-w-4xl mx-auto">
+          <div className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden">
+            <div className="flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white">
+              <div className="w-8 h-8 rounded-[6px] bg-white/10 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
               <div>
-                <h2 className="text-lg font-black text-slate-900">Account Manager System Configuration</h2>
-                <p className="text-xs text-slate-500">Configure global account management policies, notification triggers, and station parameters.</p>
+                <h2 className="text-[20px] font-bold tracking-tight text-white">Account Manager System Configuration</h2>
+                <p className="text-[12px] text-emerald-100/80">Configure global account management policies, notification triggers, and station parameters.</p>
               </div>
             </div>
 
-            <div className="space-y-6 text-xs">
-              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-4">
-                <h3 className="text-xs font-extrabold text-[#0F4C2E] uppercase tracking-wider">Account Management Settings</h3>
+            <div className="p-6 space-y-5 text-[13px]">
+              <div className="p-5 bg-slate-50/70 rounded-[8px] border border-slate-200/80 space-y-4">
+                <h3 className="text-[13px] font-bold text-[#0F4C2E] uppercase tracking-wider">Account Management Settings</h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">Default Role for New Users</label>
+                    <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">Default Role for New Users</label>
                     <select
                       value={configSettings.defaultRole}
                       onChange={(e) => setConfigSettings({ ...configSettings, defaultRole: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl outline-none font-semibold"
+                      className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                     >
                       <option value="EMPLOYEE">EMPLOYEE</option>
                       <option value="SECTION_CHIEF">SECTION_CHIEF</option>
@@ -1977,72 +1990,72 @@ function AccountManagerContent() {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">Session Inactivity Timeout (Minutes)</label>
+                    <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">Session Inactivity Timeout (Minutes)</label>
                     <input
                       type="number"
                       value={configSettings.sessionTimeoutMins}
                       onChange={(e) => setConfigSettings({ ...configSettings, sessionTimeoutMins: Number(e.target.value) })}
-                      className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl outline-none font-semibold"
+                      className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-3 pt-2">
-                  <label className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200 cursor-pointer">
+                <div className="space-y-2.5 pt-1">
+                  <label className="flex items-center justify-between p-3.5 bg-white rounded-[6px] border border-[#E5E5E7] cursor-pointer hover:bg-[#F2F2F7] transition-colors">
                     <div>
-                      <p className="font-bold text-slate-900">Require Account Manager Review for Registrations</p>
-                      <p className="text-[11px] text-slate-500">Prevent self-registered users from logging in until activated.</p>
+                      <p className="font-medium text-[#1D1D1F]">Require Account Manager Review for Registrations</p>
+                      <p className="text-[12px] text-[#86868B]">Prevent self-registered users from logging in until activated.</p>
                     </div>
                     <input
                       type="checkbox"
                       checked={configSettings.requireApproval}
                       onChange={(e) => setConfigSettings({ ...configSettings, requireApproval: e.target.checked })}
-                      className="w-4 h-4 text-[#0F4C2E] rounded border-slate-300 focus:ring-[#0F4C2E]"
+                      className="w-4 h-4 text-[#1B4332] rounded border-[#E5E5E7] focus:ring-[#1B4332]"
                     />
                   </label>
 
-                  <label className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200 cursor-pointer">
+                  <label className="flex items-center justify-between p-3.5 bg-white rounded-[6px] border border-[#E5E5E7] cursor-pointer hover:bg-[#F2F2F7] transition-colors">
                     <div>
-                      <p className="font-bold text-slate-900">Auto-Deactivate Inactive Accounts</p>
-                      <p className="text-[11px] text-slate-500">Automatically set status to DEACTIVATED after 90 days of inactivity.</p>
+                      <p className="font-medium text-[#1D1D1F]">Auto-Deactivate Inactive Accounts</p>
+                      <p className="text-[12px] text-[#86868B]">Automatically set status to DEACTIVATED after 90 days of inactivity.</p>
                     </div>
                     <input
                       type="checkbox"
                       checked={configSettings.autoDeactivate}
                       onChange={(e) => setConfigSettings({ ...configSettings, autoDeactivate: e.target.checked })}
-                      className="w-4 h-4 text-[#0F4C2E] rounded border-slate-300 focus:ring-[#0F4C2E]"
+                      className="w-4 h-4 text-[#1B4332] rounded border-[#E5E5E7] focus:ring-[#1B4332]"
                     />
                   </label>
                 </div>
               </div>
 
-              <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-4">
-                <h3 className="text-xs font-extrabold text-[#0F4C2E] uppercase tracking-wider">Notification Preferences</h3>
+              <div className="p-5 bg-[#F5F5F7] rounded-[8px] border border-[#E5E5E7] space-y-4">
+                <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Notification Preferences</h3>
 
-                <div className="space-y-3">
-                  <label className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200 cursor-pointer">
+                <div className="space-y-2.5">
+                  <label className="flex items-center justify-between p-3.5 bg-white rounded-[6px] border border-[#E5E5E7] cursor-pointer hover:bg-[#F2F2F7] transition-colors">
                     <div>
-                      <p className="font-bold text-slate-900">Send SMS Notification on Account Activation</p>
-                      <p className="text-[11px] text-slate-500">Automatically dispatch SMS via Semaphore API when account is activated.</p>
+                      <p className="font-medium text-[#1D1D1F]">Send SMS Notification on Account Activation</p>
+                      <p className="text-[12px] text-[#86868B]">Automatically dispatch SMS via Semaphore API when account is activated.</p>
                     </div>
                     <input
                       type="checkbox"
                       checked={configSettings.smsActivationAlert}
                       onChange={(e) => setConfigSettings({ ...configSettings, smsActivationAlert: e.target.checked })}
-                      className="w-4 h-4 text-[#0F4C2E] rounded border-slate-300 focus:ring-[#0F4C2E]"
+                      className="w-4 h-4 text-[#1B4332] rounded border-[#E5E5E7] focus:ring-[#1B4332]"
                     />
                   </label>
 
-                  <label className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200 cursor-pointer">
+                  <label className="flex items-center justify-between p-3.5 bg-white rounded-[6px] border border-[#E5E5E7] cursor-pointer hover:bg-[#F2F2F7] transition-colors">
                     <div>
-                      <p className="font-bold text-slate-900">In-App Notification Alerts</p>
-                      <p className="text-[11px] text-slate-500">Notify managers in real-time when a new user signs up.</p>
+                      <p className="font-medium text-[#1D1D1F]">In-App Notification Alerts</p>
+                      <p className="text-[12px] text-[#86868B]">Notify managers in real-time when a new user signs up.</p>
                     </div>
                     <input
                       type="checkbox"
                       checked={configSettings.emailNotification}
                       onChange={(e) => setConfigSettings({ ...configSettings, emailNotification: e.target.checked })}
-                      className="w-4 h-4 text-[#0F4C2E] rounded border-slate-300 focus:ring-[#0F4C2E]"
+                      className="w-4 h-4 text-[#1B4332] rounded border-[#E5E5E7] focus:ring-[#1B4332]"
                     />
                   </label>
                 </div>
@@ -2054,7 +2067,7 @@ function AccountManagerContent() {
                   onClick={() => {
                     showToast('Configuration settings saved successfully!', 'success');
                   }}
-                  className="px-6 py-2.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white font-bold rounded-xl shadow-md transition-all"
+                  className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white cursor-pointer"
                 >
                   Save Configuration
                 </button>
@@ -2066,21 +2079,25 @@ function AccountManagerContent() {
 
       {/* TAB 6: CREATE TRAVEL (FULL 5-STEP EMPLOYEE TA WIZARD) */}
       {activeTab === 'create-travel' && (
-        <div className="space-y-6 max-w-5xl mx-auto">
+        <div className="space-y-5 max-w-5xl mx-auto">
           {/* Sub-navigation tabs */}
-          <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
+          <div className="flex items-center gap-2 border-b border-[#E5E5E7] pb-3">
             <button
               onClick={() => setTaSubTab('create')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                taSubTab === 'create' ? 'bg-[#0F4C2E] text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200'
+              className={`h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+                taSubTab === 'create'
+                  ? 'bg-[#1B4332] text-white'
+                  : 'bg-white text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5E7]'
               }`}
             >
               + File New Travel Order
             </button>
             <button
               onClick={() => setTaSubTab('list')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                taSubTab === 'list' ? 'bg-[#0F4C2E] text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200'
+              className={`h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+                taSubTab === 'list'
+                  ? 'bg-[#1B4332] text-white'
+                  : 'bg-white text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5E7]'
               }`}
             >
               My Submitted TA Requests ({myTaRequests.length})
@@ -2088,11 +2105,11 @@ function AccountManagerContent() {
           </div>
 
           {taSubTab === 'create' ? (
-            <div className="space-y-6 animate-fade-in">
+            <div className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden animate-fade-in">
               {/* Wizard Stepper Bar */}
-              <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs relative isolate">
-                <div className="flex items-center justify-between relative px-8">
-                  <div className="absolute left-12 right-12 top-4 h-0.5 bg-slate-200 z-0"></div>
+              <div className="bg-[#F5F5F7] border-b border-[#E5E5E7] px-6 py-4 relative isolate">
+                <div className="flex items-center justify-between relative px-4 sm:px-8">
+                  <div className="absolute left-12 right-12 top-4 h-px bg-[#E5E5E7] z-0"></div>
 
                   {[
                     { s: 1, title: 'Travel Dates' },
@@ -2106,17 +2123,17 @@ function AccountManagerContent() {
                     return (
                       <div key={stepItem.s} className="relative z-10 flex flex-col items-center">
                         <div
-                          className={`w-9 h-9 rounded-full font-bold text-xs flex items-center justify-center transition-all ${
+                          className={`w-8 h-8 rounded-full font-semibold text-xs flex items-center justify-center transition-all ${
                             isDone
-                              ? 'bg-[#0F4C2E] text-white'
+                              ? 'bg-[#1B4332] text-white'
                               : isCurrent
-                              ? 'bg-[#0F4C2E] text-white ring-4 ring-emerald-100 font-extrabold'
-                              : 'bg-slate-200 text-slate-500'
+                              ? 'bg-[#1B4332] text-white ring-4 ring-[#1B4332]/15 font-bold'
+                              : 'bg-white border border-[#E5E5E7] text-[#86868B]'
                           }`}
                         >
                           {isDone ? '✓' : stepItem.s}
                         </div>
-                        <span className={`text-[11px] font-semibold mt-2 ${isCurrent ? 'text-[#0F4C2E] font-bold' : 'text-slate-400'}`}>
+                        <span className={`text-[12px] mt-1.5 ${isCurrent ? 'text-[#1B4332] font-semibold' : 'text-[#86868B] font-medium'}`}>
                           {stepItem.title}
                         </span>
                       </div>
@@ -2126,17 +2143,17 @@ function AccountManagerContent() {
               </div>
 
               {/* Wizard Body Card */}
-              <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-2xs space-y-6">
+              <div className="p-6 space-y-6">
                 {formError && (
-                  <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-semibold">
+                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-[13px] rounded-[6px] font-medium">
                     {formError}
                   </div>
                 )}
 
                 {/* STEP 1: Select Travel Dates */}
                 {wizardStep === 1 && (
-                  <div className="space-y-6">
-                    <h3 className="text-base font-bold text-slate-900">Select Travel Dates</h3>
+                  <div className="space-y-5">
+                    <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Select Travel Dates</h3>
                     <DualMonthCalendarPicker
                       departureDate={createForm.departureDate}
                       returnDate={createForm.returnDate}
@@ -2148,42 +2165,42 @@ function AccountManagerContent() {
 
                 {/* STEP 2: Employee Info */}
                 {wizardStep === 2 && (
-                  <div className="space-y-6">
-                    <h3 className="text-base font-bold text-slate-900">Employee Information</h3>
+                  <div className="space-y-5">
+                    <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Employee Information</h3>
 
-                    <div className="p-4 bg-[#F3F4F8] rounded-2xl border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="p-3.5 bg-[#F5F5F7] rounded-[8px] border border-[#E5E5E7] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#0F4C2E] text-white flex items-center justify-center shrink-0 shadow-2xs">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-8 h-8 rounded-[6px] bg-[#1B4332] text-white flex items-center justify-center shrink-0">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                         </div>
                         <div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block">
                             Selected Travel Dates (Set in Step 1)
                           </span>
-                          <p className="text-xs font-extrabold text-slate-800 mt-0.5">
-                            Departure: <span className="text-[#0F4C2E]">{createForm.departureDate || 'Not specified'}</span>
-                            <span className="mx-2 text-slate-300">|</span>
-                            Return: <span className="text-[#0F4C2E]">{createForm.returnDate || 'Not specified'}</span>
+                          <p className="text-[13px] font-semibold text-[#1D1D1F] mt-0.5">
+                            Departure: <span className="text-[#1B4332]">{createForm.departureDate || 'Not specified'}</span>
+                            <span className="mx-2 text-[#E5E5E7]">|</span>
+                            Return: <span className="text-[#1B4332]">{createForm.returnDate || 'Not specified'}</span>
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5 flex items-center justify-between">
                           <span>Select a Name *</span>
                           {loadingEmployees && (
-                            <span className="text-[10px] text-emerald-700 font-normal">Loading from database...</span>
+                            <span className="text-[11px] text-emerald-700 font-normal">Loading from database...</span>
                           )}
                         </label>
                         <select
                           required
                           value={createForm.employeeName}
                           onChange={(e) => handleEmployeeSelect(e.target.value)}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 outline-none focus:ring-2 focus:ring-[#0F4C2E] cursor-pointer hover:bg-white transition-all shadow-2xs"
+                          className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] cursor-pointer"
                         >
                           <option value="">-- Select a Name --</option>
                           {employeeList.map((emp) => (
@@ -2192,28 +2209,28 @@ function AccountManagerContent() {
                             </option>
                           ))}
                         </select>
-                        <p className="text-[10px] text-slate-400 mt-1">Select an employee from the database directory.</p>
+                        <p className="text-[12px] text-[#86868B] mt-1">Select an employee from the database directory.</p>
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">
                           Travel Area *
                         </label>
                         <select
                           value={createForm.travelArea}
                           onChange={(e) => setCreateForm({ ...createForm, travelArea: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#0F4C2E] cursor-pointer hover:bg-white transition-all shadow-2xs"
+                          className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] cursor-pointer"
                         >
                           <option value="WITHIN AOR">WITHIN AOR</option>
                           <option value="OUTSIDE CARAGA">OUTSIDE CARAGA</option>
                         </select>
-                        <p className="text-[10px] text-slate-400 mt-1">Area of Responsibility scope for this mission.</p>
+                        <p className="text-[12px] text-[#86868B] mt-1">Area of Responsibility scope for this mission.</p>
                       </div>
 
                       <div className="md:col-span-2">
-                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5 flex items-center justify-between">
                           <span>Position</span>
-                          <span className="text-[10px] font-bold text-[#0F4C2E] bg-emerald-100/90 border border-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1">
+                          <span className="h-5 inline-flex items-center justify-center gap-1 px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
@@ -2225,9 +2242,9 @@ function AccountManagerContent() {
                           readOnly
                           value={createForm.position || createForm.designation || ''}
                           placeholder="Position will automatically populate upon selecting an employee above..."
-                          className="w-full px-4 py-2.5 bg-slate-100/90 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none cursor-not-allowed select-none shadow-2xs"
+                          className="w-full h-8 px-2.5 text-[13px] text-[#86868B] bg-[#F5F5F7] border border-[#E5E5E7] rounded-[6px] outline-none cursor-not-allowed select-none"
                         />
-                        <p className="text-[10px] text-slate-400 mt-1">Automatically retrieved from the employee database record.</p>
+                        <p className="text-[12px] text-[#86868B] mt-1">Automatically retrieved from the employee database record.</p>
                       </div>
                     </div>
                   </div>
@@ -2235,12 +2252,12 @@ function AccountManagerContent() {
 
                 {/* STEP 3: Travel Details */}
                 {wizardStep === 3 && (
-                  <div className="space-y-6">
-                    <h3 className="text-base font-bold text-slate-900">Travel Details</h3>
+                  <div className="space-y-5">
+                    <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Travel Details</h3>
 
                     <div className="space-y-4">
                       <div className="relative">
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">
                           Destination *
                         </label>
                         <div className="relative">
@@ -2253,25 +2270,25 @@ function AccountManagerContent() {
                               if (locationSuggestions.length > 0) setShowLocationDropdown(true);
                             }}
                             placeholder="Search a place, office, or barangay (e.g., Fili, Makati, Los Baños)..."
-                            className="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E] transition-all"
+                            className="w-full pl-8 pr-8 h-8 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                           />
-                          <svg className="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 text-[#86868B] absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
 
                           {isSearchingLocation && (
-                            <div className="absolute right-3 top-3">
-                              <div className="w-4 h-4 border-2 border-[#0F4C2E] border-t-transparent rounded-full animate-spin"></div>
+                            <div className="absolute right-2.5 top-2">
+                              <div className="w-4 h-4 border-2 border-[#1B4332] border-t-transparent rounded-full animate-spin"></div>
                             </div>
                           )}
                         </div>
 
                         {showLocationDropdown && locationSuggestions.length > 0 && (
-                          <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-30 overflow-hidden divide-y divide-slate-100 animate-fade-in max-h-60 overflow-y-auto">
-                            <div className="px-3 py-1.5 bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center">
+                          <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-[#E5E5E7] rounded-[8px] shadow-lg z-30 overflow-hidden divide-y divide-[#E5E5E7] animate-fade-in max-h-60 overflow-y-auto">
+                            <div className="px-3 py-1.5 bg-[#F5F5F7] text-[11px] font-semibold text-[#86868B] uppercase tracking-wider flex justify-between items-center">
                               <span>Location Recommendations</span>
-                              <button type="button" onClick={() => setShowLocationDropdown(false)} className="hover:text-slate-700">
+                              <button type="button" onClick={() => setShowLocationDropdown(false)} className="hover:text-[#1D1D1F]">
                                 ✕
                               </button>
                             </div>
@@ -2289,15 +2306,15 @@ function AccountManagerContent() {
                                   }));
                                   setShowLocationDropdown(false);
                                 }}
-                                className="w-full px-4 py-2.5 text-left hover:bg-emerald-50/70 transition-colors flex items-start gap-2.5 group"
+                                className="w-full px-3.5 py-2 text-left hover:bg-[#F2F2F7] transition-colors flex items-start gap-2.5 group"
                               >
-                                <svg className="w-4 h-4 text-[#0F4C2E] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 text-[#1B4332] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                                 <div className="min-w-0 flex-1">
-                                  <p className="text-xs font-bold text-slate-800 group-hover:text-[#0F4C2E] truncate">{item.name}</p>
-                                  <p className="text-[10px] text-slate-500 truncate mt-0.5">{item.fullAddress}</p>
+                                  <p className="text-[13px] font-medium text-[#1D1D1F] group-hover:text-[#1B4332] truncate">{item.name}</p>
+                                  <p className="text-[12px] text-[#86868B] truncate">{item.fullAddress}</p>
                                 </div>
                               </button>
                             ))}
@@ -2306,7 +2323,7 @@ function AccountManagerContent() {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">
                           Interactive Map Pick
                         </label>
                         <DynamicMapPicker
@@ -2335,7 +2352,7 @@ function AccountManagerContent() {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">
                           Purpose of Travel *
                         </label>
                         <textarea
@@ -2344,7 +2361,7 @@ function AccountManagerContent() {
                           value={createForm.purpose}
                           onChange={(e) => setCreateForm({ ...createForm, purpose: e.target.value })}
                           placeholder="Describe the purpose of your travel..."
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          className="w-full p-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                         />
                       </div>
                     </div>
@@ -2353,69 +2370,69 @@ function AccountManagerContent() {
 
                 {/* STEP 4: Additional Information */}
                 {wizardStep === 4 && (
-                  <div className="space-y-6">
-                    <h3 className="text-base font-bold text-slate-900">Additional Information</h3>
+                  <div className="space-y-5">
+                    <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Additional Information</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Salary Grade</label>
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">Salary Grade</label>
                         <input
                           type="text"
                           value={createForm.salaryGrade}
                           onChange={(e) => setCreateForm({ ...createForm, salaryGrade: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Division/Section/Unit</label>
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">Division/Section/Unit</label>
                         <input
                           type="text"
                           value={createForm.division}
                           onChange={(e) => setCreateForm({ ...createForm, division: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Station</label>
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">Station</label>
                         <input
                           type="text"
                           value={createForm.station}
                           onChange={(e) => setCreateForm({ ...createForm, station: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Employment Status</label>
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">Employment Status</label>
                         <input
                           type="text"
                           value={createForm.employmentStatus}
                           onChange={(e) => setCreateForm({ ...createForm, employmentStatus: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Office</label>
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">Office</label>
                         <input
                           type="text"
                           value={createForm.office}
                           onChange={(e) => setCreateForm({ ...createForm, office: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Signatory Station</label>
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">Signatory Station</label>
                         <input
                           type="text"
                           value={createForm.signatoryStation}
                           onChange={(e) => setCreateForm({ ...createForm, signatoryStation: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-4 pt-2">
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">
                           Per Diems/Expense Allowed
                         </label>
                         <input
@@ -2423,12 +2440,12 @@ function AccountManagerContent() {
                           value={createForm.perDiems}
                           onChange={(e) => setCreateForm({ ...createForm, perDiems: e.target.value })}
                           placeholder="Enter per diems information..."
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">
                           Appropriations to which travel should be charged
                         </label>
                         <input
@@ -2436,12 +2453,12 @@ function AccountManagerContent() {
                           value={createForm.appropriations}
                           onChange={(e) => setCreateForm({ ...createForm, appropriations: e.target.value })}
                           placeholder="Enter appropriations Information..."
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">
                           Remarks or Special Instructions
                         </label>
                         <textarea
@@ -2449,12 +2466,12 @@ function AccountManagerContent() {
                           value={createForm.remarks}
                           onChange={(e) => setCreateForm({ ...createForm, remarks: e.target.value })}
                           placeholder="Enter any remarks or special instructions..."
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          className="w-full p-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">
                           Certification
                         </label>
                         <input
@@ -2462,12 +2479,12 @@ function AccountManagerContent() {
                           value={createForm.certification}
                           onChange={(e) => setCreateForm({ ...createForm, certification: e.target.value })}
                           placeholder="Enter certification details..."
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">
                           Contact Number
                         </label>
                         <input
@@ -2475,12 +2492,12 @@ function AccountManagerContent() {
                           value={createForm.contactNumber}
                           onChange={(e) => setCreateForm({ ...createForm, contactNumber: e.target.value })}
                           placeholder="Enter contact number..."
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                         />
                       </div>
 
                       <div className="pt-2">
-                        <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                        <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1.5">
                           Supporting Documents * (e.g., Invitation Letter, Memorandum, Program of Activities)
                         </label>
                         <SupportingDocumentsUpload
@@ -2494,36 +2511,38 @@ function AccountManagerContent() {
 
                 {/* STEP 5: Review & Submit */}
                 {wizardStep === 5 && (
-                  <div className="space-y-6">
-                    <div className="bg-emerald-950 text-white rounded-2xl p-5 shadow-sm flex items-center justify-between">
+                  <div className="space-y-5">
+                    <div className="bg-[#0F4C2E] text-white rounded-[8px] p-4 flex items-center justify-between shadow-xs">
                       <div>
-                        <h3 className="text-base font-bold">Travel Order Request Summary</h3>
-                        <p className="text-xs text-emerald-200/80 mt-0.5">Please review all submitted information before final submission.</p>
+                        <h3 className="text-[16px] font-semibold text-white">Travel Order Request Summary</h3>
+                        <p className="text-[12px] text-emerald-100/80 mt-0.5">Please review all submitted information before final submission.</p>
                       </div>
-                      <span className="px-3 py-1 rounded-full bg-emerald-800 text-emerald-200 text-xs font-bold uppercase">Ready</span>
+                      <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-800 text-emerald-100 border border-emerald-700 uppercase">
+                        Ready
+                      </span>
                     </div>
 
-                    <div className="space-y-4 text-xs">
-                      <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                        <p className="font-bold text-slate-900 text-sm">{createForm.destination}</p>
-                        <p className="text-slate-700">Dates: {createForm.departureDate} to {createForm.returnDate}</p>
-                        <p className="text-slate-600">Purpose: {createForm.purpose}</p>
-                        <p className="text-slate-500">Employee: {createForm.employeeName} ({createForm.position})</p>
-                        {createForm.perDiems && <p className="text-slate-500">Per Diems: {createForm.perDiems}</p>}
-                        {createForm.appropriations && <p className="text-slate-500">Appropriations: {createForm.appropriations}</p>}
-                        {createForm.remarks && <p className="text-slate-500">Remarks: {createForm.remarks}</p>}
-                        {createForm.certification && <p className="text-slate-500">Certification: {createForm.certification}</p>}
-                        {createForm.contactNumber && <p className="text-slate-500">Contact: {createForm.contactNumber}</p>}
-                        <div className="pt-2 border-t border-slate-200">
-                          <p className="font-bold text-slate-700 mb-1">
+                    <div className="space-y-4 text-[13px]">
+                      <div className="p-4 bg-emerald-50/50 rounded-[8px] border border-emerald-200/80 space-y-2">
+                        <p className="font-semibold text-[#1D1D1F] text-[14px]">{createForm.destination}</p>
+                        <p className="text-[#1D1D1F]">Dates: {createForm.departureDate} to {createForm.returnDate}</p>
+                        <p className="text-[#1D1D1F]">Purpose: {createForm.purpose}</p>
+                        <p className="text-[#86868B]">Employee: {createForm.employeeName} ({createForm.position})</p>
+                        {createForm.perDiems && <p className="text-[#86868B]">Per Diems: {createForm.perDiems}</p>}
+                        {createForm.appropriations && <p className="text-[#86868B]">Appropriations: {createForm.appropriations}</p>}
+                        {createForm.remarks && <p className="text-[#86868B]">Remarks: {createForm.remarks}</p>}
+                        {createForm.certification && <p className="text-[#86868B]">Certification: {createForm.certification}</p>}
+                        {createForm.contactNumber && <p className="text-[#86868B]">Contact: {createForm.contactNumber}</p>}
+                        <div className="pt-2 border-t border-emerald-200/80">
+                          <p className="font-semibold text-[#1D1D1F] mb-1.5">
                             Supporting Documents: {createForm.attachments && createForm.attachments.length > 0 ? `${createForm.attachments.length} attached` : 'None attached'}
                           </p>
                           {createForm.attachments && createForm.attachments.length > 0 && (
-                            <div className="space-y-1">
+                            <div className="space-y-1.5">
                               {createForm.attachments.map((doc, idx) => (
-                                <div key={doc.id || idx} className="flex items-center justify-between text-slate-600 bg-white p-2 rounded-lg border border-slate-200">
+                                <div key={doc.id || idx} className="flex items-center justify-between text-[#1D1D1F] bg-white px-3 py-2 rounded-[6px] border border-emerald-200/80">
                                   <span className="font-medium truncate">{doc.name}</span>
-                                  <span className="text-[10px] text-slate-400">
+                                  <span className="text-[12px] text-[#86868B]">
                                     {typeof doc.size === 'number' ? `${(doc.size / (1024 * 1024)).toFixed(1)} MB` : (doc.size || '')}
                                   </span>
                                 </div>
@@ -2537,21 +2556,21 @@ function AccountManagerContent() {
                 )}
 
                 {/* Stepper Action Footer */}
-                <div className="pt-6 border-t border-slate-200 flex items-center justify-between">
+                <div className="pt-5 border-t border-[#E5E5E7] flex items-center justify-between">
                   <button
                     type="button"
                     onClick={() => setTaSubTab('list')}
-                    className="text-xs font-bold text-slate-500 hover:text-slate-800"
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] cursor-pointer"
                   >
                     Cancel
                   </button>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5">
                     {wizardStep > 1 && (
                       <button
                         type="button"
                         onClick={() => setWizardStep((prev) => Math.max(prev - 1, 1))}
-                        className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50"
+                        className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors border border-[#E5E5E7] bg-white text-[#1D1D1F] hover:bg-[#F2F2F7] cursor-pointer"
                       >
                         ‹ Previous
                       </button>
@@ -2561,7 +2580,7 @@ function AccountManagerContent() {
                       <button
                         type="button"
                         onClick={() => setWizardStep((prev) => Math.min(prev + 1, 5))}
-                        className="px-6 py-2.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold shadow-2xs"
+                        className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white cursor-pointer"
                       >
                         Next ›
                       </button>
@@ -2570,7 +2589,7 @@ function AccountManagerContent() {
                         type="button"
                         disabled={taSubmitting}
                         onClick={handleCreateTaSubmit}
-                        className="px-6 py-2.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold shadow-md disabled:opacity-50"
+                        className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white disabled:opacity-50 cursor-pointer"
                       >
                         {taSubmitting ? 'Submitting...' : 'Submit Travel Order'}
                       </button>
@@ -2580,31 +2599,45 @@ function AccountManagerContent() {
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 space-y-4">
-              <h3 className="text-sm font-bold text-slate-900">My Travel Order Requests</h3>
+            <div className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden">
+              <div className="px-5 py-3.5 bg-slate-100/90 border-b border-[#E5E5E7]">
+                <h3 className="text-[14px] font-semibold text-[#1D1D1F]">My Travel Order Requests</h3>
+              </div>
               {myTaRequests.length === 0 ? (
-                <div className="p-8 text-center text-xs text-slate-500">No travel order requests submitted yet.</div>
+                <div className="p-8 text-center text-[13px] text-[#86868B]">No travel order requests submitted yet.</div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="bg-slate-50 border-b text-[11px] font-bold text-slate-500 uppercase">
-                        <th className="py-3 px-4">Tracking #</th>
-                        <th className="py-3 px-4">Destination</th>
-                        <th className="py-3 px-4">Dates</th>
-                        <th className="py-3 px-4">Status</th>
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-emerald-950/[0.04] border-b border-[#E5E5E7]">
+                      <tr>
+                        <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Tracking #</th>
+                        <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Destination</th>
+                        <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Dates</th>
+                        <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-[#E5E5E7]">
                       {myTaRequests.map((req) => (
-                        <tr key={req.id}>
-                          <td className="py-3 px-4 font-bold text-[#0F4C2E]">{req.trackingNumber}</td>
-                          <td className="py-3 px-4 text-slate-800">{req.destination}</td>
-                          <td className="py-3 px-4 text-slate-500">
+                        <tr key={req.id} className="h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors">
+                          <td className="px-3 py-1.5 text-[13px] font-semibold text-[#1B4332] align-middle text-left">
+                            <span className="px-2 py-0.5 rounded-[4px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200/80 font-mono text-[12px] font-semibold">
+                              {req.trackingNumber}
+                            </span>
+                          </td>
+                          <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">{req.destination}</td>
+                          <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left">
                             {new Date(req.startDate).toLocaleDateString()} - {new Date(req.endDate).toLocaleDateString()}
                           </td>
-                          <td className="py-3 px-4">
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                          <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">
+                            <span
+                              className={`h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] uppercase ${
+                                req.status === 'APPROVED'
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  : req.status === 'REJECTED' || req.status === 'RETURNED'
+                                  ? 'bg-red-50 text-red-700 border border-red-200'
+                                  : 'bg-amber-50 text-amber-700 border border-amber-200'
+                              }`}
+                            >
                               {req.status}
                             </span>
                           </td>
@@ -2621,249 +2654,259 @@ function AccountManagerContent() {
 
       {/* Activation Modal */}
       {selectedUserForActivation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/70 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-lg rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 border border-slate-200">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3.5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-lg border border-[#E5E5E7] rounded-[10px] shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white px-5 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-800 font-black flex items-center justify-center text-sm">
+                <div className="w-8 h-8 rounded-[6px] bg-white/15 text-white border border-white/20 font-bold flex items-center justify-center text-xs">
                   ✓
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-slate-900">
+                  <h3 className="text-[14px] font-semibold text-white">
                     Review & Activate Account
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">{selectedUserForActivation.name}</p>
+                  <p className="text-[12px] text-emerald-100/80">{selectedUserForActivation.name}</p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedUserForActivation(null)}
-                className="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-900 flex items-center justify-center font-bold text-sm transition-all"
+                className="w-7 h-7 rounded-[6px] hover:bg-white/10 text-emerald-100 hover:text-white flex items-center justify-center font-semibold text-xs transition-colors cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
-            {/* Applicant Submitted Credentials Details */}
-            <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2 text-xs">
-              <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Submitted Applicant Credentials
-              </span>
-              <div className="grid grid-cols-2 gap-2 text-[11px]">
-                <div>
-                  <span className="text-slate-400 block">Notification Email:</span>
-                  <span className="font-semibold text-slate-800 font-mono truncate block">{selectedUserForActivation.email}</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">SMS Mobile Number:</span>
-                  <span className="font-semibold text-slate-800 font-mono">{selectedUserForActivation.phoneNumber}</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">Division (Self-Reported):</span>
-                  <span className="font-semibold text-emerald-800">{selectedUserForActivation.division || 'Not specified'}</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">Section (Self-Reported):</span>
-                  <span className="font-medium text-slate-700">{selectedUserForActivation.section || 'N/A'}</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">Position (Self-Reported):</span>
-                  <span className="font-medium text-slate-700">{selectedUserForActivation.position || 'Not specified'}</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">Birthday:</span>
-                  <span className="font-medium text-slate-700">{selectedUserForActivation.birthday || 'Not specified'}</span>
-                </div>
-                <div className="col-span-2">
-                  <span className="text-slate-400 block">Home Address:</span>
-                  <span className="font-medium text-slate-700 truncate block">{selectedUserForActivation.address || 'Not specified'}</span>
+            <div className="p-5 space-y-4">
+              {/* Applicant Submitted Credentials Details */}
+              <div className="p-3.5 bg-emerald-50/50 border border-emerald-200/80 rounded-[8px] space-y-2 text-[12px]">
+                <span className="block text-[11px] font-semibold text-[#0F4C2E] uppercase tracking-wider">
+                  Submitted Applicant Credentials
+                </span>
+                <div className="grid grid-cols-2 gap-2 text-[12px]">
+                  <div>
+                    <span className="text-[#86868B] block">Notification Email:</span>
+                    <span className="font-medium text-[#1D1D1F] font-mono truncate block">{selectedUserForActivation.email}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#86868B] block">SMS Mobile Number:</span>
+                    <span className="font-medium text-[#1D1D1F] font-mono">{selectedUserForActivation.phoneNumber}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#86868B] block">Division (Self-Reported):</span>
+                    <span className="font-medium text-[#1B4332]">{selectedUserForActivation.division || 'Not specified'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#86868B] block">Section (Self-Reported):</span>
+                    <span className="font-normal text-[#1D1D1F]">{selectedUserForActivation.section || 'N/A'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#86868B] block">Position (Self-Reported):</span>
+                    <span className="font-normal text-[#1D1D1F]">{selectedUserForActivation.position || 'Not specified'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#86868B] block">Birthday:</span>
+                    <span className="font-normal text-[#1D1D1F]">{selectedUserForActivation.birthday || 'Not specified'}</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-[#86868B] block">Home Address:</span>
+                    <span className="font-normal text-[#1D1D1F] truncate block">{selectedUserForActivation.address || 'Not specified'}</span>
+                  </div>
                 </div>
               </div>
+
+              <form onSubmit={handleActivateSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">
+                      Position / Designation *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={activationPosition}
+                      onChange={(e) => setActivationPosition(e.target.value)}
+                      placeholder="e.g. Planning Officer I"
+                      className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">
+                      Assign Section / Unit *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={activationSection}
+                      onChange={(e) => setActivationSection(e.target.value)}
+                      placeholder="e.g. Planning Section"
+                      className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">
+                    System Role Assignment
+                  </label>
+                  <select
+                    value={activationRole}
+                    onChange={(e) => setActivationRole(e.target.value)}
+                    className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                  >
+                    <option value="EMPLOYEE">Employee (Standard Staff / Requester)</option>
+                    <option value="SECTION_CHIEF">Section Chief (Level 1 Signatory)</option>
+                    <option value="DIVISION_CHIEF">Division Chief (Level 2 Signatory)</option>
+                    <option value="HEAD_PENRO">Head of PENRO (Final Approver)</option>
+                    <option value="ACCOUNT_MANAGER">Account Manager (HR Administrator)</option>
+                  </select>
+                </div>
+
+                <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-[8px] text-[12px] text-emerald-900 flex items-start gap-2.5">
+                  <svg className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <p className="font-semibold text-emerald-900">Automated Credential Generation:</p>
+                    <p className="mt-0.5 text-emerald-800">
+                      Activating generates a standardized <strong>Username</strong> and <strong>Temporary Password</strong>, hashes them for security, and sends login details to <strong>{selectedUserForActivation.phoneNumber}</strong> (SMS) and <strong>{selectedUserForActivation.email}</strong> (Email).
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2 border-t border-[#E5E5E7]">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedUserForActivation(null)}
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={actionLoading}
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white disabled:opacity-50 cursor-pointer"
+                  >
+                    {actionLoading ? (
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Generating Account...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Activate & Generate Login</span>
+                        <span>→</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
             </div>
-
-            <form onSubmit={handleActivateSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Position / Designation *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={activationPosition}
-                    onChange={(e) => setActivationPosition(e.target.value)}
-                    placeholder="e.g. Planning Officer I"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-[#0F4C2E]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Assign Section / Unit *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={activationSection}
-                    onChange={(e) => setActivationSection(e.target.value)}
-                    placeholder="e.g. Planning Section"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-[#0F4C2E]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  System Role Assignment
-                </label>
-                <select
-                  value={activationRole}
-                  onChange={(e) => setActivationRole(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-[#0F4C2E]"
-                >
-                  <option value="EMPLOYEE">Employee (Standard Staff / Requester)</option>
-                  <option value="SECTION_CHIEF">Section Chief (Level 1 Signatory)</option>
-                  <option value="DIVISION_CHIEF">Division Chief (Level 2 Signatory)</option>
-                  <option value="HEAD_PENRO">Head of PENRO (Final Approver)</option>
-                  <option value="ACCOUNT_MANAGER">Account Manager (HR Administrator)</option>
-                </select>
-              </div>
-
-              <div className="p-3.5 bg-emerald-50 border border-emerald-200/90 rounded-2xl text-[11px] text-emerald-950 flex items-start gap-2.5">
-                <svg className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div>
-                  <p className="font-bold text-emerald-900">Automated Credential Generation:</p>
-                  <p className="mt-0.5 text-emerald-800">
-                    Activating generates a standardized <strong>Username</strong> and <strong>Temporary Password</strong>, hashes them for security, and sends login details to <strong>{selectedUserForActivation.phoneNumber}</strong> (SMS) and <strong>{selectedUserForActivation.email}</strong> (Email).
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2.5 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedUserForActivation(null)}
-                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={actionLoading}
-                  className="px-6 py-2.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold shadow-md disabled:opacity-50 flex items-center gap-2 cursor-pointer"
-                >
-                  {actionLoading ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Generating Account...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Activate & Generate Login</span>
-                      <span>→</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
 
       {/* Generated Credentials Confirmation Modal */}
       {generatedCredentialsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/75 backdrop-blur-md">
-          <div className="bg-white w-full max-w-lg rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 border border-slate-200 text-center animate-fade-in">
-            <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto shadow-sm">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-black text-slate-900">
-                Account Successfully Activated!
-              </h3>
-              <p className="text-xs text-slate-500 mt-1">
-                Official TOPS login credentials have been generated and dispatched.
-              </p>
-            </div>
-
-            {/* Generated Login Credentials Card */}
-            <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl text-left space-y-3.5">
-              <div className="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Employee</span>
-                <span className="text-xs font-extrabold text-slate-900">{generatedCredentialsModal.user.name}</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-lg border border-[#E5E5E7] rounded-[10px] shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white px-5 py-3.5 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 bg-white/15 text-white border border-white/20 rounded-[6px] flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                    System Username
-                  </span>
-                  <div className="p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-mono font-black text-[#0F4C2E]">
-                    @{generatedCredentialsModal.credentials.username}
+                  <h3 className="text-[14px] font-semibold text-white">
+                    Account Successfully Activated
+                  </h3>
+                  <p className="text-[12px] text-emerald-100/80">
+                    Official TOPS login credentials have been generated and dispatched.
+                  </p>
+                </div>
+              </div>
+              <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-800 text-emerald-100 border border-emerald-700 uppercase">
+                Active
+              </span>
+            </div>
+
+            <div className="p-5 space-y-4">
+              {/* Generated Login Credentials Card */}
+              <div className="p-4 bg-emerald-50/50 border border-emerald-200/80 rounded-[8px] text-left space-y-3.5">
+                <div className="flex items-center justify-between border-b border-[#E5E5E7] pb-2.5">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B]">Employee</span>
+                  <span className="text-[13px] font-semibold text-[#1D1D1F]">{generatedCredentialsModal.user.name}</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block mb-1">
+                      System Username
+                    </span>
+                    <div className="p-2.5 bg-white border border-[#E5E5E7] rounded-[6px] text-[13px] font-mono font-semibold text-[#1B4332]">
+                      @{generatedCredentialsModal.credentials.username}
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block mb-1">
+                      Temp Password
+                    </span>
+                    <div className="p-2.5 bg-white border border-[#E5E5E7] rounded-[6px] text-[13px] font-mono font-semibold text-[#1D1D1F]">
+                      {generatedCredentialsModal.credentials.tempPassword}
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                    Temp Password
-                  </span>
-                  <div className="p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-mono font-black text-slate-800">
-                    {generatedCredentialsModal.credentials.tempPassword}
+                <div className="grid grid-cols-2 gap-2 text-[12px] text-[#1D1D1F] pt-1">
+                  <div>
+                    <span className="text-[#86868B] block text-[11px]">Position:</span>
+                    <span className="font-medium text-[#1D1D1F]">{generatedCredentialsModal.user.position || 'Employee'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#86868B] block text-[11px]">Section:</span>
+                    <span className="font-medium text-[#1D1D1F]">{generatedCredentialsModal.user.section || 'Planning Section'}</span>
                   </div>
                 </div>
+
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-[6px] text-[12px] text-emerald-900 space-y-0.5">
+                  <div className="flex items-center gap-1.5 font-semibold text-emerald-800">
+                    <span>✓</span>
+                    <span>Dispatched via Semaphore SMS & Resend Email</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-700">
+                    Credentials sent to {generatedCredentialsModal.user.phoneNumber} and {generatedCredentialsModal.user.email}.
+                  </p>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 pt-1">
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Position:</span>
-                  <span className="font-semibold text-slate-800">{generatedCredentialsModal.user.position || 'Employee'}</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Section:</span>
-                  <span className="font-semibold text-slate-800">{generatedCredentialsModal.user.section || 'Planning Section'}</span>
-                </div>
+              {/* Modal Actions */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 pt-2 border-t border-[#E5E5E7]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const credText = `DENR TOPS Account Activated\nEmployee: ${generatedCredentialsModal.user.name}\nUsername: ${generatedCredentialsModal.credentials.username}\nPassword: ${generatedCredentialsModal.credentials.tempPassword}\nPosition: ${generatedCredentialsModal.user.position || 'Employee'}\nSection: ${generatedCredentialsModal.user.section || 'General'}`;
+                    navigator.clipboard.writeText(credText);
+                    setCopiedCredentials(true);
+                    setTimeout(() => setCopiedCredentials(false), 3000);
+                  }}
+                  className="w-full sm:w-auto h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-white border border-[#E5E5E7] text-[#1D1D1F] hover:bg-[#F2F2F7] cursor-pointer"
+                >
+                  <svg className="w-4 h-4 text-[#1B4332]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  <span>{copiedCredentials ? '✓ Copied to Clipboard!' : 'Copy Credentials'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setGeneratedCredentialsModal(null)}
+                  className="w-full sm:w-auto h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white cursor-pointer"
+                >
+                  Done
+                </button>
               </div>
-
-              <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-xl text-[11px] text-emerald-900 space-y-1">
-                <div className="flex items-center gap-1.5 font-bold">
-                  <span>✓</span>
-                  <span>Dispatched via Semaphore SMS & Resend Email</span>
-                </div>
-                <p className="text-[10px] text-emerald-700">
-                  Credentials sent to {generatedCredentialsModal.user.phoneNumber} and {generatedCredentialsModal.user.email}.
-                </p>
-              </div>
-            </div>
-
-            {/* Modal Actions */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  const credText = `DENR TOPS Account Activated\nEmployee: ${generatedCredentialsModal.user.name}\nUsername: ${generatedCredentialsModal.credentials.username}\nPassword: ${generatedCredentialsModal.credentials.tempPassword}\nPosition: ${generatedCredentialsModal.user.position || 'Employee'}\nSection: ${generatedCredentialsModal.user.section || 'General'}`;
-                  navigator.clipboard.writeText(credText);
-                  setCopiedCredentials(true);
-                  setTimeout(() => setCopiedCredentials(false), 3000);
-                }}
-                className="w-full sm:w-auto px-5 py-2.5 bg-white border border-[#0F4C2E] text-[#0F4C2E] hover:bg-emerald-50 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                <span>{copiedCredentials ? '✓ Copied to Clipboard!' : 'Copy Credentials'}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setGeneratedCredentialsModal(null)}
-                className="w-full sm:w-auto px-7 py-2.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer"
-              >
-                Done
-              </button>
             </div>
           </div>
         </div>
@@ -2871,42 +2914,45 @@ function AccountManagerContent() {
 
       {/* Password Reset Modal */}
       {resetUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md border border-[#E5E5E7] rounded-[10px] shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white px-5 py-3.5 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-slate-900">Reset Password: {resetUser.name}</h3>
-                <p className="text-xs text-slate-500">{resetUser.email}</p>
+                <h3 className="text-[14px] font-semibold text-white">Reset Password: {resetUser.name}</h3>
+                <p className="text-[12px] text-emerald-100/80">{resetUser.email}</p>
               </div>
-              <button onClick={() => setResetUser(null)} className="text-slate-400 hover:text-slate-900 font-bold">
+              <button
+                onClick={() => setResetUser(null)}
+                className="w-7 h-7 rounded-[6px] hover:bg-white/10 text-emerald-100 hover:text-white flex items-center justify-center font-semibold text-xs transition-colors cursor-pointer"
+              >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handlePasswordReset} className="space-y-4">
+            <form onSubmit={handlePasswordReset} className="p-5 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">New Password</label>
+                <label className="block text-[12px] font-medium text-[#1D1D1F] mb-1">New Password</label>
                 <input
                   type="text"
                   required
                   value={customPassword}
                   onChange={(e) => setCustomPassword(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs outline-none font-mono focus:ring-2 focus:ring-[#0F4C2E]"
+                  className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] font-mono bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex justify-end gap-2 pt-2 border-t border-[#E5E5E7]">
                 <button
                   type="button"
                   onClick={() => setResetUser(null)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold"
+                  className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-5 py-2 bg-[#0F4C2E] hover:bg-[#165E3A] text-white rounded-xl text-xs font-bold shadow-md disabled:opacity-50"
+                  className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white disabled:opacity-50"
                 >
                   {actionLoading ? 'Resetting...' : 'Confirm Reset'}
                 </button>
@@ -2918,19 +2964,19 @@ function AccountManagerContent() {
 
       {/* ── Official E-Signature Management Modal ──────────────────────── */}
       {signatureModalUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-[10px] max-w-lg w-full shadow-2xl border border-[#E5E5E7] overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-4 bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white flex items-center justify-between">
+            <div className="px-5 py-3.5 bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
-                  <svg className="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 rounded-[6px] bg-white/15 flex items-center justify-center border border-white/20 text-white">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold tracking-tight">Official E-Signature Management</h3>
-                  <p className="text-[11px] text-emerald-100/80">Affix or update digital signature for TOPS authentication</p>
+                  <h3 className="text-[14px] font-semibold text-white">Official E-Signature Management</h3>
+                  <p className="text-[12px] text-emerald-100/80">Affix or update digital signature for TOPS authentication</p>
                 </div>
               </div>
               <button
@@ -2940,42 +2986,42 @@ function AccountManagerContent() {
                     setSignatureDataInput(null);
                   }
                 }}
-                className="text-white/70 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-[6px] text-emerald-100 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
             {/* Body */}
-            <div className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+            <div className="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
               {/* User Card */}
-              <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between">
+              <div className="p-3.5 bg-[#F5F5F7] border border-[#E5E5E7] rounded-[8px] flex items-center justify-between gap-2">
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900">{signatureModalUser.name}</h4>
-                  <p className="text-xs text-slate-500 font-mono">@{signatureModalUser.username} &bull; {signatureModalUser.email}</p>
-                  <p className="text-[11px] text-slate-600 mt-0.5 font-medium">
+                  <h4 className="text-[14px] font-semibold text-[#1D1D1F]">{signatureModalUser.name}</h4>
+                  <p className="text-[12px] text-[#86868B] font-mono">@{signatureModalUser.username} &bull; {signatureModalUser.email}</p>
+                  <p className="text-[12px] text-[#86868B] mt-0.5">
                     {signatureModalUser.position || 'Personnel'} &bull; {signatureModalUser.section ? `${signatureModalUser.section}, ` : ''}{signatureModalUser.division || 'General Office'}
                   </p>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200">
+                <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
                   {roleDisplayNames[signatureModalUser.role] || signatureModalUser.role}
                 </span>
               </div>
 
               {/* Existing Signature Preview (if on file) */}
               {signatureModalUser.signatureUrl && (
-                <div className="p-3 bg-emerald-50/50 border border-emerald-200/80 rounded-xl space-y-2">
+                <div className="p-3.5 bg-[#F5F5F7] border border-[#E5E5E7] rounded-[8px] space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-emerald-900 uppercase tracking-wider">
+                    <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">
                       Current Signature on File
                     </span>
-                    <span className="text-[10px] text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full font-semibold">
+                    <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">
                       Active
                     </span>
                   </div>
-                  <div className="h-20 bg-white rounded-lg border border-emerald-200 flex items-center justify-center p-2 shadow-2xs">
+                  <div className="h-20 bg-white rounded-[6px] border border-[#E5E5E7] flex items-center justify-center p-2 shadow-2xs">
                     <img
                       src={
                         signatureModalUser.signatureUrl.startsWith('data:')
@@ -2989,7 +3035,7 @@ function AccountManagerContent() {
                       }}
                     />
                   </div>
-                  <p className="text-[10px] text-slate-500 italic text-center">
+                  <p className="text-[12px] text-[#86868B] text-center">
                     Sign below using stylus pen, board, or mouse to replace this existing signature.
                   </p>
                 </div>
@@ -3006,13 +3052,13 @@ function AccountManagerContent() {
               </div>
 
               {/* Legal Notice */}
-              <p className="text-[10px] text-slate-500 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+              <p className="text-[12px] text-[#86868B] leading-relaxed bg-[#F5F5F7] p-3 rounded-[6px] border border-[#E5E5E7]">
                 Pursuant to RA 8792 (Electronic Commerce Act), this electronic signature serves as official legal authentication for Travel Order processing, endorsements, and approvals within DENR-PENRO.
               </p>
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2.5">
+            <div className="px-5 py-3.5 bg-[#F5F5F7] border-t border-[#E5E5E7] flex items-center justify-end gap-2">
               <button
                 type="button"
                 disabled={signatureSaving}
@@ -3020,7 +3066,7 @@ function AccountManagerContent() {
                   setSignatureModalUser(null);
                   setSignatureDataInput(null);
                 }}
-                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-white hover:bg-slate-100 border border-slate-300 rounded-xl transition-all cursor-pointer disabled:opacity-50"
+                className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors text-[#1D1D1F] bg-white hover:bg-[#F2F2F7] border border-[#E5E5E7] cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -3028,7 +3074,7 @@ function AccountManagerContent() {
                 type="button"
                 disabled={signatureSaving || !signatureDataInput}
                 onClick={handleSaveSignature}
-                className="px-5 py-2 text-xs font-bold text-white bg-[#0F4C2E] hover:bg-[#165E3A] rounded-xl shadow-sm transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors text-white bg-[#1B4332] hover:bg-[#143225] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {signatureSaving ? (
                   <>
@@ -3057,7 +3103,7 @@ function AccountManagerContent() {
 
 export default function AccountManagerPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading Account Management Portal...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-[13px] text-[#86868B]">Loading Account Management Portal...</div>}>
       <AccountManagerContent />
     </Suspense>
   );

@@ -120,12 +120,12 @@ export default function AdminDestinationMap({
       const marker = L.marker([item.lat, item.lng], { icon: customIcon });
 
       const popupContent = `
-        <div style="font-family: Inter, sans-serif; padding: 2px; min-width: 190px;">
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif; padding: 2px; min-width: 190px;">
           <div style="font-weight: 600; font-size: 11px; color: #1B4332; font-family: monospace;">${item.trackingNumber}</div>
-          <div style="font-weight: 600; font-size: 13px; color: #0f172a; margin-top: 2px;">${item.destination}</div>
-          <div style="font-size: 11px; color: #475569; margin-top: 2px;">${item.employeeName}</div>
-          <div style="font-size: 10px; color: #64748b; margin-top: 2px;">${new Date(item.startDate).toLocaleDateString()} – ${new Date(item.endDate).toLocaleDateString()}</div>
-          <div style="margin-top: 5px; display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; background-color: ${isApproved ? '#d1fae5' : '#fef3c7'}; color: ${isApproved ? '#065f46' : '#92400e'}; border: 1px solid ${isApproved ? '#a7f3d0' : '#fde68a'};">
+          <div style="font-weight: 600; font-size: 13px; color: #1D1D1F; margin-top: 2px;">${item.destination}</div>
+          <div style="font-size: 11px; color: #86868B; margin-top: 2px;">${item.employeeName}</div>
+          <div style="font-size: 10px; color: #86868B; margin-top: 2px;">${new Date(item.startDate).toLocaleDateString()} – ${new Date(item.endDate).toLocaleDateString()}</div>
+          <div style="margin-top: 5px; display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; background-color: ${isApproved ? '#ecfdf5' : '#fffbeb'}; color: ${isApproved ? '#047857' : '#b45309'}; border: 1px solid ${isApproved ? '#a7f3d0' : '#fde68a'};">
             ${item.status.replace(/_/g, ' ')}
           </div>
         </div>
@@ -147,7 +147,7 @@ export default function AdminDestinationMap({
   }, [items, onSelectItem]);
 
   return (
-    <div className="relative w-full h-[540px] rounded-lg overflow-hidden border border-slate-200 z-0">
+    <div className="relative w-full h-[540px] rounded-[8px] overflow-hidden border border-[#E5E5E7] z-0">
       <div ref={mapContainerRef} className="w-full h-full" />
     </div>
   );

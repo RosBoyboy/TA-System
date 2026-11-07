@@ -7,9 +7,9 @@ export type { TAMapItem } from './AdminDestinationMap';
 const AdminDestinationMap = dynamic(() => import('./AdminDestinationMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[580px] rounded-2xl bg-slate-100 animate-pulse border border-slate-200 flex flex-col items-center justify-center text-slate-500 gap-3">
-      <div className="w-10 h-10 border-4 border-[#0F4C2E] border-t-transparent rounded-full animate-spin" />
-      <span className="text-xs font-bold text-slate-600">Loading Interactive Regional TA Destination Map...</span>
+    <div className="w-full h-[580px] rounded-[8px] bg-[#F5F5F7] animate-pulse border border-[#E5E5E7] flex flex-col items-center justify-center text-[#86868B] gap-2.5">
+      <div className="w-7 h-7 border-2 border-[#1B4332] border-t-transparent rounded-full animate-spin" />
+      <span className="text-[12px] font-medium text-[#86868B]">Loading Interactive Regional TA Destination Map...</span>
     </div>
   ),
 });

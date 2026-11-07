@@ -181,30 +181,32 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
 
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm">
-      <div className="flex w-full max-w-4xl max-h-[90dvh] min-h-0 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl border border-slate-200 my-4 mx-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs">
+      <div className="flex w-full max-w-4xl max-h-[90dvh] min-h-0 flex-col overflow-hidden rounded-[10px] bg-white shadow-2xl border border-[#E5E5E7] my-4 mx-auto">
 
-        {/* â”€â”€ Top Control Bar â”€â”€ */}
-        <div className="z-10 shrink-0 bg-slate-900 text-white px-6 py-3.5 flex items-center justify-between gap-4">
+        {/* Top Control Bar */}
+        <div className="z-10 shrink-0 bg-slate-900 text-white px-5 h-[52px] border-b border-slate-800 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
-            <svg className="w-5 h-5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
+            <div className="w-7 h-7 rounded-[6px] bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+              <h3 className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400 leading-tight">
                 Official Travel Order (Approved)
               </h3>
-              <p className="text-sm font-extrabold text-white font-mono">{trackingNo}</p>
+              <p className="text-[13px] font-bold text-white font-mono leading-tight">{trackingNo}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-md"
+              className="h-8 px-[14px] rounded-[6px] bg-emerald-600 hover:bg-emerald-500 text-white text-[13px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
               title="Print document or save as PDF"
             >
-              <svg className="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
               </svg>
               <span>Print / Save PDF</span>
@@ -212,7 +214,7 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
 
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer ml-1"
+              className="w-8 h-8 text-slate-400 hover:text-white hover:bg-slate-800 rounded-[6px] flex items-center justify-center transition-colors cursor-pointer"
               title="Close"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,8 +224,8 @@ export default function TravelOrderModal({ isOpen, onClose, request }: TravelOrd
           </div>
         </div>
 
-        {/* â”€â”€ Document Sheet Preview â”€â”€ */}
-        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain bg-slate-100/70 p-6 sm:p-8 flex flex-col items-center">
+        {/* Document Sheet Preview */}
+        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain bg-slate-100/80 p-6 sm:p-8 flex flex-col items-center">
           <div
             ref={printAreaRef}
             id="tops-to-print-area"

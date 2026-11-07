@@ -6,9 +6,9 @@ import React from 'react';
 const MapPicker = dynamic(() => import('./MapPicker'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-80 sm:h-96 lg:h-[420px] rounded-2xl bg-slate-100 animate-pulse border border-slate-200 flex flex-col items-center justify-center text-slate-500 gap-2">
-      <div className="w-8 h-8 border-3 border-[#1B4332] border-t-transparent rounded-full animate-spin" />
-      <span className="text-xs font-semibold">Loading Interactive Leaflet Map...</span>
+    <div className="w-full h-80 sm:h-96 lg:h-[420px] rounded-[8px] bg-[#F5F5F7] animate-pulse border border-[#E5E5E7] flex flex-col items-center justify-center text-[#86868B] gap-2">
+      <div className="w-7 h-7 border-2 border-[#1B4332] border-t-transparent rounded-full animate-spin" />
+      <span className="text-[12px] font-medium text-[#86868B]">Loading Interactive Leaflet Map...</span>
     </div>
   ),
 });

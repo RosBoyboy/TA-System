@@ -291,28 +291,28 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
 
   const modalContent = (
     <div
-      className="fixed inset-0 overflow-y-auto bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 overflow-y-auto bg-emerald-950/65 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6"
       style={{ zIndex: 99999 }}
     >
       <div className="fixed inset-0" onClick={onClose} />
 
       <div
-        className="relative bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]"
+        className="relative bg-white rounded-[10px] max-w-2xl w-full shadow-2xl border border-[#E5E5E7] overflow-hidden flex flex-col max-h-[90vh]"
         style={{ zIndex: 100000 }}
       >
         {/* Top Header Banner */}
-        <div className="bg-[#1B4332] px-6 sm:px-8 py-5 text-white flex items-center justify-between relative shrink-0 border-b border-emerald-900">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-emerald-300">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-[#1B4332] px-6 h-[52px] text-white flex items-center justify-between relative shrink-0 border-b border-emerald-900">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-[6px] bg-white/10 border border-white/20 flex items-center justify-center text-emerald-300">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-black tracking-tight text-white flex items-center gap-2">
+              <h3 className="text-[14px] font-bold tracking-tight text-white leading-tight">
                 DENR-PENRO TOPS Account
               </h3>
-              <p className="text-xs text-emerald-200/90 font-medium">Manage your profile, position, and contact details</p>
+              <p className="text-[11px] text-emerald-200/90">Manage your profile, position, and contact details</p>
             </div>
           </div>
 
@@ -320,18 +320,18 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
             type="button"
             onClick={onClose}
             aria-label="Close profile management"
-            className="w-8 h-8 rounded-full bg-black/20 hover:bg-black/40 text-emerald-100 flex items-center justify-center transition-all cursor-pointer"
+            className="w-7 h-7 rounded-[6px] bg-black/20 hover:bg-black/40 text-emerald-100 flex items-center justify-center transition-colors cursor-pointer"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Profile Identity Card (Google Style) */}
-        <div className="bg-slate-50 border-b border-slate-200/80 px-6 sm:px-8 py-5 flex flex-col sm:flex-row items-center sm:items-start gap-5 shrink-0">
+        {/* Profile Identity Card */}
+        <div className="bg-slate-50 border-b border-[#E5E5E7] px-6 py-4 flex flex-col sm:flex-row items-center sm:items-start gap-4 shrink-0">
           <div className="relative group shrink-0">
-            <div className="w-20 h-20 rounded-full overflow-hidden border-3 border-emerald-600/30 shadow-md bg-[#C8E6C9] flex items-center justify-center text-[#1B4332] font-black text-2xl">
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-emerald-600/30 shadow-xs bg-[#C8E6C9] flex items-center justify-center text-[#1B4332] font-bold text-xl">
               {profileImage ? (
                 <img src={profileImage} alt={name || 'Profile'} className="w-full h-full object-cover" />
               ) : (
@@ -342,10 +342,10 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="absolute inset-0 rounded-full bg-slate-900/60 text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-[10px] font-bold"
+              className="absolute inset-0 rounded-full bg-black/60 text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-[10px] font-semibold"
               title="Upload new profile picture"
             >
-              <svg className="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -363,35 +363,35 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
 
           <div className="flex-1 text-center sm:text-left space-y-1 min-w-0">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-              <h4 className="text-lg font-black text-slate-900 truncate">{name || 'User Profile'}</h4>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+              <h4 className="text-[16px] font-bold text-[#1D1D1F] truncate">{name || 'User Profile'}</h4>
+              <span className="inline-flex items-center h-5 px-2 rounded-[4px] text-[10px] font-semibold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
                 {roleDisplayNames[userRole] || userRole.replace(/_/g, ' ')}
               </span>
               {username && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-200 text-slate-700 border border-slate-300">
+                <span className="inline-flex items-center h-5 px-2 rounded-[4px] text-[10px] font-mono font-semibold bg-[#F5F5F7] text-[#1D1D1F] border border-[#E5E5E7]">
                   @{username}
                 </span>
               )}
             </div>
             
-            <p className="text-xs text-slate-600 font-medium flex items-center justify-center sm:justify-start gap-1.5 truncate">
-              <svg className="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <p className="text-[12px] text-[#86868B] flex items-center justify-center sm:justify-start gap-1.5 truncate">
+              <svg className="w-3.5 h-3.5 text-[#86868B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               <span>{email || 'No email set'}</span>
             </p>
 
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-0.5 text-[11px] text-slate-500">
-              <span className="flex items-center gap-1 font-semibold text-slate-700">
-                <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 pt-0.5 text-[11px] text-[#86868B]">
+              <span className="flex items-center gap-1 font-medium text-[#1D1D1F]">
+                <svg className="w-3.5 h-3.5 text-[#1B4332]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
                 {phoneNumber ? phoneNumber : 'No mobile registered'}
               </span>
               <span>&bull;</span>
-              <span className="font-semibold text-slate-700">{position || 'Position not set'}</span>
+              <span className="font-medium text-[#1D1D1F]">{position || 'Position not set'}</span>
               <span>&bull;</span>
-              <span className="font-semibold text-slate-600">
+              <span className="font-medium text-[#86868B]">
                 {isHeadPenro
                   ? 'PENRO Executive Office'
                   : section ? `${section}${division ? ` • ${division}` : ''}` : division || 'PENRO General Office'}
@@ -403,7 +403,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                 <button
                   type="button"
                   onClick={handleRemovePhoto}
-                  className="text-[11px] text-rose-600 hover:text-rose-700 font-bold hover:underline cursor-pointer"
+                  className="text-[11px] text-red-600 hover:text-red-700 font-semibold hover:underline cursor-pointer"
                 >
                   Remove custom photo
                 </button>
@@ -413,17 +413,17 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-slate-200 px-6 sm:px-8 bg-white shrink-0">
+        <div className="flex border-b border-[#E5E5E7] px-6 bg-[#F5F5F7] shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab('info')}
-            className={`py-3.5 px-4 font-bold text-xs sm:text-sm border-b-2 transition-all cursor-pointer flex items-center gap-2 ${
+            className={`py-2.5 px-3 font-semibold text-[12px] border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'info'
-                ? 'border-[#0F4C2E] text-[#0F4C2E]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-[#1B4332] text-[#1B4332]'
+                : 'border-transparent text-[#86868B] hover:text-[#1D1D1F]'
             }`}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
             <span>Personal & Contact Info</span>
@@ -432,13 +432,13 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
           <button
             type="button"
             onClick={() => setActiveTab('security')}
-            className={`py-3.5 px-4 font-bold text-xs sm:text-sm border-b-2 transition-all cursor-pointer flex items-center gap-2 ${
+            className={`py-2.5 px-3 font-semibold text-[12px] border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'security'
-                ? 'border-[#0F4C2E] text-[#0F4C2E]'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-[#1B4332] text-[#1B4332]'
+                : 'border-transparent text-[#86868B] hover:text-[#1D1D1F]'
             }`}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
             <span>Security & Password</span>
@@ -446,10 +446,10 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
         </div>
 
         {/* Scrollable Form Content */}
-        <form onSubmit={handleSaveProfile} className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-5 bg-white">
+        <form onSubmit={handleSaveProfile} className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
           {errorMsg && (
-            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-start gap-2.5">
-              <svg className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="p-3 rounded-[6px] bg-red-50 border border-red-200 text-red-700 text-[12px] font-medium flex items-start gap-2">
+              <svg className="w-4 h-4 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>{errorMsg}</span>
@@ -457,7 +457,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
           )}
 
           {successMsg && (
-            <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-start gap-2.5">
+            <div className="p-3 rounded-[6px] bg-emerald-50 border border-emerald-200 text-emerald-700 text-[12px] font-medium flex items-start gap-2">
               <svg className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>
@@ -467,11 +467,11 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
 
           {/* TAB 1: PERSONAL & CONTACT INFO */}
           {activeTab === 'info' && (
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               {/* Username & Full Name in 2 columns */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
                     System Username
                   </label>
                   <div className="relative">
@@ -480,18 +480,18 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                       value={username ? `@${username}` : '@unassigned'}
                       readOnly
                       disabled
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-mono font-bold text-slate-700 bg-slate-100/80 cursor-not-allowed"
+                      className="w-full h-8 px-2.5 rounded-[6px] border border-[#E5E5E7] text-[13px] font-mono font-medium text-[#86868B] bg-[#F5F5F7] cursor-not-allowed"
                     />
-                    <span className="absolute right-3 top-2.5 text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-0.5 rounded">
+                    <span className="absolute right-2 top-1.5 text-[10px] font-semibold bg-[#E5E5E7] text-[#86868B] px-1.5 py-0.5 rounded-[4px]">
                       Locked
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-1">Permanent login username assigned by HR.</p>
+                  <p className="text-[11px] text-[#86868B] mt-1">Permanent login username assigned by HR.</p>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Full Name <span className="text-rose-500">*</span>
+                  <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
+                    Full Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -499,16 +499,16 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Juan Dela Cruz"
                     required
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
+                    className="w-full h-8 px-2.5 rounded-[6px] border border-[#E5E5E7] text-[13px] text-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] transition-colors bg-white"
                   />
                 </div>
               </div>
 
               {/* Notification Channels: Email & Phone Number */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Notification Email <span className="text-rose-500">*</span>
+                  <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
+                    Notification Email <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -516,13 +516,13 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@gmail.com / denr.gov.ph"
                     required
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
+                    className="w-full h-8 px-2.5 rounded-[6px] border border-[#E5E5E7] text-[13px] text-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] transition-colors bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Mobile / SMS Number <span className="text-rose-500">*</span>
+                  <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
+                    Mobile / SMS Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -530,15 +530,15 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="09171234567"
                     required
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white font-mono"
+                    className="w-full h-8 px-2.5 rounded-[6px] border border-[#E5E5E7] text-[13px] text-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] transition-colors bg-white font-mono"
                   />
                 </div>
               </div>
 
               {/* Position */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Position <span className="text-slate-400 font-normal">(Editable)</span>
+                <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
+                  Position <span className="text-[#86868B] font-normal">(Editable)</span>
                 </label>
                 <input
                   type="text"
@@ -552,30 +552,30 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                     }
                   }}
                   placeholder={isHeadPenro ? 'e.g. Provincial Environment and Natural Resources Officer' : 'e.g. Administrative Officer V'}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
+                  className="w-full h-8 px-2.5 rounded-[6px] border border-[#E5E5E7] text-[13px] text-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] transition-colors bg-white"
                 />
-                <p className="text-[10px] text-slate-400 mt-1">
+                <p className="text-[11px] text-[#86868B] mt-1">
                   {isHeadPenro ? 'Official designation appearing on Travel Order approvals.' : 'Auto-fills in Step 2 when selected.'}
                 </p>
               </div>
 
               {/* Division & Section as Separate Fields (Not applicable for Head of PENRO) */}
               {isHeadPenro ? (
-                <div className="p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl text-xs text-emerald-950 flex items-start gap-2.5">
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-[6px] text-[12px] text-emerald-900 flex items-start gap-2.5">
                   <svg className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                   <div>
-                    <span className="font-bold text-emerald-900 block">PENRO Executive Office (Head of Office)</span>
+                    <span className="font-semibold text-emerald-900 block">PENRO Executive Office (Head of Office)</span>
                     <span className="text-[11px] text-emerald-800 leading-relaxed block mt-0.5">
                       As the Head of PENRO and final approving authority, your mandate oversees all operations across both Management Services Division and Technical Services Division. Division and Section assignments are not applicable.
                     </span>
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
                       Division
                     </label>
                     <select
@@ -591,7 +591,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                           setSection('');
                         }
                       }}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
+                      className="w-full h-8 px-2.5 rounded-[6px] border border-[#E5E5E7] text-[13px] text-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] transition-colors bg-white"
                     >
                       <option value="">Select Division</option>
                       <option value="Management Services Division">Management Services Division</option>
@@ -600,13 +600,13 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
                       Section
                     </label>
                     <select
                       value={section}
                       onChange={(e) => setSection(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
+                      className="w-full h-8 px-2.5 rounded-[6px] border border-[#E5E5E7] text-[13px] text-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] transition-colors bg-white"
                     >
                       <option value="">Select Section</option>
                       {division === 'Management Services Division' ? (
@@ -635,21 +635,21 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
               )}
 
               {/* Birthday & Address */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
                     Birthday
                   </label>
                   <input
                     type="date"
                     value={birthday}
                     onChange={(e) => setBirthday(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
+                    className="w-full h-8 px-2.5 rounded-[6px] border border-[#E5E5E7] text-[13px] text-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] transition-colors bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
                     Home Address
                   </label>
                   <input
@@ -657,7 +657,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     placeholder="e.g. Brgy. Libertad, Butuan City"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
+                    className="w-full h-8 px-2.5 rounded-[6px] border border-[#E5E5E7] text-[13px] text-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] transition-colors bg-white"
                   />
                 </div>
               </div>
@@ -666,8 +666,8 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
 
           {/* TAB 2: SECURITY & PASSWORD */}
           {activeTab === 'security' && (
-            <div className="space-y-4">
-              <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-medium flex items-start gap-2.5">
+            <div className="space-y-3.5">
+              <div className="p-3 rounded-[6px] bg-amber-50 border border-amber-200 text-amber-800 text-[12px] font-medium flex items-start gap-2">
                 <svg className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -675,7 +675,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
                   Current Password
                 </label>
                 <input
@@ -683,13 +683,13 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="Enter your current password"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
+                  className="w-full h-8 px-2.5 rounded-[6px] border border-[#E5E5E7] text-[13px] text-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] transition-colors bg-white"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
                     New Password
                   </label>
                   <input
@@ -697,12 +697,12 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="At least 6 characters"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
+                    className="w-full h-8 px-2.5 rounded-[6px] border border-[#E5E5E7] text-[13px] text-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] transition-colors bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
                     Confirm New Password
                   </label>
                   <input
@@ -710,7 +710,7 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repeat new password"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition-all bg-slate-50/50 hover:bg-white"
+                    className="w-full h-8 px-2.5 rounded-[6px] border border-[#E5E5E7] text-[13px] text-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] transition-colors bg-white"
                   />
                 </div>
               </div>
@@ -721,9 +721,9 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
                   id="showPasswordCheck"
                   checked={showPassword}
                   onChange={(e) => setShowPassword(e.target.checked)}
-                  className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+                  className="w-4 h-4 text-[#1B4332] rounded-[4px] border-[#E5E5E7] focus:ring-[#1B4332] cursor-pointer"
                 />
-                <label htmlFor="showPasswordCheck" className="text-xs font-semibold text-slate-600 cursor-pointer">
+                <label htmlFor="showPasswordCheck" className="text-[12px] font-medium text-[#1D1D1F] cursor-pointer">
                   Show passwords in plain text
                 </label>
               </div>
@@ -731,23 +731,23 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
           )}
 
           {/* Modal Footer Controls */}
-          <div className="pt-4 border-t border-slate-200 flex items-center justify-between gap-3">
+          <div className="pt-4 border-t border-[#E5E5E7] flex items-center justify-between gap-3">
             <button
               type="button"
               onClick={() => signOut({ callbackUrl: '/login' })}
-              className="px-4 py-2.5 rounded-xl border border-rose-200 text-rose-700 hover:bg-rose-50 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+              className="h-8 px-[14px] rounded-[6px] border border-red-200 text-red-700 hover:bg-red-50 text-[13px] font-medium transition-colors cursor-pointer inline-flex items-center gap-1.5"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
               <span>Sign Out</span>
             </button>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer"
+                className="h-8 px-[14px] rounded-[6px] border border-[#E5E5E7] text-[#1D1D1F] hover:bg-[#F2F2F7] text-[13px] font-medium transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -755,16 +755,16 @@ export default function ProfileModal({ isOpen, onClose, onProfileUpdated }: Prof
               <button
                 type="submit"
                 disabled={loading || fetching}
-                className="px-6 py-2.5 rounded-xl bg-[#1B4332] hover:bg-[#0F4C2E] text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50"
+                className="h-8 px-[14px] rounded-[6px] bg-[#1B4332] hover:bg-[#143225] text-white text-[13px] font-medium transition-colors cursor-pointer inline-flex items-center gap-1.5 disabled:opacity-50"
               >
                 {loading ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Saving...</span>
                   </>
                 ) : (
                   <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span>Save Changes</span>

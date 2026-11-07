@@ -96,7 +96,7 @@ export default function MapPicker({
   }, [locationName]);
 
   return (
-    <div className="w-full h-80 sm:h-96 lg:h-[420px] rounded-2xl overflow-hidden border border-slate-200 shadow-inner relative z-0">
+    <div className="w-full h-80 sm:h-96 lg:h-[420px] rounded-[8px] overflow-hidden border border-[#E5E5E7] relative z-0">
       <div ref={mapContainerRef} className="w-full h-full" />
     </div>
   );

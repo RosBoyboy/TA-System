@@ -149,14 +149,14 @@ function SingleToastCard({
     <div
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="pointer-events-auto w-full max-w-sm bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/90 overflow-hidden transition-all duration-300 transform hover:scale-[1.01] hover:shadow-2xl flex flex-col group relative"
+      className="pointer-events-auto w-full max-w-sm bg-[#FFFFFF]/95 backdrop-blur-md rounded-[8px] shadow-lg border border-[#E5E5E7] overflow-hidden transition-colors flex flex-col group relative"
     >
-      {/* Progress Bar (Smooth CSS animation that pauses on hover) */}
-      <div className="h-1 bg-slate-100 w-full overflow-hidden">
+      {/* Progress Bar */}
+      <div className="h-0.5 bg-[#F5F5F7] w-full overflow-hidden">
         <div
-          className={`h-full origin-left transition-all ${
+          className={`h-full origin-left ${
             category.theme === 'emerald'
-              ? 'bg-[#0B5A3A]'
+              ? 'bg-[#1B4332]'
               : category.theme === 'rose'
               ? 'bg-rose-500'
               : category.theme === 'sky'
@@ -170,51 +170,49 @@ function SingleToastCard({
         />
       </div>
 
-      <div className="p-3.5 sm:p-4 flex items-start gap-3">
+      <div className="p-3 flex items-start gap-2.5">
         {/* Category Icon Badge */}
         <div
-          className={`w-8 h-8 rounded-xl ${category.badgeBg} flex items-center justify-center shrink-0 shadow-sm`}
+          className={`w-7 h-7 rounded-[6px] ${category.badgeBg} flex items-center justify-center shrink-0`}
         >
           {category.icon}
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 min-w-0 pr-6">
+        <div className="flex-1 min-w-0 pr-5">
           <div className="flex items-center gap-2 flex-wrap">
             <span
-              className={`text-[9px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded-md ${
+              className={`h-5 inline-flex items-center text-[10px] font-semibold uppercase tracking-wider px-2 rounded-[4px] ${
                 category.theme === 'emerald'
-                  ? 'bg-emerald-100 text-emerald-800'
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
                   : category.theme === 'rose'
-                  ? 'bg-rose-100 text-rose-800'
+                  ? 'bg-rose-50 text-rose-700 border border-rose-200/80'
                   : category.theme === 'sky'
-                  ? 'bg-sky-100 text-sky-800'
-                  : 'bg-amber-100 text-amber-800'
+                  ? 'bg-sky-50 text-sky-700 border border-sky-200/80'
+                  : 'bg-amber-50 text-amber-700 border border-amber-200/80'
               }`}
             >
               {category.tag}
             </span>
-            <span className="text-[10px] text-slate-400 font-medium">
+            <span className="text-[10px] text-[#86868B] font-normal">
               {formatShortRelativeTime(item.createdAt)}
             </span>
           </div>
 
-          <h4 className="text-xs font-bold text-slate-900 mt-1 leading-snug truncate">
+          <h4 className="text-[12px] font-semibold text-[#1D1D1F] mt-1 leading-snug truncate">
             {item.title}
           </h4>
 
-          {/* Brief Content - Truncated snippet */}
-          <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-2 leading-relaxed">
+          <p className="text-[11px] text-[#86868B] mt-0.5 line-clamp-2 leading-snug">
             {item.message}
           </p>
 
-          {/* Action Row */}
           {onView && (
-            <div className="mt-2 flex items-center justify-end">
+            <div className="mt-1.5 flex items-center justify-end">
               <button
                 type="button"
                 onClick={() => onView(item)}
-                className="text-[10px] font-bold text-[#0B5A3A] hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+                className="text-[11px] font-medium text-[#1B4332] hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <span>View Request</span>
                 <span>→</span>
@@ -228,10 +226,10 @@ function SingleToastCard({
           type="button"
           onClick={() => onDismiss(item.id)}
           aria-label="Dismiss notification"
-          className="absolute top-3 right-3 text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-1 rounded-lg transition-colors cursor-pointer"
+          className="absolute top-2.5 right-2.5 text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] p-1 rounded-[4px] transition-colors cursor-pointer"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
@@ -251,20 +249,20 @@ export default function NotificationToastStack({
     <div
       aria-live="polite"
       aria-atomic="false"
-      className="fixed top-20 right-4 sm:right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none transition-all"
+      className="fixed top-16 right-4 sm:right-6 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"
     >
       {/* Top Header if Multiple Popups Stacked */}
       {popups.length > 1 && (
-        <div className="pointer-events-auto flex items-center justify-between px-3 py-1.5 bg-slate-900/80 backdrop-blur-md rounded-xl text-white text-[10px] font-bold shadow-lg animate-fade-in mb-0.5">
+        <div className="pointer-events-auto flex items-center justify-between px-3 py-1.5 bg-[#1D1D1F]/90 backdrop-blur-md rounded-[6px] text-white text-[11px] font-medium shadow-md mb-0.5">
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
             <span>{popups.length} New Notifications</span>
           </div>
           {onDismissAll && (
             <button
               type="button"
               onClick={onDismissAll}
-              className="text-slate-300 hover:text-white underline cursor-pointer"
+              className="text-[#A1A1A6] hover:text-white underline cursor-pointer"
             >
               Dismiss All
             </button>

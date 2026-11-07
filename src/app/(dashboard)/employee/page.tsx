@@ -123,11 +123,11 @@ function DualMonthCalendarPicker({
         cellDate > depObj &&
         cellDate < retObj;
 
-      let cellStyle = 'hover:bg-emerald-50 text-slate-700 font-semibold rounded-xl';
+      let cellStyle = 'hover:bg-emerald-50 text-slate-700 font-medium rounded-[6px]';
       if (isPast) {
-        cellStyle = 'text-slate-300 bg-slate-50/50 cursor-not-allowed pointer-events-none line-through decoration-slate-300';
+        cellStyle = 'text-slate-300 bg-slate-50/50 cursor-not-allowed pointer-events-none line-through decoration-slate-300 rounded-[6px]';
       } else if (isDeparture || isReturn) {
-        cellStyle = 'bg-[#0F4C2E] text-white font-bold rounded-xl shadow-md scale-105';
+        cellStyle = 'bg-[#0F4C2E] text-white font-semibold rounded-[6px] shadow-xs';
       } else if (inRange) {
         cellStyle = 'bg-emerald-100/80 text-emerald-900 font-semibold rounded-none';
       }
@@ -138,7 +138,7 @@ function DualMonthCalendarPicker({
           type="button"
           disabled={isPast}
           onClick={() => handleDayClick(year, month, day)}
-          className={`py-2 text-xs font-semibold transition-all flex items-center justify-center h-10 w-10 sm:h-11 sm:w-11 mx-auto ${cellStyle}`}
+          className={`text-[12px] transition-colors flex items-center justify-center h-9 w-9 mx-auto ${cellStyle}`}
         >
           {day}
         </button>
@@ -165,33 +165,33 @@ function DualMonthCalendarPicker({
   const durationDays = calculateDays();
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
       {/* Dual Month Calendar Left Column (8/12 width) */}
-      <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-7 shadow-2xs space-y-4">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+      <div className="lg:col-span-8 bg-white rounded-[8px] border border-emerald-200/80 p-5 shadow-xs space-y-4">
+        <div className="flex items-center justify-between mb-3 pb-3 border-b border-emerald-100">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handlePrevMonth}
-              className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              className="h-7 w-7 inline-flex items-center justify-center text-[#0F4C2E] hover:bg-emerald-50 rounded-[6px] transition-colors cursor-pointer"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <span className="text-xs font-bold text-slate-800">
+            <span className="text-[13px] font-semibold text-[#0F4C2E]">
               {monthNames[month1Month]} {month1Year}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-800">
+            <span className="text-[13px] font-semibold text-[#0F4C2E]">
               {monthNames[month2Month]} {month2Year}
             </span>
             <button
               type="button"
               onClick={handleNextMonth}
-              className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              className="h-7 w-7 inline-flex items-center justify-center text-[#0F4C2E] hover:bg-emerald-50 rounded-[6px] transition-colors cursor-pointer"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -201,15 +201,15 @@ function DualMonthCalendarPicker({
         </div>
 
         {/* Dual Month Side-by-Side Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Month 1 */}
-          <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-            <h4 className="text-xs font-bold text-slate-700 text-center mb-3">
+          <div className="bg-emerald-50/30 p-3.5 rounded-[8px] border border-emerald-100">
+            <h4 className="text-[13px] font-semibold text-[#0F4C2E] text-center mb-2.5">
               {monthNames[month1Month]} {month1Year}
             </h4>
             <div className="grid grid-cols-7 gap-1 text-center">
               {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, idx) => (
-                <div key={idx} className="text-[11px] font-bold text-slate-400 py-1.5 uppercase">
+                <div key={idx} className="text-[11px] font-semibold text-emerald-800/70 py-1 uppercase tracking-wider">
                   {d}
                 </div>
               ))}
@@ -218,13 +218,13 @@ function DualMonthCalendarPicker({
           </div>
 
           {/* Month 2 */}
-          <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-            <h4 className="text-xs font-bold text-slate-700 text-center mb-3">
+          <div className="bg-emerald-50/30 p-3.5 rounded-[8px] border border-emerald-100">
+            <h4 className="text-[13px] font-semibold text-[#0F4C2E] text-center mb-2.5">
               {monthNames[month2Month]} {month2Year}
             </h4>
             <div className="grid grid-cols-7 gap-1 text-center">
               {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, idx) => (
-                <div key={idx} className="text-[11px] font-bold text-slate-400 py-1.5 uppercase">
+                <div key={idx} className="text-[11px] font-semibold text-emerald-800/70 py-1 uppercase tracking-wider">
                   {d}
                 </div>
               ))}
@@ -235,42 +235,42 @@ function DualMonthCalendarPicker({
       </div>
 
       {/* Selected Dates Summary Right Column (4/12 width) */}
-      <div className="lg:col-span-4 bg-[#F3F4F8] p-6 rounded-2xl space-y-5">
+      <div className="lg:col-span-4 bg-[#F3F4F8] p-5 rounded-[8px] border border-slate-200/80 space-y-4">
         <div>
-          <h4 className="text-xs font-bold text-slate-800 mb-3.5">Selected Dates Summary</h4>
+          <h4 className="text-[14px] font-semibold text-[#0F4C2E] mb-3">Selected Dates Summary</h4>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {/* Departure Card */}
-            <div className="bg-white p-4 rounded-xl border border-slate-200/60 shadow-2xs flex items-center justify-between">
+            <div className="bg-white p-3.5 rounded-[8px] border border-emerald-200/70 border-l-4 border-l-[#0F4C2E] shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 block mb-0.5">
                   Departure Date
                 </span>
-                <span className={`text-xs font-extrabold ${departureDate ? 'text-slate-900' : 'text-slate-400'}`}>
+                <span className={`text-[13px] font-semibold ${departureDate ? 'text-[#0F4C2E]' : 'text-slate-400'}`}>
                   {formatDateDisplay(departureDate)}
                 </span>
               </div>
-              <span className={`w-3 h-3 rounded-full ${departureDate ? 'bg-[#0F4C2E]' : 'bg-slate-300'}`}></span>
+              <span className={`w-2.5 h-2.5 rounded-full ${departureDate ? 'bg-[#0F4C2E]' : 'bg-slate-300'}`}></span>
             </div>
 
             {/* Return Card */}
-            <div className="bg-white p-4 rounded-xl border border-slate-200/60 shadow-2xs flex items-center justify-between">
+            <div className="bg-white p-3.5 rounded-[8px] border border-emerald-200/70 border-l-4 border-l-[#0F4C2E] shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 block mb-0.5">
                   Return Date
                 </span>
-                <span className={`text-xs font-extrabold ${returnDate ? 'text-slate-900' : 'text-slate-400'}`}>
+                <span className={`text-[13px] font-semibold ${returnDate ? 'text-[#0F4C2E]' : 'text-slate-400'}`}>
                   {formatDateDisplay(returnDate)}
                 </span>
               </div>
-              <span className={`w-3 h-3 rounded-full ${returnDate ? 'bg-[#0F4C2E]' : 'bg-slate-300'}`}></span>
+              <span className={`w-2.5 h-2.5 rounded-full ${returnDate ? 'bg-[#0F4C2E]' : 'bg-slate-300'}`}></span>
             </div>
 
             {/* Duration Pill */}
             {durationDays !== null && (
-              <div className="p-3 bg-emerald-100/70 border border-emerald-200 rounded-xl flex items-center justify-between text-xs">
+              <div className="p-3 bg-emerald-100/70 border border-emerald-200 rounded-[8px] flex items-center justify-between text-[13px]">
                 <span className="font-semibold text-emerald-900">Total Travel Duration:</span>
-                <span className="font-black text-[#0F4C2E] bg-white px-2.5 py-0.5 rounded-lg shadow-2xs">
+                <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-[#0F4C2E] text-white shadow-2xs">
                   {durationDays} Day{durationDays > 1 ? 's' : ''}
                 </span>
               </div>
@@ -279,9 +279,9 @@ function DualMonthCalendarPicker({
         </div>
 
         {/* Instructions & Guidelines */}
-        <div className="space-y-2 pt-2 border-t border-slate-200/80">
-          <span className="text-[11px] font-bold text-slate-700 block">Filing Guidelines:</span>
-          <ul className="text-[11px] text-slate-600 space-y-1.5 pl-4 list-disc leading-relaxed">
+        <div className="space-y-1.5 pt-3 border-t border-slate-200/80">
+          <span className="text-[12px] font-semibold text-slate-800 block">Filing Guidelines:</span>
+          <ul className="text-[12px] text-slate-600 space-y-1 pl-4 list-disc leading-relaxed">
             <li>Select departure date first, followed by your return date.</li>
             <li>Travel Authorities must be filed at least 3 working days prior to departure.</li>
             <li>Sequential approvals are required before proceeding to the field.</li>
@@ -898,55 +898,63 @@ function EmployeeContent() {
     }
   };
 
-  // Helper for Status Badges (Clean, flat design matching ETAPS reference)
+  // Helper for Status Badges (macOS HIG Semantic Badges with Rich DENR Colors)
   const renderStatusBadge = (status: string) => {
     switch (status) {
       case 'APPROVED':
         return (
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#16835D] whitespace-nowrap">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#16835D] shrink-0"></span> Approved
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-[#16835D] border border-emerald-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#16835D] shrink-0"></span>
+            Approved
           </span>
         );
       case 'PENDING_SECTION_CHIEF':
         return (
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2580B8] whitespace-nowrap">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#2580B8] shrink-0 animate-pulse"></span> Pending Section Chief
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-blue-50 text-[#2580B8] border border-blue-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2580B8] shrink-0 animate-pulse"></span>
+            Pending Section Chief
           </span>
         );
       case 'PENDING_DIVISION_CHIEF':
         return (
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2580B8] whitespace-nowrap">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#2580B8] shrink-0 animate-pulse"></span> Pending Division Chief
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-blue-50 text-[#2580B8] border border-blue-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2580B8] shrink-0 animate-pulse"></span>
+            Pending Division Chief
           </span>
         );
       case 'PENDING_HEAD_PENRO':
         return (
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#D97706] whitespace-nowrap">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0 animate-pulse"></span> Pending Head of PENRO
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-amber-50 text-[#D97706] border border-amber-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0 animate-pulse"></span>
+            Pending Head of PENRO
           </span>
         );
       case 'PENDING':
         return (
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#D97706] whitespace-nowrap">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0"></span> Pending
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-amber-50 text-[#D97706] border border-amber-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0"></span>
+            Pending
           </span>
         );
       case 'REJECTED_MANUAL':
         return (
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#D97706] whitespace-nowrap">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0"></span> Returned (Needs Revision)
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0"></span>
+            Returned (Needs Revision)
           </span>
         );
       case 'REJECTED_OVERDUE':
         return (
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#DC3545] whitespace-nowrap">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#DC3545] shrink-0"></span> Overdue
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-rose-50 text-[#DC3545] border border-rose-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#DC3545] shrink-0"></span>
+            Overdue
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#64748B] whitespace-nowrap">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#64748B] shrink-0"></span> Draft
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-slate-100 text-slate-600 border border-slate-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-500 shrink-0"></span>
+            Draft
           </span>
         );
     }
@@ -1027,80 +1035,119 @@ function EmployeeContent() {
       const displayTableRows = requests.slice(0, 5);
 
       return (
-        <div className="w-full max-w-[1600px] mx-auto space-y-6 flex flex-col animate-fade-in pb-8">
-          {/* 4 Stat Cards Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {/* Stat Card 1: Total Requests */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+        <div className="w-full max-w-[1600px] mx-auto space-y-5 flex flex-col animate-fade-in pb-8">
+          {/* Welcome / Page Header Banner */}
+          <div className="bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white p-5 rounded-[8px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-[8px] bg-white/10 border border-white/15 flex items-center justify-center shrink-0 text-emerald-300">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
               <div>
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Requests</p>
+                <h1 className="text-[22px] font-bold tracking-tight text-white">
+                  Welcome back, {sessionUser?.name || 'Employee'}
+                </h1>
+                <p className="text-[13px] text-emerald-100/90 mt-0.5">
+                  DENR PENRO Agusan del Norte · Electronic Travel Authorization Processing System
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => router.push('/employee?tab=schedule')}
+                className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-white/10 hover:bg-white/20 text-white border border-white/20 cursor-pointer"
+              >
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>Travel Schedule</span>
+              </button>
+              <button
+                onClick={() => router.push('/employee?tab=create')}
+                className="h-8 px-[14px] text-[13px] font-semibold rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-white text-[#0F4C2E] hover:bg-emerald-50 shadow-xs cursor-pointer"
+              >
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                </svg>
+                <span>File Travel Authority</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 4 Stat Cards Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Stat Card 1: Total Requests */}
+            <div className="bg-white p-4 rounded-[8px] border border-slate-200/80 border-l-4 border-l-[#0F4C2E] shadow-xs flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Total Requests</p>
                 {loading ? (
-                  <div className="h-8 w-12 bg-slate-100 animate-pulse rounded-lg mt-1" />
+                  <div className="h-7 w-12 bg-slate-100 animate-pulse rounded-[6px] mt-1" />
                 ) : (
-                  <h3 className="text-2xl font-black text-slate-900 mt-1">{totalCount}</h3>
+                  <h3 className="text-[24px] font-bold tracking-tight text-slate-900 mt-1">{totalCount}</h3>
                 )}
-                <p className="text-[11px] font-semibold text-emerald-600 mt-1">
+                <p className="text-[12px] font-medium text-emerald-600 mt-0.5">
                   {loading ? 'Fetching records...' : totalCount > 0 ? `${totalCount} submitted to date` : 'No requests filed'}
                 </p>
               </div>
-              <div className="flex items-center justify-center bg-transparent">
-                <svg className="w-7 h-7 text-[#0B5A3A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-9 h-9 rounded-[6px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
             </div>
 
             {/* Stat Card 2: Pending */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-slate-200/80 border-l-4 border-l-amber-500 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending</p>
+                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Pending</p>
                 {loading ? (
-                  <div className="h-8 w-12 bg-slate-100 animate-pulse rounded-lg mt-1" />
+                  <div className="h-7 w-12 bg-slate-100 animate-pulse rounded-[6px] mt-1" />
                 ) : (
-                  <h3 className="text-2xl font-black text-slate-900 mt-1">{pendingCount}</h3>
+                  <h3 className="text-[24px] font-bold tracking-tight text-slate-900 mt-1">{pendingCount}</h3>
                 )}
-                <p className="text-[11px] font-semibold text-[#D97706] mt-1">Awaiting approval</p>
+                <p className="text-[12px] font-medium text-[#D97706] mt-0.5">Awaiting approval</p>
               </div>
-              <div className="flex items-center justify-center bg-transparent">
-                <svg className="w-7 h-7 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-9 h-9 rounded-[6px] bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
             </div>
 
             {/* Stat Card 3: Approved */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-slate-200/80 border-l-4 border-l-emerald-500 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Approved</p>
+                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Approved</p>
                 {loading ? (
-                  <div className="h-8 w-12 bg-slate-100 animate-pulse rounded-lg mt-1" />
+                  <div className="h-7 w-12 bg-slate-100 animate-pulse rounded-[6px] mt-1" />
                 ) : (
-                  <h3 className="text-2xl font-black text-slate-900 mt-1">{approvedCount}</h3>
+                  <h3 className="text-[24px] font-bold tracking-tight text-slate-900 mt-1">{approvedCount}</h3>
                 )}
-                <p className="text-[11px] font-semibold text-[#16835D] mt-1">
+                <p className="text-[12px] font-medium text-[#16835D] mt-0.5">
                   Fully signed TA
                 </p>
               </div>
-              <div className="flex items-center justify-center bg-transparent">
-                <svg className="w-7 h-7 text-[#16835D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-9 h-9 rounded-[6px] bg-emerald-50 text-[#16835D] border border-emerald-200 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
             </div>
 
             {/* Stat Card 4: Returned */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-slate-200/80 border-l-4 border-l-rose-500 shadow-xs flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Returned</p>
+                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Returned</p>
                 {loading ? (
-                  <div className="h-8 w-12 bg-slate-100 animate-pulse rounded-lg mt-1" />
+                  <div className="h-7 w-12 bg-slate-100 animate-pulse rounded-[6px] mt-1" />
                 ) : (
-                  <h3 className="text-2xl font-black text-slate-900 mt-1">{returnedCount}</h3>
+                  <h3 className="text-[24px] font-bold tracking-tight text-slate-900 mt-1">{returnedCount}</h3>
                 )}
-                <p className="text-[11px] font-semibold text-[#DC3545] mt-1">Needs revision</p>
+                <p className="text-[12px] font-medium text-[#DC3545] mt-0.5">Needs revision</p>
               </div>
-              <div className="flex items-center justify-center bg-transparent">
-                <svg className="w-7 h-7 text-[#DC3545]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-9 h-9 rounded-[6px] bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
               </div>
@@ -1108,18 +1155,18 @@ function EmployeeContent() {
           </div>
 
           {/* Middle Section: Recent Requests (8 cols) + Notifications (4 cols) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
             {/* Left Card: Recent Requests */}
-            <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-6 flex flex-col justify-between min-h-[380px]">
+            <div className="lg:col-span-8 bg-white rounded-[8px] border border-slate-200/80 shadow-xs flex flex-col justify-between min-h-[360px] overflow-hidden">
               <div>
-                <div className="flex items-center justify-between mb-5">
+                <div className="px-4 py-3 border-b border-emerald-100 bg-emerald-950/[0.04] flex items-center justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900">Recent Travel Authority Requests</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">Your recently submitted field itineraries and their approval progress</p>
+                    <h3 className="text-[14px] font-semibold text-[#0F4C2E]">Recent Travel Authority Requests</h3>
+                    <p className="text-[12px] text-slate-500 mt-0.5">Your recently submitted field itineraries and their approval progress</p>
                   </div>
                   <button
                     onClick={() => router.push('/employee?tab=create')}
-                    className="px-3.5 py-1.5 bg-transparent hover:bg-[#F4F8F5] text-[#0B5A3A] hover:border-[#0B5A3A]/60 rounded-xl text-xs font-semibold transition-all border border-[#0B5A3A]/30 flex items-center gap-1.5 shadow-none cursor-pointer"
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#0F4C2E] hover:bg-[#165E3A] text-white cursor-pointer"
                   >
                     <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -1130,32 +1177,32 @@ function EmployeeContent() {
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                        <th className="pb-3 px-2">Reference</th>
-                        <th className="pb-3 px-2">Destination</th>
-                        <th className="pb-3 px-2">Dates</th>
-                        <th className="pb-3 px-2 min-w-[170px]">Status</th>
-                        <th className="pb-3 px-2 text-right">Progress</th>
+                    <thead className="bg-slate-100/90 border-b border-slate-200">
+                      <tr>
+                        <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-600 whitespace-nowrap text-left">Reference</th>
+                        <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-600 whitespace-nowrap text-left">Destination</th>
+                        <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-600 whitespace-nowrap text-left">Dates</th>
+                        <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-600 whitespace-nowrap text-center min-w-[160px]">Status</th>
+                        <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-600 whitespace-nowrap text-right">Progress</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 text-xs">
+                    <tbody>
                       {loading ? (
                         [1, 2, 3].map((skeletonIdx) => (
-                          <tr key={`skeleton-${skeletonIdx}`} className="animate-pulse">
-                            <td className="py-3.5 px-2">
+                          <tr key={`skeleton-${skeletonIdx}`} className="h-[42px] border-b border-slate-100 last:border-b-0 animate-pulse">
+                            <td className="px-3 py-1.5 align-middle">
                               <div className="h-4 w-28 bg-slate-100 rounded"></div>
                             </td>
-                            <td className="py-3.5 px-2">
+                            <td className="px-3 py-1.5 align-middle">
                               <div className="h-4 w-36 bg-slate-100 rounded"></div>
                             </td>
-                            <td className="py-3.5 px-2">
+                            <td className="px-3 py-1.5 align-middle">
                               <div className="h-4 w-24 bg-slate-100 rounded"></div>
                             </td>
-                            <td className="py-3.5 px-2">
-                              <div className="h-5 w-28 bg-slate-100 rounded-full"></div>
+                            <td className="px-3 py-1.5 align-middle text-center">
+                              <div className="h-5 w-28 bg-slate-100 rounded-[4px] inline-block"></div>
                             </td>
-                            <td className="py-3.5 px-2 text-right">
+                            <td className="px-3 py-1.5 align-middle text-right">
                               <div className="h-2 w-20 bg-slate-100 rounded-full inline-block"></div>
                             </td>
                           </tr>
@@ -1174,20 +1221,26 @@ function EmployeeContent() {
                             <tr
                               key={req.id || idx}
                               onClick={() => setSelectedRequest(req)}
-                              className="hover:bg-slate-50/80 transition-colors cursor-pointer"
+                              className="h-[42px] border-b border-slate-100 last:border-b-0 hover:bg-emerald-50/40 transition-colors cursor-pointer"
                               title="Click to view details"
                             >
-                              <td className="py-3.5 px-2 font-bold font-mono text-[#0B5A3A]">{ref}</td>
-                              <td className="py-3.5 px-2 text-slate-700 flex items-center gap-1.5">
-                                <svg className="w-3.5 h-3.5 text-[#64748B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <span className="font-semibold">{dest}</span>
+                              <td className="px-3 py-1.5 text-[13px] align-middle text-left whitespace-nowrap">
+                                <span className="h-5 inline-flex items-center justify-center px-2 text-[11px] font-semibold font-mono rounded-[4px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200">
+                                  {ref}
+                                </span>
                               </td>
-                              <td className="py-3.5 px-2 text-slate-500 font-medium">{dates}</td>
-                              <td className="py-3.5 px-2 min-w-[170px]">{renderStatusBadge(status)}</td>
-                              <td className="py-3.5 px-2 text-right">
+                              <td className="px-3 py-1.5 text-[13px] text-slate-800 font-medium align-middle text-left">
+                                <div className="flex items-center gap-1.5">
+                                  <svg className="w-3.5 h-3.5 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  </svg>
+                                  <span className="truncate max-w-[260px]">{dest}</span>
+                                </div>
+                              </td>
+                              <td className="px-3 py-1.5 text-[13px] text-slate-600 align-middle text-left whitespace-nowrap">{dates}</td>
+                              <td className="px-3 py-1.5 text-[13px] text-slate-900 align-middle text-center min-w-[160px]">{renderStatusBadge(status)}</td>
+                              <td className="px-3 py-1.5 text-[13px] text-slate-900 align-middle text-right">
                                 <div className="inline-flex items-center gap-2">
                                   <div className="w-16 bg-slate-100 h-1.5 rounded-full overflow-hidden">
                                     <div
@@ -1195,7 +1248,7 @@ function EmployeeContent() {
                                       style={{ width: progressInfo.width }}
                                     ></div>
                                   </div>
-                                  <span className="font-mono text-[11px] font-semibold text-[#64748B]">{progressInfo.text}</span>
+                                  <span className="font-mono text-[11px] font-semibold text-slate-600">{progressInfo.text}</span>
                                 </div>
                               </td>
                             </tr>
@@ -1205,20 +1258,20 @@ function EmployeeContent() {
                         <tr>
                           <td colSpan={5} className="py-12 px-4 text-center">
                             <div className="flex flex-col items-center justify-center max-w-sm mx-auto text-center space-y-2.5">
-                              <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-[#0B5A3A] flex items-center justify-center border border-emerald-100">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <div className="w-10 h-10 rounded-[8px] bg-emerald-50 text-[#0F4C2E] flex items-center justify-center border border-emerald-200">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                               </div>
                               <div>
-                                <h4 className="text-sm font-bold text-slate-800">No Travel Authority Requests Yet</h4>
-                                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                                <h4 className="text-[14px] font-semibold text-slate-900">No Travel Authority Requests Yet</h4>
+                                <p className="text-[13px] text-slate-500 mt-1 leading-relaxed">
                                   You haven&apos;t filed any travel authority requests yet. Create a new request to start your travel authorization process.
                                 </p>
                               </div>
                               <button
                                 onClick={() => router.push('/employee?tab=create')}
-                                className="px-3.5 py-1.5 bg-[#0B5A3A] hover:bg-[#06452F] text-white rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer mt-1"
+                                className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#0F4C2E] hover:bg-[#165E3A] text-white cursor-pointer mt-1"
                               >
                                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -1234,15 +1287,15 @@ function EmployeeContent() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs text-slate-400 font-medium">
+              <div className="px-4 py-2.5 border-t border-slate-200 bg-slate-50/80 flex items-center justify-between">
+                <span className="text-[12px] text-slate-500 font-medium">
                   {loading
                     ? 'Loading requests...'
                     : `Showing ${displayTableRows.length} recent ${displayTableRows.length === 1 ? 'request' : 'requests'}`}
                 </span>
                 <button
                   onClick={() => router.push('/employee?tab=requests')}
-                  className="text-xs font-bold text-[#0B5A3A] hover:underline flex items-center gap-1 cursor-pointer"
+                  className="h-7 px-2.5 text-xs font-semibold rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors text-[#0F4C2E] bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 cursor-pointer"
                 >
                   <span>View All Requests</span>
                   <span>→</span>
@@ -1251,27 +1304,31 @@ function EmployeeContent() {
             </div>
 
             {/* Right Card: Notifications */}
-            <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-6 flex flex-col justify-between min-h-[380px]">
+            <div className="lg:col-span-4 bg-white rounded-[8px] border border-slate-200/80 shadow-xs flex flex-col justify-between min-h-[360px] overflow-hidden">
               <div>
-                <div className="flex items-center justify-between mb-5">
+                <div className="px-4 py-3 border-b border-emerald-100 bg-emerald-950/[0.04] flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-bold text-slate-900">Notifications</h3>
-                    <span className="px-2 py-0.5 rounded-full bg-[#E63946] text-white text-[10px] font-bold">
+                    <h3 className="text-[14px] font-semibold text-[#0F4C2E]">Notifications</h3>
+                    <span className={`h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] ${
+                      unreadCount > 0
+                        ? 'bg-[#E63946] text-white'
+                        : 'bg-emerald-50 text-[#0F4C2E] border border-emerald-200'
+                    }`}>
                       {unreadCount > 0 ? `${unreadCount} new` : `${notifications.length} total`}
                     </span>
                   </div>
                   <button
                     onClick={() => router.push('/employee?tab=notifications')}
-                    className="text-xs font-bold text-[#0B5A3A] hover:underline cursor-pointer"
+                    className="h-7 px-2.5 text-xs font-semibold rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors text-[#0F4C2E] hover:bg-emerald-100/60 cursor-pointer"
                   >
                     All →
                   </button>
                 </div>
 
-                <div className="space-y-3">
+                <div className="p-4 space-y-2.5">
                   {loading ? (
                     [1, 2].map((skIdx) => (
-                      <div key={`notif-sk-${skIdx}`} className="p-3 rounded-xl bg-slate-50 border border-slate-100 animate-pulse flex items-start gap-3">
+                      <div key={`notif-sk-${skIdx}`} className="p-3 rounded-[6px] bg-slate-50 border border-slate-100 animate-pulse flex items-start gap-3">
                         <div className="w-5 h-5 bg-slate-200 rounded-full shrink-0 mt-0.5" />
                         <div className="flex-1 space-y-1.5">
                           <div className="h-3.5 bg-slate-200 rounded w-3/4" />
@@ -1295,31 +1352,33 @@ function EmployeeContent() {
                       return (
                         <div
                           key={notif.id || nIdx}
-                          className={`flex items-start gap-3 p-3 rounded-xl transition-all ${
+                          className={`flex items-start gap-3 p-3 rounded-[6px] border transition-colors ${
                             isRejected
-                              ? 'bg-rose-50/60 border border-rose-100 hover:bg-rose-50'
-                              : 'bg-slate-50 border border-slate-100 hover:bg-slate-100/80'
+                              ? 'bg-rose-50/70 border-rose-200 hover:bg-rose-50'
+                              : isApproved
+                              ? 'bg-emerald-50/60 border-emerald-200 hover:bg-emerald-50'
+                              : 'bg-amber-50/50 border-amber-200/80 hover:bg-amber-50'
                           }`}
                         >
                           <div className="shrink-0 mt-0.5">
                             {isApproved ? (
-                              <svg className="w-5 h-5 text-[#16835D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-4 h-4 text-[#16835D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                               </svg>
                             ) : isRejected ? (
-                              <svg className="w-5 h-5 text-[#DC3545]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-4 h-4 text-[#DC3545]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                               </svg>
                             ) : (
-                              <svg className="w-5 h-5 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-4 h-4 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-xs font-bold text-slate-900 truncate">{notif.title}</h4>
-                            <p className="text-[11px] text-slate-600 mt-0.5 leading-snug line-clamp-2">{displayMsg}</p>
-                            <span className="text-[10px] font-semibold text-slate-400 mt-1 block">
+                            <h4 className="text-[13px] font-semibold text-slate-900 truncate">{notif.title}</h4>
+                            <p className="text-[12px] text-slate-600 mt-0.5 leading-snug line-clamp-2">{displayMsg}</p>
+                            <span className="text-[11px] font-medium text-slate-400 mt-1 block">
                               {new Date(notif.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                             </span>
                           </div>
@@ -1328,43 +1387,47 @@ function EmployeeContent() {
                     })
                   ) : (
                     <div className="py-10 flex flex-col items-center justify-center text-center space-y-2">
-                      <div className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center border border-slate-100">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-9 h-9 rounded-[6px] bg-emerald-50 text-[#0F4C2E] flex items-center justify-center border border-emerald-200">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
                       </div>
-                      <p className="text-xs font-bold text-slate-700">No notifications yet</p>
-                      <p className="text-[11px] text-slate-400 max-w-[220px]">You will be notified here about updates to your travel requests.</p>
+                      <p className="text-[13px] font-semibold text-slate-800">No notifications yet</p>
+                      <p className="text-[12px] text-slate-500 max-w-[220px]">You will be notified here about updates to your travel requests.</p>
                     </div>
                   )}
                 </div>
               </div>
 
-              <button
-                onClick={() => router.push('/employee?tab=notifications')}
-                className="mt-4 pt-3 border-t border-slate-100 text-center text-xs font-bold text-[#0B5A3A] hover:underline block w-full cursor-pointer"
-              >
-                View Full Notification Center →
-              </button>
+              <div className="px-4 py-2.5 border-t border-slate-200 bg-slate-50/80">
+                <button
+                  onClick={() => router.push('/employee?tab=notifications')}
+                  className="h-7 px-2.5 text-xs font-semibold rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors text-[#0F4C2E] hover:bg-emerald-50 w-full cursor-pointer"
+                >
+                  View Full Notification Center →
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Bottom Section: Quick Services & Field Operations Guidelines Grid (Fills remaining height) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Bottom Section: Quick Services & Field Operations Guidelines Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Card 1: File Travel Authority */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3 flex flex-col justify-between">
+            <div className="bg-white p-5 rounded-[8px] border border-slate-200/80 border-l-4 border-l-[#0F4C2E] shadow-xs space-y-3 flex flex-col justify-between">
               <div>
-                <svg className="w-7 h-7 text-[#0B5A3A] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <h4 className="text-sm font-bold text-slate-900">File Travel Authority</h4>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                <div className="w-9 h-9 rounded-[6px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200 flex items-center justify-center mb-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h4 className="text-[14px] font-semibold text-slate-900">File Travel Authority</h4>
+                <p className="text-[13px] text-slate-600 mt-1 leading-relaxed">
                   Submit field inspection, monitoring, compliance verification, or official event travel requests online.
                 </p>
               </div>
               <button
                 onClick={() => router.push('/employee?tab=create')}
-                className="w-full py-2.5 bg-[#0B5A3A] hover:bg-[#06452F] text-white text-xs font-bold rounded-xl shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors w-full bg-[#0F4C2E] hover:bg-[#165E3A] text-white cursor-pointer"
               >
                 <span>Start Application</span>
                 <span>↗</span>
@@ -1372,19 +1435,21 @@ function EmployeeContent() {
             </div>
 
             {/* Card 2: Travel Schedule & Map */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3 flex flex-col justify-between">
+            <div className="bg-white p-5 rounded-[8px] border border-slate-200/80 border-l-4 border-l-blue-500 shadow-xs space-y-3 flex flex-col justify-between">
               <div>
-                <svg className="w-7 h-7 text-[#2580B8] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <h4 className="text-sm font-bold text-slate-900">Monthly Travel Schedule</h4>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                <div className="w-9 h-9 rounded-[6px] bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center mb-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h4 className="text-[14px] font-semibold text-slate-900">Monthly Travel Schedule</h4>
+                <p className="text-[13px] text-slate-600 mt-1 leading-relaxed">
                   View scheduled field itineraries, approved calendar dates, and mapped regional destinations.
                 </p>
               </div>
               <button
                 onClick={() => router.push('/employee?tab=schedule')}
-                className="w-full py-2.5 bg-white border border-slate-200 hover:bg-[#F4F8F5] text-slate-700 hover:text-[#0B5A3A] text-xs font-bold rounded-xl shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors w-full bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-700 cursor-pointer"
               >
                 <span>Open Calendar & Map</span>
                 <span>↗</span>
@@ -1392,19 +1457,21 @@ function EmployeeContent() {
             </div>
 
             {/* Card 3: DENR Approval Policy */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs space-y-3 flex flex-col justify-between">
+            <div className="bg-white p-5 rounded-[8px] border border-slate-200/80 border-l-4 border-l-amber-500 shadow-xs space-y-3 flex flex-col justify-between">
               <div>
-                <svg className="w-7 h-7 text-[#D97706] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
-                <h4 className="text-sm font-bold text-slate-900">Approval Policy & Reminders</h4>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                <div className="w-9 h-9 rounded-[6px] bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center mb-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                </div>
+                <h4 className="text-[14px] font-semibold text-slate-900">Approval Policy & Reminders</h4>
+                <p className="text-[13px] text-slate-600 mt-1 leading-relaxed">
                   Per DENR guidelines, submit requests 3 days prior. Approvals route through Section Chief → Division Chief → PENRO Head.
                 </p>
               </div>
               <button
                 onClick={() => router.push('/employee?tab=requests')}
-                className="w-full py-2.5 bg-white border border-slate-200 hover:bg-[#F4F8F5] text-slate-700 hover:text-[#0B5A3A] text-xs font-bold rounded-xl shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors w-full bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-800 cursor-pointer"
               >
                 <span>Track My Requests</span>
                 <span>↗</span>
@@ -1420,819 +1487,818 @@ function EmployeeContent() {
     /* -------------------------------------------------------------------------- */
     if (currentTab === 'create') {
       return (
-        <div className="w-full max-w-[1400px] mx-auto space-y-6 animate-fade-in pb-10 flex flex-col">
-          {/* Wizard Stepper Bar at Top (Matching PDF Header Stepper) */}
-          <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/80 shadow-2xs relative isolate">
-            <div className="flex items-center justify-between relative px-8">
-              <div className="absolute left-12 right-12 top-4 h-0.5 bg-slate-200 z-0"></div>
+        <div className="w-full max-w-[1400px] mx-auto space-y-5 animate-fade-in pb-10 flex flex-col">
+          <div className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden flex flex-col min-h-[600px]">
+            {/* Wizard Stepper Bar at Top */}
+            <div className="bg-[#F5F5F7] px-6 py-4 border-b border-[#E5E5E7] relative isolate">
+              <div className="flex items-center justify-between relative px-6">
+                <div className="absolute left-10 right-10 top-3.5 h-px bg-[#E5E5E7] z-0"></div>
 
-              {[
-                { s: 1, title: 'Travel Dates' },
-                { s: 2, title: 'Employee Info' },
-                { s: 3, title: 'Travel Details' },
-                { s: 4, title: 'Additional Info' },
-                { s: 5, title: 'Review' },
-              ].map((stepItem) => {
-                const isDone = wizardStep > stepItem.s;
-                const isCurrent = wizardStep === stepItem.s;
-                return (
-                  <div key={stepItem.s} className="relative z-10 flex flex-col items-center">
-                    <div
-                      className={`w-9 h-9 rounded-full font-bold text-xs flex items-center justify-center transition-all ${isDone
-                          ? 'bg-[#0B5A3A] text-white'
-                          : isCurrent
-                            ? 'bg-[#0B5A3A] text-white ring-4 ring-emerald-100 font-extrabold'
-                            : 'bg-slate-200 text-slate-500'
+                {[
+                  { s: 1, title: 'Travel Dates' },
+                  { s: 2, title: 'Employee Info' },
+                  { s: 3, title: 'Travel Details' },
+                  { s: 4, title: 'Additional Info' },
+                  { s: 5, title: 'Review' },
+                ].map((stepItem) => {
+                  const isDone = wizardStep > stepItem.s;
+                  const isCurrent = wizardStep === stepItem.s;
+                  return (
+                    <div key={stepItem.s} className="relative z-10 flex flex-col items-center">
+                      <div
+                        className={`w-7 h-7 rounded-full font-semibold text-[12px] flex items-center justify-center transition-colors ${
+                          isDone
+                            ? 'bg-[#1B4332] text-white'
+                            : isCurrent
+                            ? 'bg-[#1B4332] text-white ring-2 ring-[#1B4332]/20'
+                            : 'bg-white border border-[#E5E5E7] text-[#86868B]'
                         }`}
-                    >
-                      {isDone ? (
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                        </svg>
-                      ) : (
-                        stepItem.s
-                      )}
-                    </div>
-                    <span className={`text-[11px] font-semibold mt-2 ${isCurrent ? 'text-[#0B5A3A] font-bold' : 'text-slate-400'}`}>
-                      {stepItem.title}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Wizard Card Body */}
-          <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200/80 shadow-2xs space-y-6 min-h-[580px] flex flex-col justify-between">
-            {formError && (
-              <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-semibold">
-                {formError}
-              </div>
-            )}
-
-            {/* STEP 1: Select Travel Dates (EXACT PDF Page 2 Dual Calendar View) */}
-            {wizardStep === 1 && (
-              <div className="space-y-6">
-                <h3 className="text-base font-bold text-slate-900">Select Travel Dates</h3>
-
-                <DualMonthCalendarPicker
-                  departureDate={createForm.departureDate}
-                  returnDate={createForm.returnDate}
-                  onSelectDeparture={(date) => setCreateForm((prev) => ({ ...prev, departureDate: date }))}
-                  onSelectReturn={(date) => setCreateForm((prev) => ({ ...prev, returnDate: date }))}
-                />
-              </div>
-            )}
-
-            {/* STEP 2: Employee Information (PDF Page 3) */}
-            {wizardStep === 2 && (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-slate-900">Employee Information</h3>
-                </div>
-
-                {/* Read-Only Selected Travel Dates Reference from Step 1 */}
-                <div className="p-4 bg-[#F3F4F8] rounded-2xl border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#0F4C2E] text-white flex items-center justify-center shrink-0 shadow-2xs">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                        Selected Travel Dates (Set in Step 1)
-                      </span>
-                      <p className="text-xs font-extrabold text-slate-800 mt-0.5">
-                        Departure: <span className="text-[#0F4C2E]">{createForm.departureDate || 'Not specified'}</span>
-                        <span className="mx-2 text-slate-300">|</span>
-                        Return: <span className="text-[#0F4C2E]">{createForm.returnDate || 'Not specified'}</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-lg bg-slate-200/80 text-slate-600 text-[10px] font-bold uppercase tracking-wider shrink-0 flex items-center gap-1">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      Read-Only
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                      <span>Name</span>
-                      <span className="text-[10px] font-bold text-[#0F4C2E] bg-emerald-100/90 border border-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1">
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                        Read-Only (Auto-filled)
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      readOnly
-                      value={createForm.employeeName}
-                      placeholder="Employee name..."
-                      className="w-full px-4 py-2.5 bg-slate-100/90 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 outline-none cursor-not-allowed select-none shadow-2xs"
-                    />
-                    <p className="text-[10px] text-slate-400 mt-1">Automatically retrieved from your employee account.</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Travel Area *
-                    </label>
-                    <select
-                      value={createForm.travelArea}
-                      onChange={(e) => setCreateForm({ ...createForm, travelArea: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#2E6F4E] cursor-pointer hover:bg-white transition-all shadow-2xs"
-                    >
-                      <option value="WITHIN AOR">WITHIN AOR</option>
-                      <option value="OUTSIDE CARAGA">OUTSIDE CARAGA</option>
-                    </select>
-                    <p className="text-[10px] text-slate-400 mt-1">Area of Responsibility scope for this mission.</p>
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                      <span>Position</span>
-                      <span className="text-[10px] font-bold text-[#0F4C2E] bg-emerald-100/90 border border-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1">
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                        Read-Only (Auto-filled)
-                      </span>
-                    </label>
-                    <input
-                      type="text"
-                      readOnly
-                      value={createForm.position || ''}
-                      placeholder="Position automatically retrieved from your account..."
-                      className="w-full px-4 py-2.5 bg-slate-100/90 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none cursor-not-allowed select-none shadow-2xs"
-                    />
-                    <p className="text-[10px] text-slate-400 mt-1">Automatically retrieved from the employee database record.</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* STEP 3: Travel Details (PDF Pages 4 & 5) */}
-            {wizardStep === 3 && (
-              <div className="space-y-6">
-                <h3 className="text-base font-bold text-slate-900">Travel Details</h3>
-
-                <div className="space-y-4">
-                  <div className="relative">
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Destination *
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        required
-                        value={createForm.destination}
-                        onChange={(e) => setCreateForm({ ...createForm, destination: e.target.value })}
-                        onFocus={() => {
-                          if (locationSuggestions.length > 0) setShowLocationDropdown(true);
-                        }}
-                        placeholder="Search a place, office, or barangay (e.g., Lemon, Makati, Los Baños)..."
-                        className="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E] transition-all"
-                      />
-                      <svg className="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-
-                      {isSearchingLocation && (
-                        <div className="absolute right-3 top-3">
-                          <div className="w-4 h-4 border-2 border-[#0F4C2E] border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Location Recommendations Dropdown */}
-                    {showLocationDropdown && locationSuggestions.length > 0 && (
-                      <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-30 overflow-hidden divide-y divide-slate-100 animate-fade-in max-h-60 overflow-y-auto">
-                        <div className="px-3 py-1.5 bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center">
-                          <span>Location Recommendations</span>
-                          <button
-                            type="button"
-                            onClick={() => setShowLocationDropdown(false)}
-                            className="text-slate-400 hover:text-slate-700 cursor-pointer"
-                            aria-label="Close recommendations"
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                        {locationSuggestions.map((item, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => {
-                              skipNextSearchRef.current = true;
-                              setCreateForm((prev) => ({
-                                ...prev,
-                                destination: item.fullAddress || item.name,
-                                destinationLat: item.lat,
-                                destinationLng: item.lng,
-                              }));
-                              setShowLocationDropdown(false);
-                            }}
-                            className="w-full px-4 py-2.5 text-left hover:bg-emerald-50/70 transition-colors flex items-start gap-2.5 group"
-                          >
-                            <svg className="w-4 h-4 text-[#0F4C2E] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs font-bold text-slate-800 group-hover:text-[#0F4C2E] truncate">
-                                {item.name}
-                              </p>
-                              <p className="text-[10px] text-slate-500 truncate mt-0.5">
-                                {item.fullAddress}
-                              </p>
-                            </div>
-                          </button>
-                        ))}
+                      >
+                        {isDone ? (
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          stepItem.s
+                        )}
                       </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Interactive Map Pick
-                    </label>
-                    <DynamicMapPicker
-                      initialLat={createForm.destinationLat}
-                      initialLng={createForm.destinationLng}
-                      onLocationSelect={handleMapLocationSelect}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Purpose of Travel *
-                    </label>
-                    <textarea
-                      rows={4}
-                      required
-                      value={createForm.purpose}
-                      onChange={(e) => setCreateForm({ ...createForm, purpose: e.target.value })}
-                      placeholder="Describe the purpose of your travel..."
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E]"
-                    />
-                  </div>
-                </div>
+                      <span className={`text-[12px] mt-1.5 ${isCurrent ? 'text-[#1B4332] font-semibold' : 'text-[#86868B] font-medium'}`}>
+                        {stepItem.title}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-            )}
+            </div>
 
-            {/* STEP 4: Additional Information (Strictly Matching Reference Screenshots) */}
-            {wizardStep === 4 && (
-              <div className="space-y-6">
-                <h3 className="text-base font-bold text-slate-900">Additional Information</h3>
-
-                {/* 2-Column Grid for Pre-filled Profile Fields */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Row 1 */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Salary Grade
-                    </label>
-                    <input
-                      type="text"
-                      value={createForm.salaryGrade}
-                      onChange={(e) => setCreateForm({ ...createForm, salaryGrade: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Division/Section/Unit
-                    </label>
-                    <input
-                      type="text"
-                      value={createForm.division}
-                      onChange={(e) => setCreateForm({ ...createForm, division: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E]"
-                    />
-                  </div>
-
-                  {/* Row 2 */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Station
-                    </label>
-                    <input
-                      type="text"
-                      value={createForm.station}
-                      onChange={(e) => setCreateForm({ ...createForm, station: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Employment Status
-                    </label>
-                    <input
-                      type="text"
-                      value={createForm.employmentStatus}
-                      onChange={(e) => setCreateForm({ ...createForm, employmentStatus: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E]"
-                    />
-                  </div>
-
-                  {/* Row 3 */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Office
-                    </label>
-                    <input
-                      type="text"
-                      value={createForm.office}
-                      onChange={(e) => setCreateForm({ ...createForm, office: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Signatory Station
-                    </label>
-                    <input
-                      type="text"
-                      value={createForm.signatoryStation}
-                      onChange={(e) => setCreateForm({ ...createForm, signatoryStation: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E]"
-                    />
-                  </div>
+            {/* Wizard Card Body */}
+            <div className="p-6 space-y-5 flex-1 flex flex-col justify-between">
+              {formError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-[13px] rounded-[6px] font-medium">
+                  {formError}
                 </div>
+              )}
 
-                {/* Full Width Custom Fields matching reference screenshots */}
-                <div className="space-y-4 pt-2">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Per Diems/Expense Allowed
-                    </label>
-                    <input
-                      type="text"
-                      value={createForm.perDiems}
-                      onChange={(e) => setCreateForm({ ...createForm, perDiems: e.target.value })}
-                      placeholder="Enter per diems information..."
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E]"
-                    />
-                  </div>
+              {/* STEP 1: Select Travel Dates */}
+              {wizardStep === 1 && (
+                <div className="space-y-4">
+                  <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Select Travel Dates</h3>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Appropriations to which travel should be charged
-                    </label>
-                    <input
-                      type="text"
-                      value={createForm.appropriations}
-                      onChange={(e) => setCreateForm({ ...createForm, appropriations: e.target.value })}
-                      placeholder="Enter appropriations Information..."
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Remarks or Special Instructions
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={createForm.remarks}
-                      onChange={(e) => setCreateForm({ ...createForm, remarks: e.target.value })}
-                      placeholder="Enter any remarks or special instructions..."
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Certification
-                    </label>
-                    <input
-                      type="text"
-                      value={createForm.certification}
-                      onChange={(e) => setCreateForm({ ...createForm, certification: e.target.value })}
-                      placeholder="Enter certification details..."
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Contact Number
-                    </label>
-                    <input
-                      type="text"
-                      value={createForm.contactNumber}
-                      onChange={(e) => setCreateForm({ ...createForm, contactNumber: e.target.value })}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E]"
-                    />
-                  </div>
-                </div>
-
-                {/* Supporting Documents Drag & Drop Upload Container */}
-                <div className="pt-2">
-                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Supporting Documents * (e.g., Invitation Letter, Memorandum, Program of Activities)
-                  </label>
-                  <SupportingDocumentsUpload
-                    attachments={createForm.attachments}
-                    onChange={(newAtts) => setCreateForm((prev) => ({ ...prev, attachments: newAtts }))}
+                  <DualMonthCalendarPicker
+                    departureDate={createForm.departureDate}
+                    returnDate={createForm.returnDate}
+                    onSelectDeparture={(date) => setCreateForm((prev) => ({ ...prev, departureDate: date }))}
+                    onSelectReturn={(date) => setCreateForm((prev) => ({ ...prev, returnDate: date }))}
                   />
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* STEP 5: Review and Submit (Highly Readable & Formatted Document Summary) */}
-            {wizardStep === 5 && (
-              <div className="space-y-6">
-                {/* Document Review Header */}
-                <div className="bg-emerald-950 text-white rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-white/10 text-emerald-400 flex items-center justify-center shrink-0 border border-white/10">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="text-base font-bold tracking-tight">Travel Authority Request Summary</h3>
-                      <p className="text-xs text-emerald-200/80 mt-0.5">Please review all submitted information before final submission for approval.</p>
-                    </div>
-                  </div>
-                  <span className="px-3 py-1 rounded-full bg-emerald-800/80 text-emerald-200 text-xs font-bold uppercase tracking-wider shrink-0 border border-emerald-700/50">
-                    Ready for Submission
-                  </span>
-                </div>
-
+              {/* STEP 2: Employee Information */}
+              {wizardStep === 2 && (
                 <div className="space-y-5">
-                  {/* 1. Travel Schedule */}
-                  <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-emerald-100 text-[#0F4C2E] flex items-center justify-center font-bold text-xs">
-                          1
-                        </div>
-                        <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
-                          Travel Schedule
-                        </h4>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setWizardStep(1)}
-                        className="text-[11px] font-bold text-[#0B5A3A] hover:underline inline-flex items-center gap-1 cursor-pointer"
-                      >
-                        <span>Edit Step 1</span>
-                        <svg className="w-3 h-3 text-[#0B5A3A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                          Departure Date
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          <span className="text-sm font-extrabold text-slate-900">
-                            {createForm.departureDate || 'Not specified'}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                          Return Date
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          <span className="text-sm font-extrabold text-slate-900">
-                            {createForm.returnDate || 'Not specified'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Employee Information</h3>
                   </div>
 
-                  {/* 2. Employee Profile & Travel Area */}
-                  <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-emerald-100 text-[#0B5A3A] flex items-center justify-center font-bold text-xs">
-                          2
-                        </div>
-                        <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
-                          Employee Information & Travel Area
-                        </h4>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setWizardStep(2)}
-                        className="text-[11px] font-bold text-[#0B5A3A] hover:underline inline-flex items-center gap-1 cursor-pointer"
-                      >
-                        <span>Edit Step 2</span>
-                        <svg className="w-3 h-3 text-[#0B5A3A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  {/* Read-Only Selected Travel Dates Reference from Step 1 */}
+                  <div className="p-3.5 bg-emerald-50/70 rounded-[8px] border border-emerald-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-[6px] bg-[#0F4C2E] text-white flex items-center justify-center shrink-0">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
-                          Employee Name
-                        </span>
-                        <span className="font-extrabold text-slate-900">{createForm.employeeName || 'None selected'}</span>
                       </div>
-
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 md:col-span-2">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
-                          Position
+                      <div>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-800 block">
+                          Selected Travel Dates (Set in Step 1)
                         </span>
-                        <span className="font-bold text-slate-800">{createForm.position || 'Not specified'}</span>
-                      </div>
-
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">
-                          Travel Area
-                        </span>
-                        <span className="px-2.5 py-0.5 rounded-md bg-[#0B5A3A] text-white font-extrabold text-[11px] inline-block mt-0.5 shadow-2xs">
-                          {createForm.travelArea}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 3. Travel Details & Location */}
-                  <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-emerald-100 text-[#0B5A3A] flex items-center justify-center font-bold text-xs">
-                          3
-                        </div>
-                        <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
-                          Destination & Purpose of Travel
-                        </h4>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setWizardStep(3)}
-                        className="text-[11px] font-bold text-[#0B5A3A] hover:underline inline-flex items-center gap-1 cursor-pointer"
-                      >
-                        <span>Edit Step 3</span>
-                        <svg className="w-3 h-3 text-[#0B5A3A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                      </button>
-                    </div>
-
-                    <div className="space-y-4 text-xs">
-                      <div className="p-4 bg-emerald-50/50 rounded-xl border border-emerald-100/80">
-                        <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block mb-1">
-                          Official Destination
-                        </span>
-                        <div className="flex items-start gap-2">
-                          <svg className="w-4 h-4 text-[#0B5A3A] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          <div>
-                            <p className="font-extrabold text-slate-900 text-sm">{createForm.destination}</p>
-                            <p className="text-[10px] font-mono text-slate-500 mt-0.5">
-                              Map Pin Coordinates: Latitude {createForm.destinationLat.toFixed(4)}, Longitude {createForm.destinationLng.toFixed(4)}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
-                          Purpose of Travel
-                        </span>
-                        <p className="text-xs text-slate-800 font-medium leading-relaxed whitespace-pre-line bg-white p-3 rounded-lg border border-slate-200/80">
-                          {createForm.purpose}
+                        <p className="text-[13px] font-semibold text-[#1D1D1F] mt-0.5">
+                          Departure: <span className="text-[#0F4C2E] font-bold">{createForm.departureDate || 'Not specified'}</span>
+                          <span className="mx-2 text-emerald-300">|</span>
+                          Return: <span className="text-[#0F4C2E] font-bold">{createForm.returnDate || 'Not specified'}</span>
                         </p>
                       </div>
                     </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-white text-emerald-800 border border-emerald-200/80 gap-1 shrink-0">
+                        <svg className="w-3 h-3 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        Read-Only
+                      </span>
+                    </div>
                   </div>
 
-                  {/* 4. Additional Information & Administrative Details */}
-                  <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-emerald-100 text-[#0B5A3A] flex items-center justify-center font-bold text-xs">
-                          4
-                        </div>
-                        <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
-                          Administrative & Additional Details
-                        </h4>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setWizardStep(4)}
-                        className="text-[11px] font-bold text-[#0B5A3A] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                        <span>Name</span>
+                        <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200 gap-1 normal-case tracking-normal">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                          Read-Only (Auto-filled)
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        readOnly
+                        value={createForm.employeeName}
+                        placeholder="Employee name..."
+                        className="w-full h-8 px-2.5 text-[13px] font-medium text-[#1D1D1F] bg-[#F5F5F7] border border-[#E5E5E7] rounded-[6px] outline-none cursor-not-allowed select-none"
+                      />
+                      <p className="text-[12px] text-[#86868B] mt-1">Automatically retrieved from your employee account.</p>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Travel Area *
+                      </label>
+                      <select
+                        value={createForm.travelArea}
+                        onChange={(e) => setCreateForm({ ...createForm, travelArea: e.target.value })}
+                        className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] cursor-pointer"
                       >
-                        <span>Edit Step 4</span>
-                        <svg className="w-3 h-3 text-[#0B5A3A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                      </button>
+                        <option value="WITHIN AOR">WITHIN AOR</option>
+                        <option value="OUTSIDE CARAGA">OUTSIDE CARAGA</option>
+                      </select>
+                      <p className="text-[12px] text-[#86868B] mt-1">Area of Responsibility scope for this mission.</p>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs mb-4">
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-0.5">Salary Grade</span>
-                        <span className="font-extrabold text-slate-800">{createForm.salaryGrade}</span>
-                      </div>
-
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-0.5">Division/Section</span>
-                        <span className="font-bold text-slate-800">{createForm.division}</span>
-                      </div>
-
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-0.5">Station</span>
-                        <span className="font-bold text-slate-800">{createForm.station}</span>
-                      </div>
-
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-0.5">Employment Status</span>
-                        <span className="font-bold text-slate-800">{createForm.employmentStatus}</span>
-                      </div>
-
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-0.5">Office</span>
-                        <span className="font-bold text-slate-800">{createForm.office}</span>
-                      </div>
-
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-0.5">Signatory Station</span>
-                        <span className="font-bold text-slate-800">{createForm.signatoryStation}</span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-3 border-t border-slate-100">
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-0.5">Per Diems / Expense Allowed</span>
-                        <span className="font-bold text-slate-800">{createForm.perDiems || 'Standard Allowance / As per guidelines'}</span>
-                      </div>
-
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-0.5">Appropriations</span>
-                        <span className="font-bold text-slate-800">{createForm.appropriations || 'Regular Operational Fund'}</span>
-                      </div>
-
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-0.5">Remarks or Special Instructions</span>
-                        <span className="font-medium text-slate-800">{createForm.remarks || 'None'}</span>
-                      </div>
-
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-0.5">Contact Number</span>
-                        <span className="font-extrabold text-[#0F4C2E]">{createForm.contactNumber}</span>
-                      </div>
+                    <div className="md:col-span-2">
+                      <label className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                        <span>Position</span>
+                        <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200 gap-1 normal-case tracking-normal">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                          Read-Only (Auto-filled)
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        readOnly
+                        value={createForm.position || ''}
+                        placeholder="Position automatically retrieved from your account..."
+                        className="w-full h-8 px-2.5 text-[13px] font-medium text-[#1D1D1F] bg-[#F5F5F7] border border-[#E5E5E7] rounded-[6px] outline-none cursor-not-allowed select-none"
+                      />
+                      <p className="text-[12px] text-[#86868B] mt-1">Automatically retrieved from the employee database record.</p>
                     </div>
                   </div>
+                </div>
+              )}
 
-                  {/* 5. Supporting Documents */}
-                  <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-2xs space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <svg className="w-5 h-5 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+              {/* STEP 3: Travel Details */}
+              {wizardStep === 3 && (
+                <div className="space-y-5">
+                  <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Travel Details</h3>
+
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Destination *
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          required
+                          value={createForm.destination}
+                          onChange={(e) => setCreateForm({ ...createForm, destination: e.target.value })}
+                          onFocus={() => {
+                            if (locationSuggestions.length > 0) setShowLocationDropdown(true);
+                          }}
+                          placeholder="Search a place, office, or barangay (e.g., Lemon, Makati, Los Baños)..."
+                          className="w-full h-8 pl-8 pr-8 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                        />
+                        <svg className="w-4 h-4 text-[#86868B] absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <div>
-                          <h4 className="text-xs font-extrabold text-slate-900">Supporting Documents</h4>
-                          <p className="text-[11px] text-slate-500 mt-0.5">
-                            {createForm.attachments && createForm.attachments.length > 0
-                              ? `${createForm.attachments.length} document${createForm.attachments.length === 1 ? '' : 's'} attached`
-                              : 'No supporting documents attached (optional)'}
-                          </p>
-                        </div>
+
+                        {isSearchingLocation && (
+                          <div className="absolute right-2.5 top-2">
+                            <div className="w-4 h-4 border-2 border-[#1B4332] border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                        )}
                       </div>
 
-                      {createForm.attachments && createForm.attachments.length > 0 ? (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 uppercase tracking-wider">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span>
-                          Attached ({createForm.attachments.length})
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400">
-                          None attached
-                        </span>
+                      {/* Location Recommendations Dropdown */}
+                      {showLocationDropdown && locationSuggestions.length > 0 && (
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-[#E5E5E7] rounded-[8px] shadow-xl z-30 overflow-hidden divide-y divide-[#E5E5E7] animate-fade-in max-h-60 overflow-y-auto">
+                          <div className="px-3 py-1.5 bg-[#F5F5F7] text-[11px] font-semibold text-[#86868B] uppercase tracking-wider flex justify-between items-center">
+                            <span>Location Recommendations</span>
+                            <button
+                              type="button"
+                              onClick={() => setShowLocationDropdown(false)}
+                              className="text-[#86868B] hover:text-[#1D1D1F] cursor-pointer"
+                              aria-label="Close recommendations"
+                            >
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                          {locationSuggestions.map((item, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => {
+                                skipNextSearchRef.current = true;
+                                setCreateForm((prev) => ({
+                                  ...prev,
+                                  destination: item.fullAddress || item.name,
+                                  destinationLat: item.lat,
+                                  destinationLng: item.lng,
+                                }));
+                                setShowLocationDropdown(false);
+                              }}
+                              className="w-full px-3 py-2 text-left hover:bg-[#F2F2F7] transition-colors flex items-start gap-2.5 group"
+                            >
+                              <svg className="w-4 h-4 text-[#1B4332] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-[13px] font-medium text-[#1D1D1F] group-hover:text-[#1B4332] truncate">
+                                  {item.name}
+                                </p>
+                                <p className="text-[12px] text-[#86868B] truncate">
+                                  {item.fullAddress}
+                                </p>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
                       )}
                     </div>
 
-                    {createForm.attachments && createForm.attachments.length > 0 && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-                        {createForm.attachments.map((doc, idx) => {
-                          const isPdf = doc.name.toLowerCase().endsWith('.pdf');
-                          return (
-                            <div key={doc.id || idx} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 text-xs">
-                              <div className="flex items-center gap-2 truncate">
-                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-black ${isPdf ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'}`}>
-                                  {isPdf ? 'PDF' : 'DOC'}
-                                </span>
-                                <span className="font-semibold text-slate-800 truncate" title={doc.name}>{doc.name}</span>
-                              </div>
-                              <span className="text-[10px] text-slate-400 shrink-0 ml-2">
-                                {typeof doc.size === 'number' ? `${(doc.size / (1024 * 1024)).toFixed(1)} MB` : (doc.size || '')}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Interactive Map Pick
+                      </label>
+                      <DynamicMapPicker
+                        initialLat={createForm.destinationLat}
+                        initialLng={createForm.destinationLng}
+                        onLocationSelect={handleMapLocationSelect}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Purpose of Travel *
+                      </label>
+                      <textarea
+                        rows={4}
+                        required
+                        value={createForm.purpose}
+                        onChange={(e) => setCreateForm({ ...createForm, purpose: e.target.value })}
+                        placeholder="Describe the purpose of your travel..."
+                        className="w-full p-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Stepper Action Footer matching Page 2 of PDF: Cancel on left, Save Draft + Next on right */}
-            <div className="pt-6 border-t border-slate-200/80 flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => {
-                  setWizardStep(1);
-                  setFormError('');
-                  if (sessionUser?.role === 'ACCOUNT_MANAGER') {
-                    router.push('/account-manager?tab=dashboard');
-                  } else {
-                    router.push('/employee?tab=dashboard');
-                  }
-                }}
-                className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
-              >
-                Cancel
-              </button>
+              {/* STEP 4: Additional Information */}
+              {wizardStep === 4 && (
+                <div className="space-y-5">
+                  <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Additional Information</h3>
 
-              <div className="flex items-center gap-3">
-                {wizardStep > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFormError('');
-                      setWizardStep((prev) => Math.max(prev - 1, 1));
-                    }}
-                    className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span>Previous</span>
-                  </button>
-                )}
+                  {/* 2-Column Grid for Pre-filled Profile Fields */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Salary Grade
+                      </label>
+                      <input
+                        type="text"
+                        value={createForm.salaryGrade}
+                        onChange={(e) => setCreateForm({ ...createForm, salaryGrade: e.target.value })}
+                        className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                      />
+                    </div>
 
-                {/* Save Draft Button (Matching Page 2 PDF) */}
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Division/Section/Unit
+                      </label>
+                      <input
+                        type="text"
+                        value={createForm.division}
+                        onChange={(e) => setCreateForm({ ...createForm, division: e.target.value })}
+                        className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Station
+                      </label>
+                      <input
+                        type="text"
+                        value={createForm.station}
+                        onChange={(e) => setCreateForm({ ...createForm, station: e.target.value })}
+                        className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Employment Status
+                      </label>
+                      <input
+                        type="text"
+                        value={createForm.employmentStatus}
+                        onChange={(e) => setCreateForm({ ...createForm, employmentStatus: e.target.value })}
+                        className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Office
+                      </label>
+                      <input
+                        type="text"
+                        value={createForm.office}
+                        onChange={(e) => setCreateForm({ ...createForm, office: e.target.value })}
+                        className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Signatory Station
+                      </label>
+                      <input
+                        type="text"
+                        value={createForm.signatoryStation}
+                        onChange={(e) => setCreateForm({ ...createForm, signatoryStation: e.target.value })}
+                        className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Full Width Custom Fields */}
+                  <div className="space-y-4 pt-2">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Per Diems/Expense Allowed
+                      </label>
+                      <input
+                        type="text"
+                        value={createForm.perDiems}
+                        onChange={(e) => setCreateForm({ ...createForm, perDiems: e.target.value })}
+                        placeholder="Enter per diems information..."
+                        className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Appropriations to which travel should be charged
+                      </label>
+                      <input
+                        type="text"
+                        value={createForm.appropriations}
+                        onChange={(e) => setCreateForm({ ...createForm, appropriations: e.target.value })}
+                        placeholder="Enter appropriations Information..."
+                        className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Remarks or Special Instructions
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={createForm.remarks}
+                        onChange={(e) => setCreateForm({ ...createForm, remarks: e.target.value })}
+                        placeholder="Enter any remarks or special instructions..."
+                        className="w-full p-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Certification
+                      </label>
+                      <input
+                        type="text"
+                        value={createForm.certification}
+                        onChange={(e) => setCreateForm({ ...createForm, certification: e.target.value })}
+                        placeholder="Enter certification details..."
+                        className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                        Contact Number
+                      </label>
+                      <input
+                        type="text"
+                        value={createForm.contactNumber}
+                        onChange={(e) => setCreateForm({ ...createForm, contactNumber: e.target.value })}
+                        className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Supporting Documents Drag & Drop Upload Container */}
+                  <div className="pt-2">
+                    <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
+                      Supporting Documents * (e.g., Invitation Letter, Memorandum, Program of Activities)
+                    </label>
+                    <SupportingDocumentsUpload
+                      attachments={createForm.attachments}
+                      onChange={(newAtts) => setCreateForm((prev) => ({ ...prev, attachments: newAtts }))}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 5: Review and Submit */}
+              {wizardStep === 5 && (
+                <div className="space-y-5">
+                  {/* Document Review Header */}
+                  <div className="bg-[#0F4C2E] text-white rounded-[8px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-[6px] bg-white/15 text-white border border-white/20 flex items-center justify-center shrink-0">
+                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-[14px] font-semibold text-white">Travel Authority Request Summary</h3>
+                        <p className="text-[12px] text-emerald-100/80 mt-0.5">Please review all submitted information before final submission for approval.</p>
+                      </div>
+                    </div>
+                    <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-800 text-emerald-100 border border-emerald-700 shrink-0 uppercase">
+                      Ready for Submission
+                    </span>
+                  </div>
+
+                  <div className="space-y-4">
+                    {/* 1. Travel Schedule */}
+                    <div className="bg-white rounded-[8px] border border-[#E5E5E7] p-4 shadow-xs">
+                      <div className="flex items-center justify-between pb-2.5 border-b border-[#E5E5E7] mb-3.5">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-[4px] bg-[#1B4332] text-white flex items-center justify-center font-semibold text-[11px]">
+                            1
+                          </div>
+                          <h4 className="text-[14px] font-semibold text-[#1D1D1F]">
+                            Travel Schedule
+                          </h4>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setWizardStep(1)}
+                          className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors text-[#1B4332] hover:bg-[#F2F2F7] cursor-pointer"
+                        >
+                          <span>Edit Step 1</span>
+                          <svg className="w-3 h-3 text-[#1B4332]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-1">
+                            Departure Date
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4 text-[#1B4332]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span className="text-[13px] font-semibold text-[#1D1D1F]">
+                              {createForm.departureDate || 'Not specified'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-1">
+                            Return Date
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4 text-[#1B4332]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span className="text-[13px] font-semibold text-[#1D1D1F]">
+                              {createForm.returnDate || 'Not specified'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2. Employee Profile & Travel Area */}
+                    <div className="bg-white rounded-[8px] border border-[#E5E5E7] p-4 shadow-xs">
+                      <div className="flex items-center justify-between pb-2.5 border-b border-[#E5E5E7] mb-3.5">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-[4px] bg-[#1B4332] text-white flex items-center justify-center font-semibold text-[11px]">
+                            2
+                          </div>
+                          <h4 className="text-[14px] font-semibold text-[#1D1D1F]">
+                            Employee Information & Travel Area
+                          </h4>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setWizardStep(2)}
+                          className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors text-[#1B4332] hover:bg-[#F2F2F7] cursor-pointer"
+                        >
+                          <span>Edit Step 2</span>
+                          <svg className="w-3 h-3 text-[#1B4332]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-[13px]">
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-0.5">
+                            Employee Name
+                          </span>
+                          <span className="font-semibold text-[#1D1D1F]">{createForm.employeeName || 'None selected'}</span>
+                        </div>
+
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7] md:col-span-2">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-0.5">
+                            Position
+                          </span>
+                          <span className="font-medium text-[#1D1D1F]">{createForm.position || 'Not specified'}</span>
+                        </div>
+
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-0.5">
+                            Travel Area
+                          </span>
+                          <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-[#1B4332] text-white mt-0.5">
+                            {createForm.travelArea}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 3. Travel Details & Location */}
+                    <div className="bg-white rounded-[8px] border border-[#E5E5E7] p-4 shadow-xs">
+                      <div className="flex items-center justify-between pb-2.5 border-b border-[#E5E5E7] mb-3.5">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-[4px] bg-[#1B4332] text-white flex items-center justify-center font-semibold text-[11px]">
+                            3
+                          </div>
+                          <h4 className="text-[14px] font-semibold text-[#1D1D1F]">
+                            Destination & Purpose of Travel
+                          </h4>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setWizardStep(3)}
+                          className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors text-[#1B4332] hover:bg-[#F2F2F7] cursor-pointer"
+                        >
+                          <span>Edit Step 3</span>
+                          <svg className="w-3 h-3 text-[#1B4332]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <div className="space-y-3 text-[13px]">
+                        <div className="p-3 bg-emerald-50/50 rounded-[6px] border border-emerald-200">
+                          <span className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider block mb-1">
+                            Official Destination
+                          </span>
+                          <div className="flex items-start gap-2">
+                            <svg className="w-4 h-4 text-[#1B4332] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <div>
+                              <p className="font-semibold text-[#1D1D1F] text-[13px]">{createForm.destination}</p>
+                              <p className="text-[11px] font-mono text-[#86868B] mt-0.5">
+                                Map Pin Coordinates: Latitude {createForm.destinationLat.toFixed(4)}, Longitude {createForm.destinationLng.toFixed(4)}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-1.5">
+                            Purpose of Travel
+                          </span>
+                          <p className="text-[13px] text-[#1D1D1F] leading-relaxed whitespace-pre-line bg-white p-3 rounded-[6px] border border-[#E5E5E7]">
+                            {createForm.purpose}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 4. Additional Information & Administrative Details */}
+                    <div className="bg-white rounded-[8px] border border-[#E5E5E7] p-4 shadow-xs">
+                      <div className="flex items-center justify-between pb-2.5 border-b border-[#E5E5E7] mb-3.5">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-[4px] bg-[#1B4332] text-white flex items-center justify-center font-semibold text-[11px]">
+                            4
+                          </div>
+                          <h4 className="text-[14px] font-semibold text-[#1D1D1F]">
+                            Administrative & Additional Details
+                          </h4>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setWizardStep(4)}
+                          className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors text-[#1B4332] hover:bg-[#F2F2F7] cursor-pointer"
+                        >
+                          <span>Edit Step 4</span>
+                          <svg className="w-3 h-3 text-[#1B4332]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-[13px] mb-3">
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-0.5">Salary Grade</span>
+                          <span className="font-semibold text-[#1D1D1F]">{createForm.salaryGrade}</span>
+                        </div>
+
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-0.5">Division/Section</span>
+                          <span className="font-medium text-[#1D1D1F]">{createForm.division}</span>
+                        </div>
+
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-0.5">Station</span>
+                          <span className="font-medium text-[#1D1D1F]">{createForm.station}</span>
+                        </div>
+
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-0.5">Employment Status</span>
+                          <span className="font-medium text-[#1D1D1F]">{createForm.employmentStatus}</span>
+                        </div>
+
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-0.5">Office</span>
+                          <span className="font-medium text-[#1D1D1F]">{createForm.office}</span>
+                        </div>
+
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-0.5">Signatory Station</span>
+                          <span className="font-medium text-[#1D1D1F]">{createForm.signatoryStation}</span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[13px] pt-3 border-t border-[#E5E5E7]">
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-0.5">Per Diems / Expense Allowed</span>
+                          <span className="font-medium text-[#1D1D1F]">{createForm.perDiems || 'Standard Allowance / As per guidelines'}</span>
+                        </div>
+
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-0.5">Appropriations</span>
+                          <span className="font-medium text-[#1D1D1F]">{createForm.appropriations || 'Regular Operational Fund'}</span>
+                        </div>
+
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-0.5">Remarks or Special Instructions</span>
+                          <span className="font-medium text-[#1D1D1F]">{createForm.remarks || 'None'}</span>
+                        </div>
+
+                        <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                          <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-0.5">Contact Number</span>
+                          <span className="font-semibold text-[#1B4332]">{createForm.contactNumber}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 5. Supporting Documents */}
+                    <div className="bg-white rounded-[8px] border border-[#E5E5E7] p-4 shadow-xs space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <svg className="w-5 h-5 text-[#1B4332] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                          </svg>
+                          <div>
+                            <h4 className="text-[14px] font-semibold text-[#1D1D1F]">Supporting Documents</h4>
+                            <p className="text-[12px] text-[#86868B] mt-0.5">
+                              {createForm.attachments && createForm.attachments.length > 0
+                                ? `${createForm.attachments.length} document${createForm.attachments.length === 1 ? '' : 's'} attached`
+                                : 'No supporting documents attached (optional)'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {createForm.attachments && createForm.attachments.length > 0 ? (
+                          <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            Attached ({createForm.attachments.length})
+                          </span>
+                        ) : (
+                          <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-[#F5F5F7] text-[#86868B] border border-[#E5E5E7]">
+                            None attached
+                          </span>
+                        )}
+                      </div>
+
+                      {createForm.attachments && createForm.attachments.length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-[#E5E5E7]">
+                          {createForm.attachments.map((doc, idx) => {
+                            const isPdf = doc.name.toLowerCase().endsWith('.pdf');
+                            return (
+                              <div key={doc.id || idx} className="flex items-center justify-between p-2.5 rounded-[6px] bg-[#F5F5F7] border border-[#E5E5E7] text-[13px]">
+                                <div className="flex items-center gap-2 truncate">
+                                  <span className={`h-5 inline-flex items-center justify-center px-1.5 text-[10px] font-semibold rounded-[4px] ${isPdf ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}`}>
+                                    {isPdf ? 'PDF' : 'DOC'}
+                                  </span>
+                                  <span className="font-medium text-[#1D1D1F] truncate" title={doc.name}>{doc.name}</span>
+                                </div>
+                                <span className="text-[11px] text-[#86868B] shrink-0 ml-2">
+                                  {typeof doc.size === 'number' ? `${(doc.size / (1024 * 1024)).toFixed(1)} MB` : (doc.size || '')}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Stepper Action Footer */}
+              <div className="pt-5 border-t border-[#E5E5E7] flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={handleSaveDraft}
-                  className="px-5 py-2.5 rounded-xl border border-[#0B5A3A] text-[#0B5A3A] bg-white hover:bg-emerald-50 text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
+                  onClick={() => {
+                    setWizardStep(1);
+                    setFormError('');
+                    if (sessionUser?.role === 'ACCOUNT_MANAGER') {
+                      router.push('/account-manager?tab=dashboard');
+                    } else {
+                      router.push('/employee?tab=dashboard');
+                    }
+                  }}
+                  className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] cursor-pointer"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                  </svg>
-                  <span>Save Draft</span>
+                  Cancel
                 </button>
 
-                {wizardStep < 5 ? (
+                <div className="flex items-center gap-2.5">
+                  {wizardStep > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormError('');
+                        setWizardStep((prev) => Math.max(prev - 1, 1));
+                      }}
+                      className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-white border border-[#E5E5E7] text-[#1D1D1F] hover:bg-[#F2F2F7] cursor-pointer"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      <span>Previous</span>
+                    </button>
+                  )}
+
+                  {/* Save Draft Button */}
                   <button
                     type="button"
-                    onClick={handleWizardNext}
-                    className="px-6 py-2.5 bg-[#0B5A3A] hover:bg-[#06452F] text-white rounded-xl text-xs font-bold shadow-2xs transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                    onClick={handleSaveDraft}
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-white border border-[#1B4332] text-[#1B4332] hover:bg-[#F2F2F7] cursor-pointer"
                   >
-                    <span>Next</span>
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                     </svg>
+                    <span>Save Draft</span>
                   </button>
-                ) : (
-                  <button
-                    type="button"
-                    disabled={isSubmitting}
-                    onClick={handleCreateSubmit}
-                    className="px-6 py-2.5 bg-[#0B5A3A] hover:bg-[#06452F] text-white rounded-xl text-xs font-bold shadow-md disabled:opacity-50 transition-all cursor-pointer"
-                  >
-                    {isSubmitting ? 'Submitting...' : 'Submit for Approval'}
-                  </button>
-                )}
+
+                  {wizardStep < 5 ? (
+                    <button
+                      type="button"
+                      onClick={handleWizardNext}
+                      className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white cursor-pointer"
+                    >
+                      <span>Next</span>
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={handleCreateSubmit}
+                      className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white disabled:opacity-50 cursor-pointer"
+                    >
+                      {isSubmitting ? 'Submitting...' : 'Submit for Approval'}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -2260,56 +2326,56 @@ function EmployeeContent() {
       const retReq = requests.filter((r) => r.status && r.status.startsWith('REJECTED')).length;
 
       return (
-        <div className="w-full max-w-[1600px] mx-auto space-y-6 animate-fade-in pb-10 flex flex-col">
+        <div className="w-full max-w-[1600px] mx-auto space-y-5 animate-fade-in pb-10 flex flex-col">
           {/* Header & Quick Summary Strip */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {/* Total Filed */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-[#0F4C2E] shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Filed</span>
-                <span className="text-xl font-black text-slate-900 mt-0.5 block">{totalReq}</span>
+                <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Total Filed</span>
+                <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1 block">{totalReq}</span>
               </div>
-              <div className="flex items-center justify-center bg-transparent">
-                <svg className="w-7 h-7 text-[#0B5A3A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-9 h-9 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-[#0F4C2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
             </div>
 
             {/* Approved TAs */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-emerald-500 shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Approved TAs</span>
-                <span className="text-xl font-black text-[#16835D] mt-0.5 block">{appReq}</span>
+                <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider block">Approved TAs</span>
+                <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1 block">{appReq}</span>
               </div>
-              <div className="flex items-center justify-center bg-transparent">
-                <svg className="w-7 h-7 text-[#16835D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-9 h-9 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
             </div>
 
             {/* Under Review */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-amber-500 shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Under Review</span>
-                <span className="text-xl font-black text-[#D97706] mt-0.5 block">{pendReq}</span>
+                <span className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider block">Under Review</span>
+                <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1 block">{pendReq}</span>
               </div>
-              <div className="flex items-center justify-center bg-transparent">
-                <svg className="w-7 h-7 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-9 h-9 rounded-[6px] bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
             </div>
 
             {/* Needs Revision */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-rose-500 shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Needs Revision</span>
-                <span className="text-xl font-black text-[#DC3545] mt-0.5 block">{retReq}</span>
+                <span className="text-[11px] font-semibold text-rose-600 uppercase tracking-wider block">Needs Revision</span>
+                <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1 block">{retReq}</span>
               </div>
-              <div className="flex items-center justify-center bg-transparent">
-                <svg className="w-7 h-7 text-[#DC3545]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-9 h-9 rounded-[6px] bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
               </div>
@@ -2317,25 +2383,25 @@ function EmployeeContent() {
           </div>
 
           {/* Search, Filter & Action Bar */}
-          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-white p-3.5 rounded-[8px] border border-[#E5E5E7] shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="relative flex-1 w-full">
               <input
                 type="text"
                 placeholder="Search by reference, destination, or purpose..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#2E6F4E] transition-all"
+                className="w-full h-8 pl-8 pr-3 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
               />
-              <svg className="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-[#86868B] absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
 
-            <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="flex items-center gap-2.5 w-full sm:w-auto">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:ring-2 focus:ring-[#2E6F4E] w-full sm:w-auto cursor-pointer"
+                className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] w-full sm:w-auto cursor-pointer"
               >
                 <option value="ALL">All Statuses</option>
                 <option value="APPROVED">Approved</option>
@@ -2348,7 +2414,7 @@ function EmployeeContent() {
 
               <button
                 onClick={() => router.push('/employee?tab=create')}
-                className="px-4 py-2.5 bg-[#0B5A3A] hover:bg-[#06452F] text-white text-xs font-bold rounded-xl shadow-2xs transition-all shrink-0 flex items-center gap-1.5 cursor-pointer"
+                className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white shrink-0 cursor-pointer"
               >
                 <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -2358,47 +2424,53 @@ function EmployeeContent() {
             </div>
           </div>
 
-          {/* Table Container Card (Min height with bottom pagination) */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden min-h-[460px] flex flex-col justify-between">
+          {/* Table Container Card */}
+          <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden min-h-[420px] flex flex-col justify-between">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
-                    <th className="py-4 px-6">Reference No.</th>
-                    <th className="py-4 px-6">Destination(s)</th>
-                    <th className="py-4 px-6">Travel Dates</th>
-                    <th className="py-4 px-6 min-w-[170px]">Status</th>
-                    <th className="py-4 px-6">Filed Date</th>
-                    <th className="py-4 px-6 text-right">Actions</th>
+                <thead className="bg-emerald-950/[0.04] border-b border-[#E5E5E7]">
+                  <tr>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Reference No.</th>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Destination(s)</th>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Travel Dates</th>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center min-w-[160px]">Status</th>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Filed Date</th>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-xs">
+                <tbody>
                   {filtered.length > 0 ? (
                     filtered.map((req) => (
-                      <tr key={req.id} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="py-4 px-6 font-bold font-mono text-[#0B5A3A]">{req.trackingNumber}</td>
-                        <td className="py-4 px-6 text-slate-700 font-semibold flex items-center gap-1.5">
-                          <svg className="w-3.5 h-3.5 text-[#64748B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          <span>{req.destination}</span>
+                      <tr key={req.id} className="h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors">
+                        <td className="px-3 py-1.5 text-[13px] font-medium font-mono text-[#1B4332] align-middle text-left whitespace-nowrap">
+                          <span className="px-2 py-0.5 rounded-[4px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200/80 font-mono text-[12px] font-semibold">
+                            {req.trackingNumber}
+                          </span>
                         </td>
-                        <td className="py-4 px-6 text-slate-500 font-medium">
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">
                           <div className="flex items-center gap-1.5">
-                            <svg className="w-3.5 h-3.5 text-[#64748B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-3.5 h-3.5 text-[#86868B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span className="truncate max-w-[300px]">{req.destination}</span>
+                          </div>
+                        </td>
+                        <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">
+                          <div className="flex items-center gap-1.5">
+                            <svg className="w-3.5 h-3.5 text-[#86868B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             <span>{new Date(req.startDate).toLocaleDateString()} - {new Date(req.endDate).toLocaleDateString()}</span>
                           </div>
                         </td>
-                        <td className="py-4 px-6 min-w-[170px]">{renderStatusBadge(req.status)}</td>
-                        <td className="py-4 px-6 text-slate-400 font-medium">{new Date(req.createdAt).toLocaleDateString()}</td>
-                        <td className="py-4 px-6 text-right space-x-2 whitespace-nowrap">
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center min-w-[160px]">{renderStatusBadge(req.status)}</td>
+                        <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">{new Date(req.createdAt).toLocaleDateString()}</td>
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-right space-x-1.5 whitespace-nowrap">
                           {req.status === 'APPROVED' && (
                             <button
                               onClick={() => setTravelOrderModalRequest(req)}
-                              className="px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 text-[#0B5A3A] font-bold text-xs transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 text-emerald-700 cursor-pointer"
                               title="Print Official Approved Travel Order"
                             >
                               <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2415,7 +2487,7 @@ function EmployeeContent() {
                                 setResubmitEndDate(new Date(req.endDate).toISOString().slice(0, 10));
                                 setResubmitError('');
                               }}
-                              className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-700 cursor-pointer"
                               title="Revise travel dates and resubmit"
                             >
                               <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2426,7 +2498,7 @@ function EmployeeContent() {
                           )}
                           <button
                             onClick={() => setSelectedRequest(req)}
-                            className="px-3 py-1.5 rounded-lg bg-transparent border border-slate-200 hover:bg-[#F5F7F9] hover:border-[#0B5A3A]/40 text-slate-600 hover:text-[#0B5A3A] font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-none"
+                            className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-white border border-[#E5E5E7] hover:bg-[#F2F2F7] text-[#1D1D1F] cursor-pointer"
                             title="View Full Details"
                           >
                             <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2440,7 +2512,7 @@ function EmployeeContent() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} className="py-12 text-center text-slate-400">
+                      <td colSpan={6} className="py-12 text-center text-[13px] text-[#86868B]">
                         No travel authorities found matching the filter.
                       </td>
                     </tr>
@@ -2450,22 +2522,22 @@ function EmployeeContent() {
             </div>
 
             {/* Table Footer & Information Bar */}
-            <div className="p-4 sm:p-5 bg-slate-50/70 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span>Showing <strong className="text-slate-800">{filtered.length}</strong> of <strong className="text-slate-800">{requests.length}</strong> Travel Authority records</span>
+            <div className="px-4 py-2.5 bg-[#F5F5F7] border-t border-[#E5E5E7] flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-[12px] text-[#86868B]">
+                <span>Showing <strong className="text-[#1D1D1F] font-semibold">{filtered.length}</strong> of <strong className="text-[#1D1D1F] font-semibold">{requests.length}</strong> Travel Authority records</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400 mr-2 hidden sm:inline">Page 1 of 1</span>
+                <span className="text-[12px] text-[#86868B] mr-1 hidden sm:inline">Page 1 of 1</span>
                 <button
                   disabled
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-400 text-xs font-semibold cursor-not-allowed"
+                  className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors border border-[#E5E5E7] bg-white text-[#86868B] cursor-not-allowed"
                 >
                   Previous
                 </button>
                 <button
                   disabled
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-400 text-xs font-semibold cursor-not-allowed"
+                  className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors border border-[#E5E5E7] bg-white text-[#86868B] cursor-not-allowed"
                 >
                   Next
                 </button>
@@ -2474,18 +2546,19 @@ function EmployeeContent() {
           </div>
 
           {/* Quick Notice Card at Bottom */}
-          <div className="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-100 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-[#0B5A3A] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="p-3.5 bg-[#F5F5F7] rounded-[8px] border border-[#E5E5E7] flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
+              <svg className="w-4 h-4 text-[#1B4332] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-xs text-[#0B5A3A] font-medium leading-snug">
-                <strong>Need to modify or cancel a submitted request?</strong> Requests pending review can be recalled or edited prior to Head of PENRO approval.
+              <p className="text-[13px] text-[#1D1D1F] leading-snug">
+                <strong className="font-semibold">Need to modify or cancel a submitted request?</strong>{' '}
+                <span className="text-[#86868B]">Requests pending review can be recalled or edited prior to Head of PENRO approval.</span>
               </p>
             </div>
             <button
               onClick={() => router.push('/employee?tab=schedule')}
-              className="text-xs font-bold text-[#0B5A3A] hover:underline whitespace-nowrap hidden md:inline-block cursor-pointer"
+              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors text-[#1B4332] hover:bg-[#E5E5E7]/60 whitespace-nowrap hidden md:inline-flex cursor-pointer"
             >
               View Travel Schedule →
             </button>
@@ -2535,30 +2608,30 @@ function EmployeeContent() {
       );
 
       return (
-        <div className="w-full max-w-[1600px] mx-auto space-y-6 animate-fade-in">
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-            {/* Calendar Main Box (8 cols on XL, 9 cols on 2XL) */}
-            <div className="xl:col-span-8 2xl:col-span-9 bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-6 sm:p-8 space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        <div className="w-full max-w-[1600px] mx-auto space-y-5 animate-fade-in">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+            {/* Calendar Main Box */}
+            <div className="xl:col-span-8 2xl:col-span-9 bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden">
+              <div className="px-5 py-3.5 bg-slate-100/90 border-b border-[#E5E5E7] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Monthly Travel Schedule</h3>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">Overview of scheduled, approved, and pending field travel itineraries</p>
+                  <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Monthly Travel Schedule</h3>
+                  <p className="text-[12px] text-[#86868B] mt-0.5">Overview of scheduled, approved, and pending field travel itineraries</p>
                 </div>
-                <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 shrink-0">
-                  <span className="px-3 py-1.5 bg-emerald-50 text-[#0B5A3A] border border-emerald-200/80 rounded-lg font-bold">
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="h-7 px-2.5 inline-flex items-center justify-center bg-white text-[#1B4332] border border-[#E5E5E7] rounded-[6px] text-xs font-semibold">
                     {schedMonthLabel}
                   </span>
                   <button
                     type="button"
                     onClick={handleToday}
-                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition-colors cursor-pointer"
+                    className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-white border border-[#E5E5E7] hover:bg-emerald-50/50 text-[#1D1D1F] cursor-pointer"
                   >
                     Today
                   </button>
                   <button
                     type="button"
                     onClick={handlePrevMonth}
-                    className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+                    className="h-7 w-7 inline-flex items-center justify-center rounded-[6px] bg-white border border-[#E5E5E7] hover:bg-emerald-50/50 text-[#86868B] hover:text-[#1D1D1F] transition-colors cursor-pointer"
                     title="Previous Month"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2568,7 +2641,7 @@ function EmployeeContent() {
                   <button
                     type="button"
                     onClick={handleNextMonth}
-                    className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+                    className="h-7 w-7 inline-flex items-center justify-center rounded-[6px] bg-white border border-[#E5E5E7] hover:bg-emerald-50/50 text-[#86868B] hover:text-[#1D1D1F] transition-colors cursor-pointer"
                     title="Next Month"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2578,147 +2651,136 @@ function EmployeeContent() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-7 gap-2.5 text-center text-xs">
-                {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((d, i) => (
-                  <div key={i} className="font-bold text-slate-400 py-2 text-[11px] uppercase tracking-wider">{d}</div>
-                ))}
+              <div className="p-5">
+                <div className="grid grid-cols-7 gap-2 text-center text-xs">
+                  {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((d, i) => (
+                    <div key={i} className="font-semibold text-[#86868B] py-1.5 text-[11px] uppercase tracking-wider">{d}</div>
+                  ))}
 
-                {/* Leading padding cells from previous month */}
-                {Array.from({ length: firstDayIndex }).map((_, idx) => {
-                  const prevDay = prevMonthDays - firstDayIndex + idx + 1;
-                  return (
-                    <div
-                      key={`prev-${idx}`}
-                      className="min-h-[76px] sm:min-h-[92px] p-2.5 rounded-xl border border-slate-100/60 bg-slate-50/40 text-slate-300 opacity-40 flex flex-col justify-between"
-                    >
-                      <span className="text-right text-xs font-medium">{prevDay}</span>
-                    </div>
-                  );
-                })}
-
-                {/* Days of current month */}
-                {Array.from({ length: daysInMonth }).map((_, i) => {
-                  const day = i + 1;
-                  const dayRequests = requests.filter((r) => {
-                    if (!r.startDate || !r.endDate) return false;
-                    const start = new Date(r.startDate);
-                    start.setHours(0, 0, 0, 0);
-                    const end = new Date(r.endDate);
-                    end.setHours(23, 59, 59, 999);
-                    const checkDate = new Date(schedYear, schedMonth, day, 12, 0, 0, 0);
-                    return checkDate >= start && checkDate <= end;
-                  });
-
-                  const hasApproved = dayRequests.some((r) => r.status === 'APPROVED');
-                  const hasPending = dayRequests.some((r) => r.status && r.status.startsWith('PENDING'));
-                  const hasRequests = dayRequests.length > 0;
-
-                  const isToday =
-                    new Date().getFullYear() === schedYear &&
-                    new Date().getMonth() === schedMonth &&
-                    new Date().getDate() === day;
-
-                  return (
-                    <div
-                      key={day}
-                      onClick={() => {
-                        if (dayRequests.length === 1) {
-                          setSelectedRequest(dayRequests[0]);
-                        }
-                      }}
-                      className={`min-h-[84px] sm:min-h-[100px] p-2 rounded-xl border flex flex-col justify-between transition-all ${
-                        isToday
-                          ? 'border-[#16835D] bg-white ring-2 ring-emerald-100 text-slate-900 shadow-2xs'
-                          : hasRequests
-                          ? 'border-slate-200 bg-white hover:bg-slate-50/60 text-slate-800'
-                          : 'border-slate-100 bg-white hover:bg-slate-50/40 text-slate-700'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        {isToday ? (
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#16835D]"></span>
-                        ) : <span></span>}
-                        <span className={`text-right text-xs font-semibold ${isToday ? 'text-[#0B5A3A] font-black' : 'text-slate-600'}`}>
-                          {day}
-                        </span>
+                  {/* Leading padding cells from previous month */}
+                  {Array.from({ length: firstDayIndex }).map((_, idx) => {
+                    const prevDay = prevMonthDays - firstDayIndex + idx + 1;
+                    return (
+                      <div
+                        key={`prev-${idx}`}
+                        className="min-h-[76px] sm:min-h-[92px] p-2 rounded-[6px] border border-[#E5E5E7]/60 bg-[#F5F5F7]/50 text-[#86868B]/40 flex flex-col justify-between"
+                      >
+                        <span className="text-right text-[12px] font-medium">{prevDay}</span>
                       </div>
+                    );
+                  })}
 
-                      {/* Stacked list of all matching TA requests on this day */}
-                      {hasRequests ? (
-                        <div className="space-y-1 w-full mt-auto">
-                          {dayRequests.map((req) => {
-                            const isApp = req.status === 'APPROVED';
-                            const isPend = req.status && req.status.startsWith('PENDING');
+                  {/* Days of current month */}
+                  {Array.from({ length: daysInMonth }).map((_, i) => {
+                    const day = i + 1;
+                    const dayRequests = requests.filter((r) => {
+                      if (!r.startDate || !r.endDate) return false;
+                      const start = new Date(r.startDate);
+                      start.setHours(0, 0, 0, 0);
+                      const end = new Date(r.endDate);
+                      end.setHours(23, 59, 59, 999);
+                      const checkDate = new Date(schedYear, schedMonth, day, 12, 0, 0, 0);
+                      return checkDate >= start && checkDate <= end;
+                    });
 
-                            return (
-                              <button
-                                key={req.id}
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedRequest(req);
-                                }}
-                                className={`w-full text-left text-[10px] px-1.5 py-1 rounded-md font-semibold truncate flex items-center gap-1.5 transition-all hover:opacity-90 cursor-pointer border ${
-                                  isApp
-                                    ? 'bg-emerald-50/90 text-[#0B5A3A] border-emerald-200/80 hover:bg-emerald-100'
-                                    : isPend
-                                    ? 'bg-amber-50/90 text-[#D97706] border-amber-200/80 hover:bg-amber-100'
-                                    : 'bg-slate-50 text-slate-700 border-slate-200/80 hover:bg-slate-100'
-                                }`}
-                                title={`${isApp ? 'Approved' : isPend ? 'Under Review' : req.status}: ${req.destination || req.purpose} (${req.trackingNumber})`}
-                              >
-                                {isApp ? (
-                                  <svg className="w-3 h-3 text-[#16835D] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                ) : isPend ? (
-                                  <svg className="w-3 h-3 text-[#D97706] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                  </svg>
-                                ) : (
-                                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                                )}
-                                <span className="truncate">{req.destination || req.trackingNumber}</span>
-                              </button>
-                            );
-                          })}
+                    const hasRequests = dayRequests.length > 0;
+
+                    const isToday =
+                      new Date().getFullYear() === schedYear &&
+                      new Date().getMonth() === schedMonth &&
+                      new Date().getDate() === day;
+
+                    return (
+                      <div
+                        key={day}
+                        onClick={() => {
+                          if (dayRequests.length === 1) {
+                            setSelectedRequest(dayRequests[0]);
+                          }
+                        }}
+                        className={`min-h-[84px] sm:min-h-[100px] p-2 rounded-[6px] border flex flex-col justify-between transition-colors ${
+                          isToday
+                            ? 'border-[#1B4332] bg-white ring-1 ring-[#1B4332]/20 text-[#1D1D1F]'
+                            : hasRequests
+                            ? 'border-[#E5E5E7] bg-white hover:bg-[#F2F2F7] text-[#1D1D1F]'
+                            : 'border-[#E5E5E7] bg-white hover:bg-[#F2F2F7] text-[#1D1D1F]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          {isToday ? (
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#1B4332]"></span>
+                          ) : <span></span>}
+                          <span className={`text-right text-[12px] font-medium ${isToday ? 'text-[#1B4332] font-bold' : 'text-[#86868B]'}`}>
+                            {day}
+                          </span>
                         </div>
-                      ) : null}
-                    </div>
-                  );
-                })}
+
+                        {/* Stacked list of all matching TA requests on this day */}
+                        {hasRequests ? (
+                          <div className="space-y-1 w-full mt-auto">
+                            {dayRequests.map((req) => {
+                              const isApp = req.status === 'APPROVED';
+                              const isPend = req.status && req.status.startsWith('PENDING');
+
+                              return (
+                                <button
+                                  key={req.id}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedRequest(req);
+                                  }}
+                                  className={`w-full text-left text-[10px] px-1.5 py-0.5 rounded-[4px] font-semibold truncate flex items-center gap-1 transition-colors cursor-pointer border ${
+                                    isApp
+                                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                                      : isPend
+                                      ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                                      : 'bg-[#F5F5F7] text-[#86868B] border-[#E5E5E7] hover:bg-[#F2F2F7]'
+                                  }`}
+                                  title={`${isApp ? 'Approved' : isPend ? 'Under Review' : req.status}: ${req.destination || req.purpose} (${req.trackingNumber})`}
+                                >
+                                  <span className="truncate">{req.destination || req.trackingNumber}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* Right Statistics & Upcoming Itineraries Panel (4 cols on XL, 3 cols on 2XL) */}
-            <div className="xl:col-span-4 2xl:col-span-3 space-y-6">
-              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-6 space-y-5">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <h3 className="text-sm font-bold text-slate-900">Travel Statistics</h3>
-                  <span className="text-xs text-[#0B5A3A] font-semibold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
+            {/* Right Statistics & Upcoming Itineraries Panel */}
+            <div className="xl:col-span-4 2xl:col-span-3 space-y-5">
+              <div className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden">
+                <div className="px-4 py-3 bg-slate-100/90 border-b border-[#E5E5E7] flex items-center justify-between">
+                  <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Travel Statistics</h3>
+                  <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">
                     FY {schedYear}
                   </span>
                 </div>
-                <div className="space-y-3.5 text-xs">
-                  <div className="flex justify-between py-2 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Total Travel Days</span>
-                    <span className="font-extrabold text-slate-900 text-sm">{totalTravelDays} days</span>
+                <div className="p-4 space-y-3 text-[13px]">
+                  <div className="flex justify-between py-1.5 border-b border-[#E5E5E7]">
+                    <span className="text-[#86868B]">Total Travel Days</span>
+                    <span className="font-semibold text-[#1D1D1F]">{totalTravelDays} days</span>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Approved / Completed Trips</span>
-                    <span className="font-extrabold text-slate-900 text-sm">
+                  <div className="flex justify-between py-1.5 border-b border-[#E5E5E7]">
+                    <span className="text-[#86868B]">Approved / Completed Trips</span>
+                    <span className="font-semibold text-[#1D1D1F]">
                       {completedTripsCount} {completedTripsCount === 1 ? 'trip' : 'trips'}
                     </span>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Destinations Visited</span>
-                    <span className="font-extrabold text-slate-900 text-sm">
+                  <div className="flex justify-between py-1.5 border-b border-[#E5E5E7]">
+                    <span className="text-[#86868B]">Destinations Visited</span>
+                    <span className="font-semibold text-[#1D1D1F]">
                       {uniqueDestinationsCount} {uniqueDestinationsCount === 1 ? 'location' : 'locations'}
                     </span>
                   </div>
-                  <div className="flex justify-between py-2">
-                    <span className="text-slate-500 font-medium">Upcoming Itinerary</span>
-                    <span className="font-bold text-[#0B5A3A] text-xs">
+                  <div className="flex justify-between py-1.5">
+                    <span className="text-[#86868B]">Upcoming Itinerary</span>
+                    <span className="font-semibold text-[#1B4332]">
                       {nextUpcoming
                         ? formatDateRangeShort(nextUpcoming.startDate, nextUpcoming.endDate)
                         : 'None scheduled'}
@@ -2728,63 +2790,66 @@ function EmployeeContent() {
               </div>
 
               {/* Scheduled Itineraries Card */}
-              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-6 space-y-4">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                  <h3 className="text-sm font-bold text-slate-900">Scheduled Itineraries</h3>
-                  <span className="text-[11px] font-bold text-slate-400">
+              <div className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden">
+                <div className="px-4 py-3 bg-[#F5F5F7] border-b border-[#E5E5E7] flex items-center justify-between">
+                  <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Scheduled Itineraries</h3>
+                  <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-white text-[#86868B] border border-[#E5E5E7]">
                     {scheduledItineraries.length} active
                   </span>
                 </div>
 
-                {scheduledItineraries.length > 0 ? (
-                  <div className="space-y-3">
-                    {scheduledItineraries.map((itinerary) => {
-                      const isApproved = itinerary.status === 'APPROVED';
-                      const sDate = new Date(itinerary.startDate);
-                      const eDate = new Date(itinerary.endDate);
-                      const daysCount = Math.max(1, Math.round((eDate.getTime() - sDate.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+                <div className="p-4">
+                  {scheduledItineraries.length > 0 ? (
+                    <div className="space-y-2.5">
+                      {scheduledItineraries.map((itinerary) => {
+                        const isApproved = itinerary.status === 'APPROVED';
+                        const sDate = new Date(itinerary.startDate);
+                        const eDate = new Date(itinerary.endDate);
+                        const daysCount = Math.max(1, Math.round((eDate.getTime() - sDate.getTime()) / (1000 * 60 * 60 * 24)) + 1);
 
-                      return (
-                        <div
-                          key={itinerary.id}
-                          onClick={() => setSelectedRequest(itinerary)}
-                          className="p-4 rounded-xl border border-slate-200/80 bg-white hover:bg-[#F4F8F5] transition-all cursor-pointer shadow-2xs hover:shadow-xs"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-mono text-xs font-bold text-[#0B5A3A]">
-                              {itinerary.trackingNumber}
-                            </span>
-                            <span
-                              className={`inline-flex items-center gap-1.5 text-xs font-semibold ${
-                                isApproved ? 'text-[#16835D]' : 'text-[#D97706]'
-                              }`}
-                            >
-                              <span className={`w-1.5 h-1.5 rounded-full ${isApproved ? 'bg-[#16835D]' : 'bg-[#D97706]'}`}></span>
-                              {isApproved ? 'Approved' : 'Under Review'}
-                            </span>
+                        return (
+                          <div
+                            key={itinerary.id}
+                            onClick={() => setSelectedRequest(itinerary)}
+                            className="p-3 rounded-[6px] border border-[#E5E5E7] bg-white hover:bg-[#F2F2F7] transition-colors cursor-pointer"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-mono text-[13px] font-medium text-[#1B4332]">
+                                {itinerary.trackingNumber}
+                              </span>
+                              <span
+                                className={`h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] ${
+                                  isApproved
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                    : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                }`}
+                              >
+                                {isApproved ? 'Approved' : 'Under Review'}
+                              </span>
+                            </div>
+                            <p className="text-[13px] font-medium text-[#1D1D1F] flex items-center gap-1.5 mt-1.5">
+                              <svg className="w-3.5 h-3.5 text-[#86868B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                              <span className="truncate">{itinerary.destination}</span>
+                            </p>
+                            <p className="text-[12px] text-[#86868B] mt-1 flex items-center gap-1.5">
+                              <svg className="w-3.5 h-3.5 text-[#86868B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              <span>{formatDateRangeShort(itinerary.startDate, itinerary.endDate)} ({daysCount} {daysCount === 1 ? 'day' : 'days'})</span>
+                            </p>
                           </div>
-                          <p className="text-xs font-bold text-slate-800 flex items-center gap-1.5 mt-1.5">
-                            <svg className="w-3.5 h-3.5 text-[#64748B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span className="truncate">{itinerary.destination}</span>
-                          </p>
-                          <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1.5">
-                            <svg className="w-3.5 h-3.5 text-[#64748B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span>{formatDateRangeShort(itinerary.startDate, itinerary.endDate)} ({daysCount} {daysCount === 1 ? 'day' : 'days'})</span>
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="p-6 text-center text-xs text-slate-400 bg-slate-50 rounded-xl border border-slate-100">
-                    No scheduled itineraries found.
-                  </div>
-                )}
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="p-6 text-center text-[13px] text-[#86868B] bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                      No scheduled itineraries found.
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -2810,21 +2875,24 @@ function EmployeeContent() {
       };
 
       return (
-        <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-6 animate-fade-in pb-10 flex flex-col min-h-[560px]">
-          <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+        <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-5 animate-fade-in pb-10 flex flex-col min-h-[560px]">
+          <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#0B5A3A] border border-emerald-100 flex items-center justify-center font-bold">
+              <div className="w-9 h-9 rounded-[6px] bg-[#F5F5F7] text-[#1B4332] border border-[#E5E5E7] flex items-center justify-center">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900">Notification Center</h3>
-                <p className="text-xs text-slate-500">{unreadCount} unread system notifications</p>
+                <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Notification Center</h3>
+                <p className="text-[12px] text-[#86868B]">{unreadCount} unread system notifications</p>
               </div>
             </div>
 
-            <button onClick={handleMarkAllRead} className="text-xs font-bold text-[#0B5A3A] hover:underline flex items-center gap-1.5 cursor-pointer">
+            <button
+              onClick={handleMarkAllRead}
+              className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-white border border-[#E5E5E7] hover:bg-[#F2F2F7] text-[#1B4332] cursor-pointer"
+            >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>
@@ -2832,7 +2900,7 @@ function EmployeeContent() {
             </button>
           </div>
 
-          <div className="space-y-4 flex-1">
+          <div className="space-y-3 flex-1">
             {notifications.length > 0 ? (
               notifications.map((notif: any, idx: number) => {
                 // Find the linked TA request (if any) so we can open it on click
@@ -2861,54 +2929,54 @@ function EmployeeContent() {
                 };
 
                 return (
-                  <div key={notif.id || idx} className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-5 sm:p-6 space-y-3">
+                  <div key={notif.id || idx} className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs p-4 space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                      <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">
                         {formatDayHeading(notif.createdAt)}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-semibold">
+                      <span className="text-[11px] text-[#86868B] font-medium">
                         {formatRelativeTime(notif.createdAt)}
                       </span>
                     </div>
                     <div
                       onClick={handleNotifClick}
-                      className={`flex items-start gap-4 p-3.5 rounded-xl border transition-all ${
+                      className={`flex items-start gap-3.5 p-3 rounded-[6px] border transition-colors ${
                         notif.isRead
-                          ? 'bg-slate-50/80 border-slate-100 hover:bg-slate-100'
-                          : 'bg-emerald-50/70 border-emerald-100 hover:bg-emerald-50 shadow-2xs'
+                          ? 'bg-[#F5F5F7] border-[#E5E5E7] hover:bg-[#F2F2F7]'
+                          : 'bg-emerald-50/50 border-emerald-200 hover:bg-emerald-50'
                       } ${linkedRequest ? 'cursor-pointer' : 'cursor-default'}`}
                     >
                       <div className="shrink-0 mt-0.5">
                         {notif.isRead ? (
-                          <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 text-[#86868B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                         ) : (
-                          <svg className="w-5 h-5 text-[#0B5A3A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 text-[#1B4332]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                           </svg>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-baseline justify-between gap-2">
-                          <h4 className="text-xs font-bold text-slate-900">{notif.title}</h4>
-                          <span className="text-[10px] text-slate-400 font-medium shrink-0">
+                          <h4 className="text-[14px] font-semibold text-[#1D1D1F]">{notif.title}</h4>
+                          <span className="text-[11px] text-[#86868B] font-medium shrink-0">
                             {formatTimeDisplay(notif.createdAt)}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-600 mt-1">{notif.message}</p>
+                        <p className="text-[13px] text-[#1D1D1F] mt-1">{notif.message}</p>
                         {(() => {
                           const remarksText = getNotificationRemarks(notif, linkedRequest);
                           if (!remarksText) return null;
                           return (
-                            <div className="mt-2.5 p-2.5 bg-slate-50/90 rounded-xl border border-slate-200/80 text-xs text-slate-700 shadow-2xs">
-                              <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#0B5A3A] uppercase tracking-wider mb-1">
-                                <svg className="w-3.5 h-3.5 text-[#0B5A3A] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="mt-2 p-2.5 bg-white rounded-[6px] border border-[#E5E5E7] text-[13px] text-[#1D1D1F]">
+                              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#1B4332] uppercase tracking-wider mb-1">
+                                <svg className="w-3.5 h-3.5 text-[#1B4332] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                                 </svg>
                                 <span>Signatory Remarks:</span>
                               </div>
-                              <p className="italic text-slate-800 font-medium pl-5">
+                              <p className="italic text-[#1D1D1F] pl-5">
                                 &ldquo;{remarksText}&rdquo;
                               </p>
                             </div>
@@ -2916,7 +2984,7 @@ function EmployeeContent() {
                         })()}
                         {linkedRequest && (
                           <div className="flex items-center justify-end mt-2">
-                            <span className="text-[10px] font-bold text-[#0B5A3A] flex items-center gap-0.5">
+                            <span className="text-[12px] font-medium text-[#1B4332] flex items-center gap-0.5">
                               View Request Details →
                             </span>
                           </div>
@@ -2927,15 +2995,18 @@ function EmployeeContent() {
                 );
               })
             ) : (
-              <div className="p-12 text-center text-xs text-slate-500 bg-white rounded-2xl border border-slate-200/80">
+              <div className="p-12 text-center text-[13px] text-[#86868B] bg-white rounded-[8px] border border-[#E5E5E7]">
                 No notifications found. You are all caught up!
               </div>
             )}
           </div>
 
-          <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between text-xs text-slate-500">
+          <div className="p-3.5 bg-[#F5F5F7] rounded-[8px] border border-[#E5E5E7] flex items-center justify-between text-[13px] text-[#86868B]">
             <span>Real-time email and push notifications are active for all Travel Authority step endorsements.</span>
-            <button onClick={() => router.push('/employee?tab=dashboard')} className="font-bold text-[#0B5A3A] hover:underline cursor-pointer">
+            <button
+              onClick={() => router.push('/employee?tab=dashboard')}
+              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors text-[#1B4332] hover:bg-[#E5E5E7]/60 cursor-pointer"
+            >
               Back to Dashboard →
             </button>
           </div>
@@ -2951,44 +3022,44 @@ function EmployeeContent() {
       {/* Toast Notification Banner */}
       {toastMessage && (
         <div
-          className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl shadow-2xl font-semibold text-xs flex items-center gap-2.5 border transition-all animate-bounce ${
+          className={`fixed bottom-6 right-6 z-50 px-3.5 py-2.5 rounded-[8px] shadow-lg font-medium text-[13px] flex items-center gap-2 border transition-all ${
             toastMessage.type === 'success'
-              ? 'bg-[#0B5A3A] text-white border-emerald-400/40 ring-4 ring-emerald-500/10'
-              : 'bg-[#DC3545] text-white border-rose-400/40 ring-4 ring-rose-500/10'
+              ? 'bg-[#1B4332] text-white border-[#143225]'
+              : 'bg-red-700 text-white border-red-800'
           }`}
         >
-          <span className="text-base">{toastMessage.type === 'success' ? '✅' : '⚠️'}</span>
+          <span>{toastMessage.type === 'success' ? '✓' : '⚠'}</span>
           <span>{toastMessage.text}</span>
         </div>
       )}
 
       {renderTabContent()}
 
-      {/* Floating View History Page / Modal (Matching Reference UI strictly: Document History & Signatory List) */}
+      {/* Floating View History Page / Modal */}
       {selectedRequest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in overflow-y-auto">
-          <div className="bg-[#F8FAFC] w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col my-auto max-h-[92vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-fade-in overflow-y-auto">
+          <div className="bg-white border border-[#E5E5E7] rounded-[10px] shadow-xl overflow-hidden w-full max-w-4xl flex flex-col my-auto max-h-[92vh]">
 
             {/* Modal Navigation Top Bar */}
-            <div className="bg-white px-8 py-5 border-b border-slate-200/80 flex items-center justify-between shrink-0 sticky top-0 z-20">
-              <div className="flex items-center gap-3">
+            <div className="bg-[#F5F5F7] border-b border-[#E5E5E7] px-5 py-3.5 flex items-center justify-between shrink-0 sticky top-0 z-20">
+              <div className="flex items-center gap-2.5">
                 <button
                   type="button"
                   onClick={() => setSelectedRequest(null)}
-                  className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                  className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-white border border-[#E5E5E7] text-[#1D1D1F] hover:bg-[#F2F2F7] cursor-pointer"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                   </svg>
                   <span>Back</span>
                 </button>
-                <div className="h-4 w-px bg-slate-300"></div>
-                <span className="text-xs font-mono font-bold text-[#0B5A3A] bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200/80">
+                <div className="h-4 w-px bg-[#E5E5E7]"></div>
+                <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
                   {selectedRequest.trackingNumber}
                 </span>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 {selectedRequest.status === 'REJECTED_MANUAL' && (
                   <button
                     type="button"
@@ -2998,10 +3069,10 @@ function EmployeeContent() {
                       setResubmitEndDate(new Date(selectedRequest.endDate).toISOString().slice(0, 10));
                       setResubmitError('');
                     }}
-                    className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-700 cursor-pointer"
                     title="Revise travel dates and resubmit"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     <span>Revise & Resubmit</span>
@@ -3014,10 +3085,10 @@ function EmployeeContent() {
                     onClick={() => {
                       setTravelOrderModalRequest(selectedRequest);
                     }}
-                    className="px-4 py-2 bg-[#0B5A3A] hover:bg-[#06452F] text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white cursor-pointer"
                     title="View and Print Official Approved Travel Order"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
                     <span>Print Travel Order</span>
@@ -3027,7 +3098,7 @@ function EmployeeContent() {
                 <button
                   type="button"
                   onClick={() => setSelectedRequest(null)}
-                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer"
+                  className="h-8 w-8 rounded-[6px] bg-white border border-[#E5E5E7] hover:bg-[#F2F2F7] text-[#86868B] hover:text-[#1D1D1F] flex items-center justify-center transition-colors cursor-pointer"
                   title="Close"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3038,58 +3109,57 @@ function EmployeeContent() {
             </div>
 
             {/* Floating Page Scroll Area */}
-            <div className="p-8 sm:p-12 overflow-y-auto space-y-12 bg-[#F8FAFC]">
+            <div className="p-6 sm:p-8 overflow-y-auto space-y-8 bg-white">
 
               {/* ==================== 1. DOCUMENT HISTORY ==================== */}
-              <section className="space-y-8">
-                <div className="text-center space-y-1.5">
-                  <h2 className="text-2xl font-serif font-bold text-slate-900 tracking-tight">Document History</h2>
-                  <p className="text-xs text-slate-500 font-medium">A chronological record of all events and updates.</p>
+              <section className="space-y-5">
+                <div className="text-center space-y-1">
+                  <h2 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Document History</h2>
+                  <p className="text-[12px] text-[#86868B]">A chronological record of all events and updates.</p>
                 </div>
 
                 {/* Document History Timeline Container */}
-                <div className="relative max-w-2xl mx-auto py-4">
+                <div className="relative max-w-2xl mx-auto py-3">
                   {/* Centered Vertical Line */}
-                  <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-200 -translate-x-1/2 z-0"></div>
+                  <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#E5E5E7] -translate-x-1/2 z-0"></div>
 
-                  {/* Document History Events */}
                   {/* Event 1: Request Created */}
-                  <div className="relative z-10 my-6 flex items-center w-full">
-                    <div className="w-1/2 pr-8 text-right">
-                      <div className="inline-block bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all text-left max-w-sm w-full">
-                        <h4 className="text-sm font-bold text-[#1E3A8A]">{selectedRequest.createdBy?.name || 'Juan Dela Cruz'}</h4>
-                        <p className="text-xs text-slate-500 mt-1">
-                          Submitted on <span className="font-semibold text-slate-700">{formatFullDateTimeDisplay(selectedRequest.createdAt)}</span>
+                  <div className="relative z-10 my-4 flex items-center w-full">
+                    <div className="w-1/2 pr-6 text-right">
+                      <div className="inline-block bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs text-left max-w-sm w-full">
+                        <h4 className="text-[14px] font-semibold text-[#1D1D1F]">{selectedRequest.createdBy?.name || 'Juan Dela Cruz'}</h4>
+                        <p className="text-[12px] text-[#86868B] mt-1">
+                          Submitted on <span className="font-medium text-[#1D1D1F]">{formatFullDateTimeDisplay(selectedRequest.createdAt)}</span>
                         </p>
                       </div>
                     </div>
 
                     {/* Blue Clock Node Icon */}
-                    <div className="absolute left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-xs shadow-md border-4 border-[#F8FAFC]">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="absolute left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shadow-xs border-2 border-white">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
 
-                    <div className="w-1/2 pl-8 invisible"></div>
+                    <div className="w-1/2 pl-6 invisible"></div>
                   </div>
                 </div>
               </section>
 
               {/* Divider Line */}
-              <div className="border-t border-slate-200/60 w-3/4 mx-auto"></div>
+              <div className="border-t border-[#E5E5E7] w-3/4 mx-auto"></div>
 
               {/* ==================== 2. SIGNATORY LIST ==================== */}
-              <section className="space-y-8">
-                <div className="text-center space-y-1.5">
-                  <h2 className="text-2xl font-serif font-bold text-slate-900 tracking-tight">Signatory List</h2>
-                  <p className="text-xs text-slate-500 font-medium">Required signatories for document approval.</p>
+              <section className="space-y-5">
+                <div className="text-center space-y-1">
+                  <h2 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Signatory List</h2>
+                  <p className="text-[12px] text-[#86868B]">Required signatories for document approval.</p>
                 </div>
 
                 {/* Signatory List Timeline Container */}
-                <div className="relative max-w-2xl mx-auto py-4">
+                <div className="relative max-w-2xl mx-auto py-3">
                   {/* Centered Vertical Line */}
-                  <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-200 -translate-x-1/2 z-0"></div>
+                  <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#E5E5E7] -translate-x-1/2 z-0"></div>
 
                   {[
                     { order: 1, defaultName: 'Section Chief', role: 'Verifier' },
@@ -3104,47 +3174,45 @@ function EmployeeContent() {
                     const isApproved = step?.action === 'APPROVED';
                     const isRejected = step?.action === 'REJECTED';
 
-                    // Determine node icon appearance based on step status
                     const nodeClasses = isApproved
-                      ? 'bg-[#16835D] text-white'
+                      ? 'bg-[#1B4332] text-white'
                       : isRejected
-                      ? 'bg-[#DC3545] text-white'
-                      : 'bg-[#10B981] text-white';
+                      ? 'bg-red-600 text-white'
+                      : 'bg-[#86868B] text-white';
 
-                    // Card border highlight for approved steps
                     const cardBorderClass = isApproved
-                      ? 'border-emerald-300 bg-emerald-50/40'
+                      ? 'border-emerald-200 bg-emerald-50/40'
                       : isRejected
-                      ? 'border-rose-300 bg-rose-50/40'
-                      : 'border-slate-200/80 bg-white';
+                      ? 'border-red-200 bg-red-50/40'
+                      : 'border-[#E5E5E7] bg-white';
 
                     return (
-                      <div key={sig.order} className="relative z-10 my-8 flex items-center w-full">
+                      <div key={sig.order} className="relative z-10 my-6 flex items-center w-full">
                         {/* Left Side Card */}
-                        <div className={`w-1/2 pr-8 text-right ${isLeft ? 'block' : 'invisible'}`}>
-                          <div className={`inline-block p-5 rounded-2xl border shadow-xs hover:shadow-md transition-all text-left max-w-sm w-full ${cardBorderClass}`}>
-                            <h4 className="text-sm font-bold text-[#0B5A3A]">{name}</h4>
-                            <p className="text-xs text-slate-500 mt-1">{roleSubtitle}</p>
+                        <div className={`w-1/2 pr-6 text-right ${isLeft ? 'block' : 'invisible'}`}>
+                          <div className={`inline-block p-4 rounded-[8px] border shadow-xs text-left max-w-sm w-full ${cardBorderClass}`}>
+                            <h4 className="text-[14px] font-semibold text-[#1D1D1F]">{name}</h4>
+                            <p className="text-[12px] text-[#86868B] mt-0.5">{roleSubtitle}</p>
                             {isApproved && step?.actionDate && (
-                              <p className="text-[10px] text-[#16835D] font-semibold mt-1 flex items-center gap-1 justify-end">
-                                <svg className="w-3 h-3 text-[#16835D] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <p className="text-[11px] text-emerald-700 font-medium mt-1.5 flex items-center gap-1 justify-end">
+                                <svg className="w-3 h-3 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <span>Approved · {formatFullDateTimeDisplay(step.actionDate)}</span>
                               </p>
                             )}
                             {isRejected && (
-                              <div className="mt-1">
-                                <p className="text-[10px] text-[#DC3545] font-semibold flex items-center gap-1 justify-end">
-                                  <svg className="w-3 h-3 text-[#DC3545] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <div className="mt-1.5">
+                                <p className="text-[11px] text-red-700 font-medium flex items-center gap-1 justify-end">
+                                  <svg className="w-3 h-3 text-red-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                                   </svg>
                                   <span>Returned · {formatFullDateTimeDisplay(step?.actionDate || step?.updatedAt)}</span>
                                 </p>
                                 {step?.remarks && (
-                                  <div className="mt-2 p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-left">
-                                    <span className="text-[10px] font-bold text-rose-800 uppercase tracking-wider block">Return Remarks:</span>
-                                    <p className="text-xs text-rose-900 font-semibold mt-0.5">{step.remarks}</p>
+                                  <div className="mt-2 p-2.5 bg-red-50 border border-red-200 rounded-[6px] text-left">
+                                    <span className="text-[10px] font-semibold text-red-700 uppercase tracking-wider block">Return Remarks:</span>
+                                    <p className="text-[12px] text-red-800 font-medium mt-0.5">{step.remarks}</p>
                                   </div>
                                 )}
                               </div>
@@ -3152,10 +3220,10 @@ function EmployeeContent() {
                           </div>
                         </div>
 
-                        {/* Dynamic Node Icon — checkmark when approved, pencil when pending */}
-                        <div className={`absolute left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center text-xs shadow-md border-4 border-[#F8FAFC] ${nodeClasses}`}>
+                        {/* Dynamic Node Icon */}
+                        <div className={`absolute left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-xs border-2 border-white ${nodeClasses}`}>
                           {isApproved ? (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                             </svg>
                           ) : isRejected ? (
@@ -3163,37 +3231,37 @@ function EmployeeContent() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                           ) : (
-                            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                               <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                             </svg>
                           )}
                         </div>
 
                         {/* Right Side Card */}
-                        <div className={`w-1/2 pl-8 text-left ${!isLeft ? 'block' : 'invisible'}`}>
-                          <div className={`inline-block p-5 rounded-2xl border shadow-xs hover:shadow-md transition-all text-left max-w-sm w-full ${cardBorderClass}`}>
-                            <h4 className="text-sm font-bold text-[#0B5A3A]">{name}</h4>
-                            <p className="text-xs text-slate-500 mt-1">{roleSubtitle}</p>
+                        <div className={`w-1/2 pl-6 text-left ${!isLeft ? 'block' : 'invisible'}`}>
+                          <div className={`inline-block p-4 rounded-[8px] border shadow-xs text-left max-w-sm w-full ${cardBorderClass}`}>
+                            <h4 className="text-[14px] font-semibold text-[#1D1D1F]">{name}</h4>
+                            <p className="text-[12px] text-[#86868B] mt-0.5">{roleSubtitle}</p>
                             {isApproved && step?.actionDate && (
-                              <p className="text-[10px] text-[#16835D] font-semibold mt-1 flex items-center gap-1">
-                                <svg className="w-3 h-3 text-[#16835D] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <p className="text-[11px] text-emerald-700 font-medium mt-1.5 flex items-center gap-1">
+                                <svg className="w-3 h-3 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                                 </svg>
                                 <span>Approved · {formatFullDateTimeDisplay(step.actionDate)}</span>
                               </p>
                             )}
                             {isRejected && (
-                              <div className="mt-1">
-                                <p className="text-[10px] text-[#DC3545] font-semibold flex items-center gap-1">
-                                  <svg className="w-3 h-3 text-[#DC3545] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <div className="mt-1.5">
+                                <p className="text-[11px] text-red-700 font-medium flex items-center gap-1">
+                                  <svg className="w-3 h-3 text-red-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                                   </svg>
                                   <span>Returned · {formatFullDateTimeDisplay(step?.actionDate || step?.updatedAt)}</span>
                                 </p>
                                 {step?.remarks && (
-                                  <div className="mt-2 p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-left">
-                                    <span className="text-[10px] font-bold text-rose-800 uppercase tracking-wider block">Return Remarks:</span>
-                                    <p className="text-xs text-rose-900 font-semibold mt-0.5">{step.remarks}</p>
+                                  <div className="mt-2 p-2.5 bg-red-50 border border-red-200 rounded-[6px] text-left">
+                                    <span className="text-[10px] font-semibold text-red-700 uppercase tracking-wider block">Return Remarks:</span>
+                                    <p className="text-[12px] text-red-800 font-medium mt-0.5">{step.remarks}</p>
                                   </div>
                                 )}
                               </div>
@@ -3209,11 +3277,11 @@ function EmployeeContent() {
               {/* Supporting Documents Section in View Modal */}
               {selectedRequest.attachments && (selectedRequest.attachments as any[]).length > 0 && (
                 <>
-                  <div className="border-t border-slate-200/60 w-3/4 mx-auto"></div>
+                  <div className="border-t border-[#E5E5E7] w-3/4 mx-auto"></div>
                   <section className="space-y-4 max-w-2xl mx-auto">
                     <div className="text-center space-y-1">
-                      <h2 className="text-xl font-serif font-bold text-slate-900 tracking-tight">Supporting Documents</h2>
-                      <p className="text-xs text-slate-500 font-medium">Uploaded documentation for this Travel Authority.</p>
+                      <h2 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Supporting Documents</h2>
+                      <p className="text-[12px] text-[#86868B]">Uploaded documentation for this Travel Authority.</p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
@@ -3229,21 +3297,21 @@ function EmployeeContent() {
                           <div
                             key={doc.id || idx}
                             onClick={() => doc.url && window.open(doc.url, '_blank')}
-                            className="flex items-center justify-between p-3.5 rounded-2xl bg-white border border-slate-200/80 hover:border-emerald-300 hover:shadow-sm transition-all cursor-pointer group"
+                            className="flex items-center justify-between p-3 rounded-[8px] bg-white border border-[#E5E5E7] hover:bg-[#F2F2F7] transition-colors cursor-pointer group"
                             title={`Open ${doc.name}`}
                           >
-                            <div className="flex items-center gap-3 min-w-0">
-                              <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-[10px] shrink-0 ${
-                                isPdf ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className={`h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] shrink-0 ${
+                                isPdf ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-blue-50 text-blue-700 border border-blue-200'
                               }`}>
                                 {isPdf ? 'PDF' : 'DOC'}
                               </span>
                               <div className="min-w-0">
-                                <p className="text-xs font-bold text-slate-800 truncate group-hover:text-[#0B5A3A] transition-colors">{doc.name}</p>
-                                <p className="text-[10px] text-slate-400">{formattedSize}</p>
+                                <p className="text-[13px] font-medium text-[#1D1D1F] truncate group-hover:text-[#1B4332] transition-colors">{doc.name}</p>
+                                <p className="text-[11px] text-[#86868B]">{formattedSize}</p>
                               </div>
                             </div>
-                            <div className="w-7 h-7 rounded-lg bg-slate-50 group-hover:bg-[#0B5A3A] group-hover:text-white flex items-center justify-center text-slate-400 shrink-0 transition-colors">
+                            <div className="w-7 h-7 rounded-[6px] bg-[#F5F5F7] group-hover:bg-[#1B4332] group-hover:text-white flex items-center justify-center text-[#86868B] shrink-0 transition-colors">
                               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                               </svg>
@@ -3263,85 +3331,85 @@ function EmployeeContent() {
 
       {/* Resubmit / Date Revision Modal */}
       {resubmitModalRequest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-            <div className="bg-amber-600 text-white p-4 font-bold text-sm flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white border border-[#E5E5E7] rounded-[10px] shadow-xl overflow-hidden w-full max-w-lg">
+            <div className="bg-[#F5F5F7] border-b border-[#E5E5E7] px-5 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-amber-100 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-[#1B4332] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                <span>Revise Travel Dates & Resubmit</span>
+                <span className="text-[14px] font-semibold text-[#1D1D1F]">Revise Travel Dates & Resubmit</span>
               </div>
               <button
                 onClick={() => setResubmitModalRequest(null)}
-                className="text-amber-100 hover:text-white font-bold text-sm cursor-pointer"
+                className="h-7 w-7 rounded-[6px] inline-flex items-center justify-center text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
-            <div className="p-6 space-y-4">
-              <div className="p-3 bg-amber-50 border border-amber-200/80 rounded-xl text-xs space-y-1">
+            <div className="p-5 space-y-4">
+              <div className="p-3 bg-[#F5F5F7] border border-[#E5E5E7] rounded-[8px] text-[13px] space-y-1">
                 <div className="flex justify-between">
-                  <span className="text-amber-800 font-semibold">Reference:</span>
-                  <span className="font-mono font-bold text-amber-950">{resubmitModalRequest.trackingNumber}</span>
+                  <span className="text-[#86868B]">Reference:</span>
+                  <span className="font-mono font-medium text-[#1B4332]">{resubmitModalRequest.trackingNumber}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-amber-800 font-semibold">Destination:</span>
-                  <span className="font-bold text-amber-950">{resubmitModalRequest.destination}</span>
+                  <span className="text-[#86868B]">Destination:</span>
+                  <span className="font-medium text-[#1D1D1F]">{resubmitModalRequest.destination}</span>
                 </div>
                 {(() => {
                   const rejectedStep = resubmitModalRequest.approvalSteps?.find((s: any) => s.action === 'REJECTED');
                   if (!rejectedStep?.remarks) return null;
                   return (
-                    <div className="pt-1.5 mt-1.5 border-t border-amber-200 text-amber-900">
-                      <span className="font-bold block">Chief's Return Remarks:</span>
-                      <p className="italic mt-0.5 font-medium">"{rejectedStep.remarks}"</p>
+                    <div className="pt-1.5 mt-1.5 border-t border-[#E5E5E7] text-amber-800">
+                      <span className="font-semibold block text-[12px]">Chief&apos;s Return Remarks:</span>
+                      <p className="italic mt-0.5 text-[12px]">&ldquo;{rejectedStep.remarks}&rdquo;</p>
                     </div>
                   );
                 })()}
               </div>
 
               {resubmitError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-semibold text-rose-800">
+                <div className="p-3 bg-red-50 border border-red-200 rounded-[6px] text-[13px] font-medium text-red-700">
                   {resubmitError}
                 </div>
               )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">
-                    New Departure Date <span className="text-rose-600">*</span>
+                  <label className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-1.5">
+                    New Departure Date <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="date"
                     value={resubmitStartDate}
                     onChange={(e) => setResubmitStartDate(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">
-                    New Arrival Date <span className="text-rose-600">*</span>
+                  <label className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-1.5">
+                    New Arrival Date <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="date"
                     value={resubmitEndDate}
                     onChange={(e) => setResubmitEndDate(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                   />
                 </div>
               </div>
 
-              <p className="text-[11px] text-slate-500 leading-relaxed">
-                Upon resubmission, this request will restart verification at <strong>Step 1 (Section Chief)</strong> with your updated dates.
+              <p className="text-[12px] text-[#86868B] leading-relaxed">
+                Upon resubmission, this request will restart verification at <strong className="text-[#1D1D1F] font-semibold">Step 1 (Section Chief)</strong> with your updated dates.
               </p>
 
-              <div className="flex justify-end items-center gap-3 pt-3 border-t border-slate-100">
+              <div className="flex justify-end items-center gap-2.5 pt-3 border-t border-[#E5E5E7]">
                 <button
                   type="button"
                   onClick={() => setResubmitModalRequest(null)}
-                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-white border border-[#E5E5E7] text-[#1D1D1F] hover:bg-[#F2F2F7] cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -3350,7 +3418,7 @@ function EmployeeContent() {
                   type="button"
                   disabled={resubmitLoading || !resubmitStartDate || !resubmitEndDate}
                   onClick={handleResubmit}
-                  className="px-6 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-md disabled:opacity-50 transition-all cursor-pointer"
+                  className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white disabled:opacity-50 cursor-pointer"
                 >
                   {resubmitLoading ? 'Resubmitting...' : 'Confirm Resubmission'}
                 </button>
@@ -3372,7 +3440,7 @@ function EmployeeContent() {
 
 export default function EmployeeDashboardPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading Employee Portal...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-[13px] text-[#86868B]">Loading Employee Portal...</div>}>
       <EmployeeContent />
     </Suspense>
   );

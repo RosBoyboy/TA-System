@@ -187,29 +187,29 @@ function StaffDashboardContent() {
     // Fully terminal statuses are the same for everyone
     if (status === 'APPROVED')
       return (
-        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span>
+        <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
           APPROVED
         </span>
       );
     if (status === 'REJECTED_MANUAL' || status === 'DISAPPROVED')
       return (
-        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-700 uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-600 shrink-0"></span>
+        <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-600 shrink-0" />
           RETURNED
         </span>
       );
     if (status === 'REJECTED_OVERDUE')
       return (
-        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-700 uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-600 shrink-0"></span>
+        <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-600 shrink-0" />
           OVERDUE
         </span>
       );
     if (status === 'DRAFT')
       return (
-        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-700 uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-purple-600 shrink-0"></span>
+        <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-violet-50 text-violet-700 border border-violet-200 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-violet-600 shrink-0" />
           DRAFT
         </span>
       );
@@ -232,8 +232,8 @@ function StaffDashboardContent() {
     if (myStep > 0 && currentStep > myStep) {
       // This verifier already endorsed — request passed their step
       return (
-        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-sky-600 shrink-0"></span>
+        <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-sky-50 text-sky-700 border border-sky-200 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-600 shrink-0" />
           ENDORSED
         </span>
       );
@@ -241,8 +241,8 @@ function StaffDashboardContent() {
     if (myStep > 0 && currentStep === myStep) {
       // Request is currently sitting at this verifier's step
       return (
-        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+        <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
           FOR REVIEW
         </span>
       );
@@ -254,16 +254,16 @@ function StaffDashboardContent() {
         PENDING_HEAD_PENRO: 'HEAD OF PENRO REVIEW',
       };
       return (
-        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+        <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
           {stepLabels[status] || status}
         </span>
       );
     }
     // Fallback — steps before this verifier (should rarely appear in their history)
     return (
-      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 uppercase tracking-wider">
-        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+      <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-slate-100 text-slate-700 border border-slate-200 uppercase tracking-wider">
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-500 shrink-0" />
         IN PROGRESS
       </span>
     );
@@ -526,20 +526,23 @@ function StaffDashboardContent() {
   /* -------------------------------------------------------------------------- */
   if (reviewRequest) {
     return (
-      <div className="w-full max-w-[1600px] mx-auto space-y-6 animate-fade-in">
+      <div className="w-full max-w-[1600px] mx-auto space-y-5 animate-fade-in">
         {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+        <div className="bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white p-4 rounded-[8px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setReviewRequest(null)}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors"
+              className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-white/15 hover:bg-white/25 text-white border border-white/20 transition-colors cursor-pointer"
             >
               ← Back
             </button>
             <div>
-              <h2 className="text-lg font-black text-slate-900">Review TA Request</h2>
-              <p className="text-xs font-semibold text-slate-500">
-                {reviewRequest.trackingNumber} • Submitted on {formatDateDisplay(reviewRequest.createdAt)}
+              <h2 className="text-[22px] font-bold tracking-tight text-white">Review TA Request</h2>
+              <p className="text-[12px] text-emerald-100/90 mt-0.5 flex items-center gap-2">
+                <span className="font-mono font-semibold bg-white/15 px-1.5 py-0.5 rounded-[4px] text-white">
+                  {reviewRequest.trackingNumber}
+                </span>
+                <span>• Submitted on {formatDateDisplay(reviewRequest.createdAt)}</span>
               </p>
             </div>
           </div>
@@ -547,127 +550,136 @@ function StaffDashboardContent() {
         </div>
 
         {actionError && (
-          <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-semibold">
+          <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-[13px] rounded-[6px] font-medium">
             {actionError}
           </div>
         )}
 
         {/* 2-Column Main Review Layout (2/3 + 1/3) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column (2/3 width) */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-5">
             {/* 1. Request Details Card */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs space-y-5">
-              <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                <span className="w-9 h-9 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-700 shrink-0">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+            <div className="bg-white border border-[#E5E5E7] border-t-4 border-t-[#0F4C2E] rounded-[8px] shadow-xs overflow-hidden">
+              <div className="bg-emerald-950/[0.04] border-b border-[#E5E5E7] px-4 py-2.5 flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-[6px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200 flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                   </svg>
                 </span>
-                <h3 className="text-sm font-extrabold text-slate-900">Request Details</h3>
+                <h3 className="text-[14px] font-semibold text-[#0F4C2E]">Request Details</h3>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs">
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                    EMPLOYEE NAME
-                  </span>
-                  <p className="font-extrabold text-slate-900 text-sm">
-                    {reviewRequest.createdBy?.name || 'Maria Santos'}
-                  </p>
+              <div className="p-4 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block mb-1">
+                      EMPLOYEE NAME
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-emerald-100 text-[#0F4C2E] text-[11px] font-semibold flex items-center justify-center shrink-0">
+                        {(reviewRequest.createdBy?.name || 'M').charAt(0).toUpperCase()}
+                      </span>
+                      <p className="text-[13px] font-semibold text-[#1D1D1F]">
+                        {reviewRequest.createdBy?.name || 'Maria Santos'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block mb-1">
+                      DESTINATION
+                    </span>
+                    <p className="text-[13px] font-medium text-[#1D1D1F] flex items-start gap-1.5">
+                      <svg className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                      </svg>
+                      <span className="leading-snug">{resolvedAddress || reviewRequest.destination}</span>
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block mb-1">
+                      POSITION & UNIT
+                    </span>
+                    <p className="text-[13px] font-medium text-[#1D1D1F]">
+                      {reviewRequest.createdBy?.position || 'Personnel'}
+                    </p>
+                    <p className="text-[12px] text-[#0F4C2E] font-medium">
+                      {[reviewRequest.createdBy?.division, reviewRequest.createdBy?.section].filter(Boolean).join(' • ') || 'PENRO Agusan del Norte'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block mb-1">
+                      TRAVEL DATES
+                    </span>
+                    <p className="text-[13px] font-medium text-[#1D1D1F] flex items-center gap-1.5">
+                      <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      {formatDateDisplay(reviewRequest.startDate)} - {formatDateDisplay(reviewRequest.endDate)}
+                    </p>
+                  </div>
                 </div>
 
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                    DESTINATION
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block mb-1.5">
+                    PURPOSE OF TRAVEL
                   </span>
-                  <p className="font-bold text-slate-800 flex items-start gap-1.5">
-                    <svg className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                    </svg>
-                    <span className="leading-snug">{resolvedAddress || reviewRequest.destination}</span>
-                  </p>
-                </div>
-
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                    POSITION & UNIT
-                  </span>
-                  <p className="font-bold text-slate-800">
-                    {reviewRequest.createdBy?.position || 'Personnel'}
-                  </p>
-                  <p className="text-[11px] text-slate-500">
-                    {[reviewRequest.createdBy?.division, reviewRequest.createdBy?.section].filter(Boolean).join(' • ') || 'PENRO Agusan del Norte'}
-                  </p>
-                </div>
-
-                <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                    TRAVEL DATES
-                  </span>
-                  <p className="font-bold text-slate-800 flex items-center gap-1.5">
-                    <svg className="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    {formatDateDisplay(reviewRequest.startDate)} - {formatDateDisplay(reviewRequest.endDate)}
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
-                  PURPOSE OF TRAVEL
-                </span>
-                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/60 text-xs text-slate-700 font-medium leading-relaxed">
-                  {reviewRequest.purpose}
+                  <div className="p-3 bg-emerald-50/40 rounded-[6px] border border-emerald-200/70 text-[13px] text-[#1D1D1F] font-normal leading-relaxed">
+                    {reviewRequest.purpose}
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* 2. Destination Map Card (Matching PDF Page 6) */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
-              <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                <span className="w-9 h-9 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-700 shrink-0">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+            <div className="bg-white border border-[#E5E5E7] border-t-4 border-t-sky-500 rounded-[8px] shadow-xs overflow-hidden">
+              <div className="bg-emerald-950/[0.04] border-b border-[#E5E5E7] px-4 py-2.5 flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-[6px] bg-sky-50 text-sky-600 border border-sky-200 flex items-center justify-center shrink-0">
+                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                   </svg>
                 </span>
-                <h3 className="text-sm font-extrabold text-slate-900">Destination Map</h3>
+                <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Destination Map</h3>
               </div>
 
-              <div className="rounded-2xl overflow-hidden border border-slate-200 relative">
-                <DynamicMapPicker
-                  initialLat={reviewRequest.destinationLat || 7.0097}
-                  initialLng={reviewRequest.destinationLng || 125.2708}
-                  onLocationSelect={() => {}}
-                  readOnly={true}
-                  locationName={resolvedAddress || reviewRequest.destination}
-                />
-                <div className="absolute bottom-3 left-3 right-3 sm:right-auto sm:max-w-md bg-white/95 backdrop-blur-md p-3.5 rounded-xl border border-slate-200/90 shadow-md text-xs z-10 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-slate-800 shrink-0"></span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                      Specific Location Address
-                    </span>
-                    {isResolvingAddress && (
-                      <span className="text-[10px] text-slate-400 font-medium animate-pulse">Resolving...</span>
+              <div className="p-4">
+                <div className="rounded-[6px] overflow-hidden border border-[#E5E5E7] relative">
+                  <DynamicMapPicker
+                    initialLat={reviewRequest.destinationLat || 7.0097}
+                    initialLng={reviewRequest.destinationLng || 125.2708}
+                    onLocationSelect={() => {}}
+                    readOnly={true}
+                    locationName={resolvedAddress || reviewRequest.destination}
+                  />
+                  <div className="absolute bottom-3 left-3 right-3 sm:right-auto sm:max-w-md bg-white/95 backdrop-blur-md p-3 rounded-[6px] border border-emerald-200 shadow-xs z-10 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0"></span>
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0F4C2E]">
+                        Specific Location Address
+                      </span>
+                      {isResolvingAddress && (
+                        <span className="text-[11px] text-emerald-600 font-normal animate-pulse">Resolving...</span>
+                      )}
+                    </div>
+                    <p className="font-medium text-[#1D1D1F] text-[13px] leading-snug">
+                      {resolvedAddress || reviewRequest.destination}
+                    </p>
+                    {reviewRequest.destinationLat && reviewRequest.destinationLng && (
+                      <p className="text-[11px] font-mono text-[#86868B]">
+                        Coordinates: {reviewRequest.destinationLat.toFixed(5)}° N, {reviewRequest.destinationLng.toFixed(5)}° E
+                      </p>
                     )}
                   </div>
-                  <p className="font-extrabold text-slate-900 text-xs leading-snug">
-                    {resolvedAddress || reviewRequest.destination}
-                  </p>
-                  {reviewRequest.destinationLat && reviewRequest.destinationLng && (
-                    <p className="text-[10px] font-mono text-slate-500">
-                      Coordinates: {reviewRequest.destinationLat.toFixed(5)}° N, {reviewRequest.destinationLng.toFixed(5)}° E
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
 
-            {/* 3. Attachments Card — Outlier Premium Design */}
+            {/* 3. Attachments Card */}
             {(() => {
               const rawAttachments: any[] = (reviewRequest as any).attachments || [];
               const attachments = rawAttachments.map((file) => {
@@ -694,58 +706,55 @@ function StaffDashboardContent() {
               });
               const hasFiles = attachments.length > 0;
               return (
-                <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                    <div className="flex items-center gap-3">
-                      <span className="w-9 h-9 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-700 shrink-0">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+                <div className="bg-white border border-[#E5E5E7] border-t-4 border-t-violet-500 rounded-[8px] shadow-xs overflow-hidden">
+                  <div className="bg-emerald-950/[0.04] border-b border-[#E5E5E7] px-4 py-2.5 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-7 h-7 rounded-[6px] bg-violet-50 text-violet-600 border border-violet-200 flex items-center justify-center shrink-0">
+                        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.373L8.557 18.315a1.5 1.5 0 11-2.122-2.122l7.694-7.694" />
                         </svg>
                       </span>
-                      <h3 className="text-sm font-extrabold text-slate-900">Attachments</h3>
+                      <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Attachments</h3>
                     </div>
                     {hasFiles && (
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-violet-100 text-violet-700 border border-violet-200/80">
+                      <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-violet-100 text-violet-700 border border-violet-200">
                         {attachments.length} {attachments.length === 1 ? 'file' : 'files'}
                       </span>
                     )}
                   </div>
 
-                  {hasFiles ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {attachments.map((file, idx) => {
-                        const gradients: Record<string, string> = {
-                          rose: 'from-rose-400 to-orange-500',
-                          blue: 'from-blue-400 to-indigo-600',
-                          violet: 'from-violet-400 to-purple-600',
-                        };
-                        const badgeColors: Record<string, string> = {
-                          rose: 'bg-rose-100 text-rose-600',
-                          blue: 'bg-blue-100 text-blue-600',
-                          violet: 'bg-violet-100 text-violet-600',
-                        };
-                        return (
-                          <div
-                            key={idx}
-                            onClick={() => {
-                              if (file.url) {
-                                window.open(file.url, '_blank', 'noopener,noreferrer');
-                              }
-                            }}
-                            title={`Click to open/download ${file.name}`}
-                            className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300 cursor-pointer"
-                          >
-                            <div className="absolute inset-0 bg-gradient-to-br from-violet-50/0 to-violet-100/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                            <div className="relative p-4 flex items-center gap-3.5">
-                              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradients[file.color] || gradients.rose} flex items-center justify-center shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300`}>
-                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  <div className="p-4">
+                    {hasFiles ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {attachments.map((file, idx) => {
+                          const gradients: Record<string, string> = {
+                            rose: 'from-rose-400 to-orange-500',
+                            blue: 'from-blue-400 to-indigo-600',
+                          };
+                          const badgeColors: Record<string, string> = {
+                            rose: 'bg-rose-50 text-rose-700 border border-rose-200',
+                            blue: 'bg-blue-50 text-blue-700 border border-blue-200',
+                          };
+                          return (
+                            <div
+                              key={idx}
+                              onClick={() => {
+                                if (file.url) {
+                                  window.open(file.url, '_blank', 'noopener,noreferrer');
+                                }
+                              }}
+                              title={`Click to open/download ${file.name}`}
+                              className="group rounded-[6px] border border-[#E5E5E7] bg-gradient-to-br from-slate-50 to-white hover:border-violet-300 hover:bg-violet-50/30 transition-colors cursor-pointer p-3 flex items-center gap-3"
+                            >
+                              <div className={`w-9 h-9 rounded-[6px] bg-gradient-to-br ${gradients[file.color] || gradients.rose} text-white shadow-xs flex items-center justify-center shrink-0`}>
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                               </div>
                               <div className="min-w-0 flex-1">
-                                <h4 className="text-xs font-extrabold text-slate-900 truncate" title={file.name}>{file.name}</h4>
-                                <p className="text-[10px] text-slate-500 mt-0.5 font-medium">{file.typeLabel}</p>
-                                <div className="flex items-center gap-2 mt-1.5">
-                                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${badgeColors[file.color] || badgeColors.rose}`}>{file.badgeLabel}</span>
-                                  <span className="text-[9px] text-slate-400 font-medium">{file.formattedSize}</span>
+                                <h4 className="text-[13px] font-medium text-[#1D1D1F] truncate" title={file.name}>{file.name}</h4>
+                                <p className="text-[12px] text-[#86868B] mt-0.5">{file.typeLabel}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className={`h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] ${badgeColors[file.color] || badgeColors.rose}`}>{file.badgeLabel}</span>
+                                  <span className="text-[11px] text-[#86868B]">{file.formattedSize}</span>
                                 </div>
                               </div>
                               <button
@@ -755,33 +764,33 @@ function StaffDashboardContent() {
                                   if (file.url) window.open(file.url, '_blank', 'noopener,noreferrer');
                                 }}
                                 title="Download / Open in new tab"
-                                className="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-violet-600 flex items-center justify-center shrink-0 transition-colors duration-300 cursor-pointer"
+                                className="h-7 w-7 rounded-[6px] bg-violet-50 group-hover:bg-violet-600 text-violet-600 group-hover:text-white border border-violet-200 inline-flex items-center justify-center shrink-0 transition-colors cursor-pointer"
                               >
-                                <svg className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                <svg className="w-3.5 h-3.5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                               </button>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-8 text-center gap-3">
-                      <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
-                        <svg className="w-7 h-7 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                          );
+                        })}
                       </div>
-                      <div>
-                        <p className="text-xs font-bold text-slate-400">No files attached</p>
-                        <p className="text-[10px] text-slate-300 mt-0.5">The employee did not attach any files to this request.</p>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-6 text-center gap-2">
+                        <div className="w-10 h-10 rounded-[6px] bg-violet-50 border border-violet-200 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                        </div>
+                        <div>
+                          <p className="text-[13px] font-medium text-[#1D1D1F]">No files attached</p>
+                          <p className="text-[12px] text-[#86868B] mt-0.5">The employee did not attach any files to this request.</p>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               );
             })()}
           </div>
 
           {/* Right Column (1/3 width): Action Box + Timeline */}
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Determine if the logged-in verifier still needs to act on this request */}
             {(() => {
               const pendingStatusForRole: Record<string, string> = {
@@ -816,39 +825,42 @@ function StaffDashboardContent() {
               if (requiresMyAction) {
                 // ── ACTIVE ACTION PANEL ──────────────────────────────────
                 return (
-                  <div className="bg-white rounded-2xl border border-slate-200/80 shadow-md overflow-hidden">
-                    <div className="bg-[#0F4C2E] text-white p-4 font-bold text-xs uppercase tracking-wider">
-                      Your Action Required
+                  <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden">
+                    <div className="bg-[#0F4C2E] text-white px-4 py-2.5 flex items-center justify-between">
+                      <span className="text-[14px] font-semibold text-white">Your Action Required</span>
+                      <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-amber-400/20 text-amber-200 border border-amber-300/30 uppercase tracking-wider">
+                        FOR REVIEW
+                      </span>
                     </div>
 
-                    <div className="p-5 space-y-5">
+                    <div className="p-4 space-y-4">
                       {/* Digital Signature Container */}
                       <div>
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
+                        <label className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block mb-1.5">
                           DIGITAL SIGNATURE
                         </label>
                         <div
                           onClick={() => setHasDigitalSignature(!hasDigitalSignature)}
-                          className={`h-28 rounded-xl border-2 border-dashed p-4 flex flex-col items-center justify-center text-center cursor-pointer transition-all ${
+                          className={`h-24 rounded-[6px] border-2 border-dashed p-3 flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${
                             hasDigitalSignature
                               ? 'border-emerald-500 bg-emerald-50/80 text-emerald-800'
-                              : 'border-slate-300 bg-slate-50 text-slate-400 hover:border-emerald-500 hover:bg-emerald-50/30'
+                              : 'border-emerald-200 bg-emerald-50/30 text-[#0F4C2E] hover:bg-emerald-50/60 hover:border-[#0F4C2E]'
                           }`}
                         >
                           {hasDigitalSignature ? (
                             <div className="space-y-1">
-                              <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-extrabold text-sm flex items-center justify-center mx-auto shadow-xs">
+                              <div className="w-7 h-7 rounded-full bg-emerald-600 text-white font-semibold text-xs flex items-center justify-center mx-auto shadow-xs">
                                 ✓
                               </div>
-                              <p className="text-xs font-extrabold text-emerald-900">Digital Signature Affixed</p>
-                              <p className="text-[10px] text-emerald-700 font-mono">{user?.name || userRole}</p>
+                              <p className="text-[13px] font-semibold text-emerald-900">Digital Signature Affixed</p>
+                              <p className="text-[11px] text-emerald-700 font-mono">{user?.name || userRole}</p>
                             </div>
                           ) : (
                             <div className="space-y-1">
-                              <svg className="w-6 h-6 text-slate-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-5 h-5 text-[#0F4C2E] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                               </svg>
-                              <p className="text-xs font-bold text-slate-600">Click to sign as Verifier</p>
+                              <p className="text-[13px] font-medium text-[#0F4C2E]">Click to sign as Verifier</p>
                             </div>
                           )}
                         </div>
@@ -856,7 +868,7 @@ function StaffDashboardContent() {
 
                       {/* Remarks Field */}
                       <div>
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
+                        <label className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block mb-1.5">
                           REMARKS (OPTIONAL)
                         </label>
                         <textarea
@@ -864,12 +876,12 @@ function StaffDashboardContent() {
                           value={remarks}
                           onChange={(e) => setRemarks(e.target.value)}
                           placeholder="Add comments or instructions..."
-                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                          className="w-full px-2.5 py-2 text-[13px] text-[#1D1D1F] bg-slate-50/70 border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#0F4C2E]/20 focus:border-[#0F4C2E]"
                         />
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex items-center gap-3 pt-2">
+                      <div className="flex items-center gap-2.5 pt-1">
                         <button
                           type="button"
                           onClick={() => {
@@ -881,7 +893,7 @@ function StaffDashboardContent() {
                             }
                           }}
                           disabled={actionLoading}
-                          className="flex-1 py-2.5 rounded-xl border border-rose-300 text-rose-700 bg-white hover:bg-rose-50 text-xs font-bold transition-all shadow-2xs cursor-pointer"
+                          className="flex-1 h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 border border-rose-300 text-rose-700 bg-rose-50 hover:bg-rose-100 transition-colors cursor-pointer"
                         >
                           Return
                         </button>
@@ -890,7 +902,7 @@ function StaffDashboardContent() {
                           type="button"
                           onClick={() => setShowApproveModal(true)}
                           disabled={actionLoading}
-                          className="flex-1 py-2.5 rounded-xl bg-[#0F4C2E] hover:bg-[#165E3A] text-white text-xs font-bold shadow-md transition-all"
+                          className="flex-1 h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white shadow-xs transition-colors cursor-pointer"
                         >
                           Approve
                         </button>
@@ -926,49 +938,58 @@ function StaffDashboardContent() {
               const isUpcoming = myStepNum > 0 && currentStep < myStepNum;
 
               return (
-                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-md overflow-hidden">
-                  <div className={`p-4 font-bold text-xs uppercase tracking-wider ${
+                <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden">
+                  <div className={`px-4 py-2.5 flex items-center justify-between ${
                     isProcessed
-                      ? 'bg-emerald-700 text-white'
-                      : isUpcoming
-                      ? 'bg-slate-100 text-slate-500'
-                      : 'bg-slate-100 text-slate-500'
+                      ? 'bg-[#0F4C2E] text-white'
+                      : 'bg-amber-50 border-b border-amber-200 text-amber-900'
                   }`}>
-                    {isProcessed ? '✓ You Have Already Processed This' : 'Awaiting Earlier Step'}
+                    <span className="text-[14px] font-semibold">
+                      {isProcessed ? '✓ Processed Status' : 'Awaiting Earlier Step'}
+                    </span>
+                    <span className={`h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] uppercase tracking-wider ${
+                      isProcessed
+                        ? 'bg-emerald-400/20 text-emerald-100 border border-emerald-300/30'
+                        : isUpcoming
+                        ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                        : 'bg-amber-100 text-amber-800 border border-amber-300'
+                    }`}>
+                      {isProcessed ? 'PROCESSED' : 'PENDING'}
+                    </span>
                   </div>
-                  <div className="p-5 space-y-3">
+                  <div className="p-4 space-y-3">
                     {isProcessed && myStep ? (
                       <>
-                        <div className="flex items-center gap-2">
-                          <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-extrabold text-sm shrink-0">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-emerald-100 border border-emerald-200 text-[#0F4C2E] flex items-center justify-center font-semibold text-xs shrink-0">
                             ✓
                           </div>
                           <div>
-                            <p className="text-xs font-extrabold text-slate-900">
+                            <p className="text-[13px] font-semibold text-[#1D1D1F]">
                               {myStep.action === 'APPROVED' ? 'Endorsed' : 'Returned'}
                             </p>
-                            <p className="text-[10px] text-slate-500">{formatDateDisplay(myStep.actionDate)}</p>
+                            <p className="text-[12px] text-[#86868B]">{formatDateDisplay(myStep.actionDate)}</p>
                           </div>
                         </div>
                         {myStep.remarks && (
-                          <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl">
-                            <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-1">Your Remarks</p>
-                            <p className="text-xs text-slate-700">{myStep.remarks}</p>
+                          <div className="p-3 bg-emerald-50/50 border border-emerald-200 rounded-[6px]">
+                            <p className="text-[11px] text-[#0F4C2E] font-semibold uppercase tracking-wider mb-1">Your Remarks</p>
+                            <p className="text-[13px] text-[#1D1D1F]">{myStep.remarks}</p>
                           </div>
                         )}
-                        <p className="text-[10px] text-slate-400 pt-1">
+                        <p className="text-[12px] text-[#86868B] pt-1">
                           No further action needed from you on this request.
                         </p>
                       </>
                     ) : !isMyUnit ? (
-                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl">
-                        <p className="text-xs font-bold text-amber-900">Different Unit Assignment</p>
-                        <p className="text-[11px] text-amber-800 mt-1">
+                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-[6px]">
+                        <p className="text-[13px] font-semibold text-amber-900">Different Unit Assignment</p>
+                        <p className="text-[12px] text-amber-800 mt-1">
                           This request belongs to {reviewRequest.createdBy?.section || reviewRequest.createdBy?.division || 'another unit'} and is assigned to their designated Chief.
                         </p>
                       </div>
                     ) : (
-                      <p className="text-xs text-slate-500">
+                      <p className="text-[13px] text-[#86868B]">
                         This request has not yet reached your review step. You will be notified when it requires your action.
                       </p>
                     )}
@@ -987,36 +1008,36 @@ function StaffDashboardContent() {
 
         {/* Approve Confirmation Modal (Strictly Matching PDF Page 7) */}
         {showApproveModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-            <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
-              <div className="bg-[#0F4C2E] text-white p-4 font-bold text-sm flex items-center gap-2.5">
-                <svg className="w-5 h-5 text-emerald-200 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs animate-fade-in">
+            <div className="w-full max-w-lg bg-white border border-[#E5E5E7] rounded-[10px] shadow-xl overflow-hidden">
+              <div className="bg-[#0F4C2E] text-white px-5 py-3.5 flex items-center gap-2.5">
+                <svg className="w-4 h-4 text-emerald-200 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>Approve Confirmation</span>
+                <span className="text-[14px] font-semibold text-white">Approve Confirmation</span>
               </div>
 
-              <div className="p-6 space-y-4">
-                <p className="text-xs text-slate-700">
+              <div className="p-5 space-y-4">
+                <p className="text-[13px] text-[#1D1D1F]">
                   Are you sure you want to approve this travel request for{' '}
-                  <strong className="text-slate-900 font-extrabold">
+                  <strong className="text-[#0F4C2E] font-semibold">
                     {reviewRequest.createdBy?.name || 'Maria Santos'}
                   </strong>
                   ?
                 </p>
 
                 {/* Legal Consent Callout */}
-                <div className="p-4 bg-sky-50 border border-sky-200/80 rounded-xl space-y-1">
-                  <p className="text-[11px] text-sky-900 font-semibold leading-relaxed">
-                    <strong className="font-extrabold text-sky-950">Notice:</strong> By clicking 'Affix Signature,' you hereby affirm your explicit intention to authenticate and approve this electronic document and the transaction it embodies. This action serves as your legal consent and is equivalent to a physical handwritten signature.
+                <div className="p-3.5 bg-sky-50 border border-sky-200 rounded-[6px]">
+                  <p className="text-[12px] text-sky-900 leading-relaxed">
+                    <strong className="font-semibold text-sky-950">Notice:</strong> By clicking &apos;Affix Signature,&apos; you hereby affirm your explicit intention to authenticate and approve this electronic document and the transaction it embodies. This action serves as your legal consent and is equivalent to a physical handwritten signature.
                   </p>
                 </div>
 
-                <div className="flex justify-end items-center gap-3 pt-3 border-t border-slate-100">
+                <div className="flex justify-end items-center gap-2.5 pt-3 border-t border-[#E5E5E7]">
                   <button
                     type="button"
                     onClick={() => setShowApproveModal(false)}
-                    className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors"
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -1025,7 +1046,7 @@ function StaffDashboardContent() {
                     type="button"
                     disabled={actionLoading}
                     onClick={() => handleAction('APPROVED')}
-                    className="px-6 py-2.5 rounded-xl bg-[#0F4C2E] hover:bg-[#165E3A] text-white text-xs font-bold shadow-md disabled:opacity-50 transition-all"
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white shadow-xs disabled:opacity-50 transition-colors cursor-pointer"
                   >
                     {actionLoading ? 'Affixing Signature...' : 'Affix Signature'}
                   </button>
@@ -1037,49 +1058,49 @@ function StaffDashboardContent() {
 
         {/* Reject / Return Confirmation Modal */}
         {showRejectModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-            <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
-              <div className="bg-rose-700 text-white p-4 font-bold text-sm flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <svg className="w-5 h-5 text-rose-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs animate-fade-in">
+            <div className="w-full max-w-lg bg-white border border-[#E5E5E7] rounded-[10px] shadow-xl overflow-hidden">
+              <div className="bg-rose-700 text-white px-5 py-3.5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-rose-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
-                  <span>Return Request for Revision</span>
+                  <span className="text-[14px] font-semibold text-white">Return Request for Revision</span>
                 </div>
                 <button
                   onClick={() => setShowRejectModal(false)}
-                  className="text-rose-200 hover:text-white font-bold text-sm cursor-pointer"
+                  className="text-rose-200 hover:text-white text-sm cursor-pointer"
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="p-6 space-y-4">
+              <div className="p-5 space-y-4">
                 {reviewRequest && (
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
+                  <div className="p-3 bg-rose-50/40 border border-rose-200/70 rounded-[6px] text-[12px] space-y-1">
                     <div className="flex justify-between">
-                      <span className="text-slate-400 font-semibold">Reference:</span>
-                      <span className="font-mono font-bold text-slate-800">{reviewRequest.trackingNumber}</span>
+                      <span className="text-[#86868B]">Reference:</span>
+                      <span className="font-mono font-medium text-[#0F4C2E]">{reviewRequest.trackingNumber}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400 font-semibold">Employee:</span>
-                      <span className="font-bold text-slate-800">{reviewRequest.createdBy?.name}</span>
+                      <span className="text-[#86868B]">Employee:</span>
+                      <span className="font-medium text-[#1D1D1F]">{reviewRequest.createdBy?.name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400 font-semibold">Destination:</span>
-                      <span className="font-bold text-slate-800">{reviewRequest.destination}</span>
+                      <span className="text-[#86868B]">Destination:</span>
+                      <span className="font-medium text-[#1D1D1F]">{reviewRequest.destination}</span>
                     </div>
                   </div>
                 )}
 
                 {actionError && (
-                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-semibold text-rose-800">
+                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-[6px] text-[12px] font-medium text-rose-700">
                     {actionError}
                   </div>
                 )}
 
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                  <label className="text-[13px] font-medium text-[#1D1D1F] block mb-1.5">
                     Reason for Return / Revision Instructions <span className="text-rose-600">*</span>
                   </label>
                   <textarea
@@ -1090,18 +1111,18 @@ function StaffDashboardContent() {
                       if (actionError) setActionError('');
                     }}
                     placeholder="E.g., Please adjust travel dates or provide further travel justification..."
-                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-rose-500"
+                    className="w-full px-2.5 py-2 text-[13px] text-[#1D1D1F] bg-slate-50/70 border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
                   />
-                  <p className="text-[11px] text-slate-400 mt-1">
+                  <p className="text-[12px] text-[#86868B] mt-1">
                     This reason will be sent immediately via SMS and in-app notification to the employee.
                   </p>
                 </div>
 
-                <div className="flex justify-end items-center gap-3 pt-3 border-t border-slate-100">
+                <div className="flex justify-end items-center gap-2.5 pt-3 border-t border-[#E5E5E7]">
                   <button
                     type="button"
                     onClick={() => setShowRejectModal(false)}
-                    className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors cursor-pointer"
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -1110,7 +1131,7 @@ function StaffDashboardContent() {
                     type="button"
                     disabled={actionLoading || !remarks.trim()}
                     onClick={() => handleAction('REJECTED')}
-                    className="px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md disabled:opacity-50 transition-all cursor-pointer"
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-rose-600 hover:bg-rose-700 text-white shadow-xs disabled:opacity-50 transition-colors cursor-pointer"
                   >
                     {actionLoading ? 'Returning...' : 'Confirm Return'}
                   </button>
@@ -1122,94 +1143,96 @@ function StaffDashboardContent() {
 
         {/* Document History Modal (Strictly Matching PDF Page 8) */}
         {showHistoryModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-            <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-extrabold text-slate-900">Document History</h3>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs animate-fade-in">
+            <div className="w-full max-w-md bg-white border border-[#E5E5E7] rounded-[10px] shadow-xl overflow-hidden">
+              <div className="bg-[#0F4C2E] text-white px-5 py-3.5 flex items-center justify-between">
+                <h3 className="text-[14px] font-semibold text-white">Document History</h3>
                 <button
                   onClick={() => setShowHistoryModal(false)}
-                  className="text-slate-400 hover:text-slate-700 font-bold"
+                  className="text-emerald-200 hover:text-white text-sm cursor-pointer"
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="space-y-6 relative pl-6 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
-                {/* Event 1: Document Submitted */}
-                <div className="relative flex items-start gap-3">
-                  <div className="absolute -left-6 top-0 w-6 h-6 rounded-full bg-emerald-500 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-                    ✓
+              <div className="p-5 space-y-5">
+                <div className="space-y-5 relative pl-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-px before:bg-emerald-200">
+                  {/* Event 1: Document Submitted */}
+                  <div className="relative flex items-start gap-3">
+                    <div className="absolute -left-6 top-0 w-5 h-5 rounded-full bg-emerald-600 text-white font-semibold text-[11px] flex items-center justify-center shrink-0">
+                      ✓
+                    </div>
+                    <div>
+                      <h4 className="text-[13px] font-semibold text-[#1D1D1F]">Document Filed & Submitted</h4>
+                      <p className="text-[12px] text-[#86868B] mt-0.5">Applicant: <span className="font-medium text-[#1D1D1F]">{reviewRequest.createdBy?.name || 'Juan Dela Cruz'}</span></p>
+                      <span className="text-[11px] text-[#86868B] mt-0.5 block">
+                        {formatFullDateTimeDisplay(reviewRequest.createdAt)}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900">Document Filed & Submitted</h4>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Applicant: <span className="font-semibold text-slate-800">{reviewRequest.createdBy?.name || 'Juan Dela Cruz'}</span></p>
-                    <span className="text-[10px] text-slate-500 mt-0.5 block font-medium">
-                      {formatFullDateTimeDisplay(reviewRequest.createdAt)}
-                    </span>
-                  </div>
+
+                  {/* Dynamic Signatory Steps */}
+                  {[
+                    { order: 1, defaultTitle: 'Section Chief Verification', defaultRole: 'Section Chief' },
+                    { order: 2, defaultTitle: 'Division Chief Review & Endorsement', defaultRole: 'Division Chief' },
+                    { order: 3, defaultTitle: 'Head of PENRO Final Approval', defaultRole: 'Head of PENRO' },
+                  ].map((stepDef) => {
+                    const step = reviewRequest.approvalSteps?.find((s) => s.order === stepDef.order);
+                    const isApproved = step?.action === 'APPROVED';
+                    const isRejected = step?.action === 'REJECTED';
+                    const approverName = step?.approver?.name || stepDef.defaultRole;
+
+                    return (
+                      <div key={stepDef.order} className="relative flex items-start gap-3">
+                        <div
+                          className={`absolute -left-6 top-0 w-5 h-5 rounded-full font-semibold text-[11px] flex items-center justify-center shrink-0 ${
+                            isApproved
+                              ? 'bg-emerald-600 text-white'
+                              : isRejected
+                              ? 'bg-rose-600 text-white'
+                              : 'bg-emerald-50 text-[#0F4C2E] border border-emerald-200'
+                          }`}
+                        >
+                          {isApproved ? '✓' : isRejected ? '✕' : stepDef.order + 1}
+                        </div>
+                        <div>
+                          <h4 className="text-[13px] font-semibold text-[#1D1D1F]">{stepDef.defaultTitle}</h4>
+                          <p className="text-[12px] text-[#86868B] mt-0.5">
+                            Signatory: <span className="font-medium text-[#1D1D1F]">{approverName}</span>
+                          </p>
+                          {isApproved && (
+                            <span className="text-[11px] text-emerald-700 mt-0.5 block font-medium">
+                              ✓ Approved · {formatFullDateTimeDisplay(step?.actionDate || step?.updatedAt)}
+                            </span>
+                          )}
+                          {isRejected && (
+                            <span className="text-[11px] text-rose-700 mt-0.5 block font-medium">
+                              ✕ Returned / Rejected · {formatFullDateTimeDisplay(step?.actionDate || step?.updatedAt)}
+                            </span>
+                          )}
+                          {!isApproved && !isRejected && (
+                            <span className="text-[11px] text-amber-700 mt-0.5 inline-flex items-center gap-1 font-medium">
+                              <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <span>Awaiting Action</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
 
-                {/* Dynamic Signatory Steps */}
-                {[
-                  { order: 1, defaultTitle: 'Section Chief Verification', defaultRole: 'Section Chief' },
-                  { order: 2, defaultTitle: 'Division Chief Review & Endorsement', defaultRole: 'Division Chief' },
-                  { order: 3, defaultTitle: 'Head of PENRO Final Approval', defaultRole: 'Head of PENRO' },
-                ].map((stepDef) => {
-                  const step = reviewRequest.approvalSteps?.find((s) => s.order === stepDef.order);
-                  const isApproved = step?.action === 'APPROVED';
-                  const isRejected = step?.action === 'REJECTED';
-                  const approverName = step?.approver?.name || stepDef.defaultRole;
-
-                  return (
-                    <div key={stepDef.order} className="relative flex items-start gap-3">
-                      <div
-                        className={`absolute -left-6 top-0 w-6 h-6 rounded-full font-bold text-xs flex items-center justify-center shrink-0 shadow-xs ${
-                          isApproved
-                            ? 'bg-emerald-600 text-white'
-                            : isRejected
-                            ? 'bg-rose-600 text-white'
-                            : 'bg-slate-200 text-slate-600'
-                        }`}
-                      >
-                        {isApproved ? '✓' : isRejected ? '✕' : stepDef.order + 1}
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900">{stepDef.defaultTitle}</h4>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
-                          Signatory: <span className="font-semibold text-slate-800">{approverName}</span>
-                        </p>
-                        {isApproved && (
-                          <span className="text-[10px] text-emerald-700 mt-0.5 block font-semibold">
-                            ✓ Approved · {formatFullDateTimeDisplay(step?.actionDate || step?.updatedAt)}
-                          </span>
-                        )}
-                        {isRejected && (
-                          <span className="text-[10px] text-rose-700 mt-0.5 block font-semibold">
-                            ✕ Returned / Rejected · {formatFullDateTimeDisplay(step?.actionDate || step?.updatedAt)}
-                          </span>
-                        )}
-                        {!isApproved && !isRejected && (
-                          <span className="text-[10px] text-amber-700 mt-0.5 inline-flex items-center gap-1 font-medium">
-                            <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Awaiting Action</span>
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="pt-2 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setShowHistoryModal(false)}
-                  className="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
-                >
-                  Close
-                </button>
+                <div className="pt-3 border-t border-[#E5E5E7] flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowHistoryModal(false)}
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-[#0F4C2E] border border-emerald-200 transition-colors cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1223,63 +1246,71 @@ function StaffDashboardContent() {
   /* -------------------------------------------------------------------------- */
   if (currentTab === 'dashboard') {
     return (
-      <div className="w-full max-w-[1600px] mx-auto space-y-6 animate-fade-in">
-        {/* 4 Stat Cards Row (Clean, Standalone Outline Icons) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="w-full max-w-[1600px] mx-auto space-y-5 animate-fade-in">
+        {/* 4 Stat Cards Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Stat 1: Total */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
-            <svg className="w-7 h-7 text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
+          <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-[#0F4C2E] shadow-xs flex items-center gap-3.5">
+            <div className="w-9 h-9 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
             <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total</p>
-              <h3 className="text-2xl font-black text-slate-900 mt-0.5">{totalCount}</h3>
+              <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">Total</p>
+              <h3 className="text-[24px] font-bold tracking-tight text-[#1D1D1F] leading-tight mt-0.5">{totalCount}</h3>
             </div>
           </div>
 
           {/* Stat 2: Approved */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
-            <svg className="w-7 h-7 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-emerald-500 shadow-xs flex items-center gap-3.5">
+            <div className="w-9 h-9 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
             <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Approved</p>
-              <h3 className="text-2xl font-black text-slate-900 mt-0.5">{approvedCount}</h3>
+              <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">Approved</p>
+              <h3 className="text-[24px] font-bold tracking-tight text-[#1D1D1F] leading-tight mt-0.5">{approvedCount}</h3>
             </div>
           </div>
 
           {/* Stat 3: Pending */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
-            <svg className="w-7 h-7 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-amber-500 shadow-xs flex items-center gap-3.5">
+            <div className="w-9 h-9 rounded-[6px] bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-amber-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
             <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pending</p>
-              <h3 className="text-2xl font-black text-slate-900 mt-0.5">{pendingCount}</h3>
+              <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">Pending</p>
+              <h3 className="text-[24px] font-bold tracking-tight text-[#1D1D1F] leading-tight mt-0.5">{pendingCount}</h3>
             </div>
           </div>
 
           {/* Stat 4: Ongoing */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
-            <svg className="w-7 h-7 text-purple-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
+          <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-blue-500 shadow-xs flex items-center gap-3.5">
+            <div className="w-9 h-9 rounded-[6px] bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-blue-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            </div>
             <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ongoing</p>
-              <h3 className="text-2xl font-black text-slate-900 mt-0.5">{ongoingCount}</h3>
+              <p className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider">Ongoing</p>
+              <h3 className="text-[24px] font-bold tracking-tight text-[#1D1D1F] leading-tight mt-0.5">{ongoingCount}</h3>
             </div>
           </div>
         </div>
 
         {/* 2-Column Grid (2/3 + 1/3) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column (2/3): Recent Approval Activity Table */}
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-sm font-bold text-slate-900">Recent Approval Activity</h3>
+          <div className="lg:col-span-2 bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden">
+            <div className="px-4 py-3 border-b border-[#E5E5E7] flex items-center justify-between">
+              <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Recent Approval Activity</h3>
               <button
                 onClick={() => router.push('/staff?tab=pending')}
-                className="text-xs font-bold text-[#0F4C2E] hover:underline"
+                className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 text-[#1B4332] hover:bg-[#F2F2F7] transition-colors cursor-pointer"
               >
                 View All
               </button>
@@ -1287,41 +1318,41 @@ function StaffDashboardContent() {
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                    <th className="pb-3">PERSONNEL</th>
-                    <th className="pb-3">DESTINATION & PURPOSE</th>
-                    <th className="pb-3">TRAVEL DATES</th>
-                    <th className="pb-3">DATE FILED</th>
-                    <th className="pb-3">STATUS</th>
-                    <th className="pb-3 text-right">ACTIONS</th>
+                <thead className="bg-[#F5F5F7] border-b border-[#E5E5E7]">
+                  <tr>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">PERSONNEL</th>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">DESTINATION & PURPOSE</th>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">TRAVEL DATES</th>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">DATE FILED</th>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">STATUS</th>
+                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-right">ACTIONS</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-xs">
+                <tbody>
                   {dashboardActivityRequests.length > 0 ? (
                     dashboardActivityRequests.map((req, idx) => (
-                      <tr key={req.id || idx} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="py-4 font-bold text-slate-900">
-                          <div>{req.createdBy?.name || 'Maria Santos'}</div>
+                      <tr key={req.id || idx} className="h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-[#F2F2F7] transition-colors">
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">
+                          <div className="font-medium text-[#1D1D1F]">{req.createdBy?.name || 'Maria Santos'}</div>
                           {(req.createdBy?.section || req.createdBy?.division) && (
-                            <div className="text-[10px] text-slate-400 font-normal mt-0.5">
+                            <div className="text-[12px] text-[#86868B]">
                               {[req.createdBy?.division, req.createdBy?.section].filter(Boolean).join(' • ')}
                             </div>
                           )}
                         </td>
-                        <td className="py-4 max-w-xs">
-                          <p className="font-bold text-slate-800 truncate">{req.destination}</p>
-                          <p className="text-[11px] text-slate-500 truncate mt-0.5">{req.purpose}</p>
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left max-w-xs">
+                          <p className="font-medium text-[#1D1D1F] truncate">{req.destination}</p>
+                          <p className="text-[12px] text-[#86868B] truncate">{req.purpose}</p>
                         </td>
-                        <td className="py-4 text-slate-600 font-medium">
+                        <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">
                           {formatDateRangeShort(req.startDate, req.endDate)}
                         </td>
-                        <td className="py-4 text-slate-400 font-medium">{formatDateDisplay(req.createdAt)}</td>
-                        <td className="py-4">{renderStatusBadge(req.status)}</td>
-                        <td className="py-4 text-right">
+                        <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">{formatDateDisplay(req.createdAt)}</td>
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">{renderStatusBadge(req.status)}</td>
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-right">
                           <button
                             onClick={() => setReviewRequest(req)}
-                            className="text-xs font-bold text-[#0F4C2E] hover:underline"
+                            className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
                           >
                             View
                           </button>
@@ -1329,8 +1360,8 @@ function StaffDashboardContent() {
                       </tr>
                     ))
                   ) : (
-                    <tr>
-                      <td colSpan={6} className="py-12 text-center text-slate-400 font-medium">
+                    <tr className="h-[42px]">
+                      <td colSpan={6} className="px-3 py-8 text-center text-[13px] text-[#86868B]">
                         No recent approval activity in your unit.
                       </td>
                     </tr>
@@ -1340,15 +1371,15 @@ function StaffDashboardContent() {
             </div>
           </div>
 
-          {/* Right Column (1/3): Approval Workflow SOP Card (Matching PDF Page 1) */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden flex flex-col justify-between relative isolate">
+          {/* Right Column (1/3): Approval Workflow SOP Card */}
+          <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden flex flex-col justify-between relative isolate">
             <div>
-              <div className="bg-[#1B4332] text-white p-5">
-                <h3 className="text-sm font-extrabold">Approval Workflow</h3>
-                <p className="text-[11px] text-emerald-200 mt-0.5">Standard operating procedure</p>
+              <div className="bg-[#F5F5F7] border-b border-[#E5E5E7] px-4 py-3">
+                <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Approval Workflow</h3>
+                <p className="text-[12px] text-[#86868B] mt-0.5">Standard operating procedure</p>
               </div>
 
-              <div className="p-6">
+              <div className="p-4">
                 <div className="relative">
                   {[
                     {
@@ -1368,11 +1399,11 @@ function StaffDashboardContent() {
                       description: 'Final approval and digital signature.',
                     },
                   ].map((item, idx, arr) => (
-                    <div key={idx} className="relative flex items-start gap-4 pb-6 last:pb-0">
+                    <div key={idx} className="relative flex items-start gap-3.5 pb-5 last:pb-0">
                       {/* Single vertical line connecting nodes from Step 1 through Step 4 */}
                       {idx < arr.length - 1 && (
                         <div
-                          className="absolute left-[7px] top-2.5 h-full w-[2px] bg-slate-200"
+                          className="absolute left-[7px] top-2.5 h-full w-px bg-[#E5E5E7]"
                           aria-hidden="true"
                         />
                       )}
@@ -1385,11 +1416,11 @@ function StaffDashboardContent() {
                       </div>
 
                       {/* Step Title & Description to the right */}
-                      <div className="min-w-0 flex-1 pt-0.5">
-                        <h4 className="font-extrabold text-slate-900 text-xs tracking-tight">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-semibold text-[#1D1D1F] text-[13px]">
                           {item.step}
                         </h4>
-                        <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                        <p className="text-[12px] text-[#86868B] mt-0.5 leading-snug">
                           {item.description}
                         </p>
                       </div>
@@ -1423,32 +1454,32 @@ function StaffDashboardContent() {
     };
 
     return (
-      <div className="w-full max-w-[1600px] mx-auto space-y-6 animate-fade-in pb-16">
+      <div className="w-full max-w-[1600px] mx-auto space-y-5 animate-fade-in pb-16">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-900">Pending Approvals</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">Pending Approvals</h2>
+            <p className="text-[13px] text-[#86868B] mt-0.5">
               Requests requiring your immediate action ({pendingRequests.length})
             </p>
           </div>
 
           {/* Search & Filter Header Bar */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <div className="relative w-72">
               <input
                 type="text"
                 placeholder="Search Personnel, ID, Dest..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+                className="w-full h-8 pl-8 pr-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
               />
-              <svg className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 text-[#86868B] absolute left-2.5 top-2.25" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
 
-            <button className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button className="h-8 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white border border-[#E5E5E7] text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors">
+              <svg className="w-3.5 h-3.5 text-[#86868B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
             </button>
@@ -1456,107 +1487,109 @@ function StaffDashboardContent() {
         </div>
 
         {/* Table Container */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+        <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50/80 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
-                  <th className="py-4 px-4 w-10 text-center">
+              <thead className="bg-emerald-950/[0.04] border-b border-[#E5E5E7]">
+                <tr>
+                  <th className="h-8 px-3 w-10 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">
                     <input
                       type="checkbox"
                       onChange={handleSelectAll}
                       checked={pendingRequests.length > 0 && selectedIds.length === pendingRequests.length}
-                      className="rounded border-slate-300 text-[#0F4C2E] focus:ring-[#0F4C2E]"
+                      className="rounded border-[#E5E5E7] text-[#1B4332] focus:ring-[#1B4332]"
                     />
                   </th>
-                  <th className="py-4 px-4">PERSONNEL</th>
-                  <th className="py-4 px-4">DESTINATION</th>
-                  <th className="py-4 px-4 max-w-xs">PURPOSE</th>
-                  <th className="py-4 px-4">TRAVEL DATES</th>
-                  <th className="py-4 px-4">DATE FILED</th>
-                  <th className="py-4 px-4">STATUS</th>
-                  <th className="py-4 px-4 text-right">ACTIONS</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">PERSONNEL</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">DESTINATION</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left max-w-xs">PURPOSE</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">TRAVEL DATES</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">DATE FILED</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">STATUS</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-right">ACTIONS</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-xs">
+              <tbody>
                 {pendingRequests.length > 0 ? (
                   pendingRequests.map((req, idx) => {
                     const isSelected = selectedIds.includes(req.id);
 
                     return (
-                      <tr key={req.id || idx} className={`hover:bg-slate-50/80 transition-colors ${isSelected ? 'bg-emerald-50/30' : ''}`}>
-                        <td className="py-4 px-4 text-center">
+                      <tr key={req.id || idx} className={`h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors ${isSelected ? 'bg-emerald-50/40' : ''}`}>
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">
                           <input
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => handleToggleSelect(req.id)}
-                            className="rounded border-slate-300 text-[#0F4C2E] focus:ring-[#0F4C2E]"
+                            className="rounded border-[#E5E5E7] text-[#1B4332] focus:ring-[#1B4332]"
                           />
                         </td>
-                        <td className="py-4 px-4 font-bold text-slate-900">
-                          <div>{req.createdBy?.name || 'Maria Santos'}</div>
-                          <div className="text-[10px] text-slate-400 font-mono mt-0.5">{req.trackingNumber}</div>
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">
+                          <div className="font-medium text-[#1D1D1F]">{req.createdBy?.name || 'Maria Santos'}</div>
+                          <div className="text-[12px] text-[#86868B] font-mono">{req.trackingNumber}</div>
                           {(req.createdBy?.section || req.createdBy?.division) && (
                             <div className="mt-1 flex flex-wrap gap-1">
                               {req.createdBy?.division && (
-                                <span className="inline-block px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[9px] font-semibold">
+                                <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-[#F5F5F7] text-[#86868B] border border-[#E5E5E7]">
                                   {req.createdBy.division}
                                 </span>
                               )}
                               {req.createdBy?.section && (
-                                <span className="inline-block px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-semibold border border-emerald-200">
+                                <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">
                                   {req.createdBy.section}
                                 </span>
                               )}
                             </div>
                           )}
                         </td>
-                        <td className="py-4 px-4 font-bold text-slate-800">{req.destination}</td>
-                        <td className="py-4 px-4 text-slate-600 max-w-xs leading-relaxed">{req.purpose}</td>
-                        <td className="py-4 px-4 text-slate-600 font-medium">
+                        <td className="px-3 py-1.5 text-[13px] font-medium text-[#1D1D1F] align-middle text-left">{req.destination}</td>
+                        <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left max-w-xs leading-relaxed">{req.purpose}</td>
+                        <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">
                           {formatDateRangeShort(req.startDate, req.endDate)}
                         </td>
-                        <td className="py-4 px-4 text-slate-400 font-medium">{formatDateDisplay(req.createdAt)}</td>
-                        <td className="py-4 px-4">{renderStatusBadge(req.status)}</td>
-                        <td className="py-4 px-4 text-right space-x-2 whitespace-nowrap">
-                          <button
-                            onClick={() => {
-                              setReviewRequest(req);
-                              setShowApproveModal(true);
-                            }}
-                            className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors shadow-2xs"
-                          >
-                            Approve
-                          </button>
+                        <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">{formatDateDisplay(req.createdAt)}</td>
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">{renderStatusBadge(req.status)}</td>
+                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-right whitespace-nowrap">
+                          <div className="inline-flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => {
+                                setReviewRequest(req);
+                                setShowApproveModal(true);
+                              }}
+                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-[#1B4332] hover:bg-[#143225] text-white transition-colors cursor-pointer"
+                            >
+                              Approve
+                            </button>
 
-                          <button
-                            onClick={() => {
-                              setReviewRequest(req);
-                              setRemarks('');
-                              setActionError('');
-                              setShowRejectModal(true);
-                            }}
-                            className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition-colors shadow-2xs cursor-pointer"
-                          >
-                            Disapprove
-                          </button>
+                            <button
+                              onClick={() => {
+                                setReviewRequest(req);
+                                setRemarks('');
+                                setActionError('');
+                                setShowRejectModal(true);
+                              }}
+                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition-colors cursor-pointer"
+                            >
+                              Disapprove
+                            </button>
 
-                          <button
-                            onClick={() => setReviewRequest(req)}
-                            className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px] transition-colors shadow-2xs inline-flex items-center gap-1.5"
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span>View Docs</span>
-                          </button>
+                            <button
+                              onClick={() => setReviewRequest(req)}
+                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
+                            >
+                              <svg className="w-3.5 h-3.5 text-[#86868B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              <span>View Docs</span>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
                   })
                 ) : (
-                  <tr>
-                    <td colSpan={8} className="py-12 text-center text-slate-500 font-medium">
+                  <tr className="h-[42px]">
+                    <td colSpan={8} className="px-3 py-8 text-center text-[13px] text-[#86868B]">
                       No pending requests requiring your action.
                     </td>
                   </tr>
@@ -1567,17 +1600,17 @@ function StaffDashboardContent() {
         </div>
 
         {/* Bottom Selection Action Bar (Matching PDF Page 2) */}
-        <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-          <span className="text-xs font-bold text-slate-500">
+        <div className="flex items-center justify-between pt-3 border-t border-[#E5E5E7]">
+          <span className="text-[13px] font-medium text-[#86868B]">
             {selectedIds.length} request(s) selected
           </span>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={() => alert('Printing selected requests...')}
-              className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs"
+              className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-white border border-[#E5E5E7] hover:bg-[#F2F2F7] text-[#1D1D1F] transition-colors cursor-pointer"
             >
-              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 text-[#86868B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
               </svg>
               <span>Print</span>
@@ -1588,7 +1621,7 @@ function StaffDashboardContent() {
                 if (selectedIds.length === 0) return alert('Select at least 1 request to approve.');
                 alert(`Approved ${selectedIds.length} request(s) successfully!`);
               }}
-              className="px-5 py-2 bg-[#81B29A] hover:bg-[#689F86] text-white rounded-xl text-xs font-extrabold shadow-md transition-all"
+              className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#1B4332] hover:bg-[#143225] text-white transition-colors cursor-pointer"
             >
               Approve Selected
             </button>
@@ -1603,11 +1636,11 @@ function StaffDashboardContent() {
   /* -------------------------------------------------------------------------- */
   if (currentTab === 'history') {
     return (
-      <div className="w-full max-w-[1600px] mx-auto space-y-6 animate-fade-in">
+      <div className="w-full max-w-[1600px] mx-auto space-y-5 animate-fade-in">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-900">Approval History</h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">Approval History</h2>
+            <p className="text-[13px] text-[#86868B] mt-0.5">
               Archive of all processed travel order requests ({filteredRequests.length} record{filteredRequests.length === 1 ? '' : 's'})
             </p>
           </div>
@@ -1616,13 +1649,13 @@ function StaffDashboardContent() {
           <div className="relative">
             <button
               onClick={() => setShowExportMenu(!showExportMenu)}
-              className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-bold flex items-center gap-2 shadow-2xs self-start sm:self-auto transition-all cursor-pointer"
+              className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-white border border-[#E5E5E7] hover:bg-[#F2F2F7] text-[#1D1D1F] shadow-xs self-start sm:self-auto transition-colors cursor-pointer"
             >
-              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 text-[#86868B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
               <span>Export Report</span>
-              <svg className={`w-3.5 h-3.5 text-slate-400 transition-transform ${showExportMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-3.5 h-3.5 text-[#86868B] transition-transform ${showExportMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
@@ -1633,24 +1666,24 @@ function StaffDashboardContent() {
                   className="fixed inset-0 z-20"
                   onClick={() => setShowExportMenu(false)}
                 />
-                <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl border border-slate-200 p-2 z-30 animate-fade-in space-y-1">
+                <div className="absolute right-0 mt-1.5 w-60 bg-white rounded-[8px] shadow-xl border border-[#E5E5E7] p-1.5 z-30 animate-fade-in space-y-0.5">
                   <button
                     onClick={() => {
                       setShowExportMenu(false);
                       exportApprovalHistoryToCSV(filteredRequests, userRole);
                     }}
-                    className="w-full px-3 py-2.5 text-left text-xs rounded-xl hover:bg-emerald-50 text-slate-700 hover:text-[#0F4C2E] flex items-center gap-3 transition-colors cursor-pointer"
+                    className="w-full px-3 py-2 text-left text-[13px] rounded-[6px] hover:bg-[#F2F2F7] text-[#1D1D1F] flex items-center gap-2.5 transition-colors cursor-pointer"
                   >
-                    <svg className="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-[#1B4332] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                     <div>
-                      <div className="font-bold text-slate-800">Export to CSV / Excel</div>
-                      <div className="text-[10px] text-slate-400">Download spreadsheet (.csv)</div>
+                      <div className="font-medium text-[#1D1D1F]">Export to CSV / Excel</div>
+                      <div className="text-[11px] text-[#86868B]">Download spreadsheet (.csv)</div>
                     </div>
                   </button>
 
-                  <div className="border-t border-slate-100 my-1" />
+                  <div className="border-t border-[#E5E5E7] my-1" />
 
                   <button
                     onClick={() => {
@@ -1670,14 +1703,14 @@ function StaffDashboardContent() {
                         searchQuery,
                       });
                     }}
-                    className="w-full px-3 py-2.5 text-left text-xs rounded-xl hover:bg-emerald-50 text-slate-700 hover:text-[#0F4C2E] flex items-center gap-3 transition-colors cursor-pointer"
+                    className="w-full px-3 py-2 text-left text-[13px] rounded-[6px] hover:bg-[#F2F2F7] text-[#1D1D1F] flex items-center gap-2.5 transition-colors cursor-pointer"
                   >
-                    <svg className="w-4 h-4 text-slate-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-[#1D1D1F] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
                     <div>
-                      <div className="font-bold text-slate-800">Print / Save as PDF</div>
-                      <div className="text-[10px] text-slate-400">Official government summary report</div>
+                      <div className="font-medium text-[#1D1D1F]">Print / Save as PDF</div>
+                      <div className="text-[11px] text-[#86868B]">Official government summary report</div>
                     </div>
                   </button>
                 </div>
@@ -1687,25 +1720,25 @@ function StaffDashboardContent() {
         </div>
 
         {/* Filter Bar matching PDF Page 3 */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="bg-white p-3 rounded-[8px] border border-[#E5E5E7] shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="relative flex-1 w-full">
             <input
               type="text"
               placeholder="Search by Employee Name or TA Number..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#0F4C2E]"
+              className="w-full h-8 pl-8 pr-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
             />
-            <svg className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 text-[#86868B] absolute left-2.5 top-2.25" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none"
+              className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
             >
               <option value="ALL">All Statuses</option>
               <option value="PENDING">Pending</option>
@@ -1716,13 +1749,13 @@ function StaffDashboardContent() {
 
             <button
               onClick={() => setShowDateRangeModal(true)}
-              className={`px-4 py-2 border rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 border transition-colors cursor-pointer ${
                 startDateFilter || endDateFilter
-                  ? 'bg-emerald-50 border-emerald-300 text-[#0F4C2E] font-bold'
-                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                  : 'bg-white border-[#E5E5E7] text-[#1D1D1F] hover:bg-[#F2F2F7]'
               }`}
             >
-              <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 text-[#86868B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <span>
@@ -1737,7 +1770,7 @@ function StaffDashboardContent() {
                     setStartDateFilter('');
                     setEndDateFilter('');
                   }}
-                  className="ml-1 text-slate-400 hover:text-rose-600 font-bold"
+                  className="ml-1 text-[#86868B] hover:text-red-600 font-semibold"
                   title="Clear Date Range"
                 >
                   ✕
@@ -1749,155 +1782,161 @@ function StaffDashboardContent() {
 
         {/* Date Range Modal */}
         {showDateRangeModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in">
-            <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4 border border-slate-100">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                  <svg className="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs animate-fade-in">
+            <div className="w-full max-w-sm bg-white border border-[#E5E5E7] rounded-[10px] shadow-2xl overflow-hidden">
+              <div className="bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white px-5 py-3.5 flex items-center justify-between">
+                <h3 className="text-[14px] font-semibold text-white flex items-center gap-2">
+                  <svg className="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   Filter by Filing Date Range
                 </h3>
                 <button
                   onClick={() => setShowDateRangeModal(false)}
-                  className="text-slate-400 hover:text-slate-700 font-bold"
+                  className="w-7 h-7 rounded-[6px] hover:bg-white/10 text-emerald-100 hover:text-white flex items-center justify-center font-semibold text-xs transition-colors cursor-pointer"
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="space-y-3 text-xs">
-                <div>
-                  <label className="font-bold text-slate-700 block mb-1">Start Date</label>
-                  <input
-                    type="date"
-                    value={startDateFilter}
-                    onChange={(e) => setStartDateFilter(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-[#0F4C2E]"
-                  />
-                </div>
+              <div className="p-5 space-y-4">
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-[12px] font-medium text-[#1D1D1F] block mb-1">Start Date</label>
+                    <input
+                      type="date"
+                      value={startDateFilter}
+                      onChange={(e) => setStartDateFilter(e.target.value)}
+                      className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                    />
+                  </div>
 
-                <div>
-                  <label className="font-bold text-slate-700 block mb-1">End Date</label>
-                  <input
-                    type="date"
-                    value={endDateFilter}
-                    onChange={(e) => setEndDateFilter(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-[#0F4C2E]"
-                  />
-                </div>
+                  <div>
+                    <label className="text-[12px] font-medium text-[#1D1D1F] block mb-1">End Date</label>
+                    <input
+                      type="date"
+                      value={endDateFilter}
+                      onChange={(e) => setEndDateFilter(e.target.value)}
+                      className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                    />
+                  </div>
 
-                {/* Quick Presets */}
-                <div className="pt-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Quick Presets</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const today = new Date().toISOString().split('T')[0];
-                        setStartDateFilter(today);
-                        setEndDateFilter(today);
-                      }}
-                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold"
-                    >
-                      Today
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const d = new Date();
-                        d.setDate(d.getDate() - 7);
-                        setStartDateFilter(d.toISOString().split('T')[0]);
-                        setEndDateFilter(new Date().toISOString().split('T')[0]);
-                      }}
-                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold"
-                    >
-                      Last 7 Days
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const d = new Date();
-                        d.setDate(d.getDate() - 30);
-                        setStartDateFilter(d.toISOString().split('T')[0]);
-                        setEndDateFilter(new Date().toISOString().split('T')[0]);
-                      }}
-                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold"
-                    >
-                      Last 30 Days
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setStartDateFilter('');
-                        setEndDateFilter('');
-                      }}
-                      className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-semibold"
-                    >
-                      Clear
-                    </button>
+                  {/* Quick Presets */}
+                  <div className="pt-1">
+                    <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-1.5">Quick Presets</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const today = new Date().toISOString().split('T')[0];
+                          setStartDateFilter(today);
+                          setEndDateFilter(today);
+                        }}
+                        className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-[#F5F5F7] hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
+                      >
+                        Today
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const d = new Date();
+                          d.setDate(d.getDate() - 7);
+                          setStartDateFilter(d.toISOString().split('T')[0]);
+                          setEndDateFilter(new Date().toISOString().split('T')[0]);
+                        }}
+                        className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-[#F5F5F7] hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
+                      >
+                        Last 7 Days
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const d = new Date();
+                          d.setDate(d.getDate() - 30);
+                          setStartDateFilter(d.toISOString().split('T')[0]);
+                          setEndDateFilter(new Date().toISOString().split('T')[0]);
+                        }}
+                        className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-[#F5F5F7] hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
+                      >
+                        Last 30 Days
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setStartDateFilter('');
+                          setEndDateFilter('');
+                        }}
+                        className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition-colors cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStartDateFilter('');
-                    setEndDateFilter('');
-                    setShowDateRangeModal(false);
-                  }}
-                  className="text-xs text-slate-500 hover:text-slate-700 font-semibold"
-                >
-                  Reset All
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowDateRangeModal(false)}
-                  className="px-5 py-2 bg-[#0F4C2E] hover:bg-[#0B3A23] text-white rounded-xl text-xs font-bold shadow-xs cursor-pointer"
-                >
-                  Apply Filter
-                </button>
+                <div className="pt-3 border-t border-[#E5E5E7] flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStartDateFilter('');
+                      setEndDateFilter('');
+                      setShowDateRangeModal(false);
+                    }}
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors cursor-pointer"
+                  >
+                    Reset All
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowDateRangeModal(false)}
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#1B4332] hover:bg-[#143225] text-white transition-colors cursor-pointer"
+                  >
+                    Apply Filter
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         )}
 
         {/* History Table */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+        <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">
-                  <th className="py-4 px-6">TA NUMBER</th>
-                  <th className="py-4 px-6">PERSONNEL</th>
-                  <th className="py-4 px-6">DESTINATION</th>
-                  <th className="py-4 px-6 max-w-xs">PURPOSE</th>
-                  <th className="py-4 px-6">TRAVEL DATES</th>
-                  <th className="py-4 px-6">DATE FILED</th>
-                  <th className="py-4 px-6">STATUS</th>
-                  <th className="py-4 px-6">ACTION DATE</th>
-                  <th className="py-4 px-6 text-right">ACTIONS</th>
+              <thead className="bg-emerald-950/[0.04] border-b border-[#E5E5E7]">
+                <tr>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">TA NUMBER</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">PERSONNEL</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">DESTINATION</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left max-w-xs">PURPOSE</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">TRAVEL DATES</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">DATE FILED</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">STATUS</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">ACTION DATE</th>
+                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-right">ACTIONS</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-xs">
+              <tbody>
                 {filteredRequests.length > 0 ? (
                   filteredRequests.map((req, idx) => (
-                    <tr key={req.id || idx} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-4 px-6 font-mono font-bold text-[#0F4C2E]">{req.trackingNumber}</td>
-                      <td className="py-4 px-6 font-bold text-slate-900">
-                        <div>{req.createdBy?.name || 'Maria Santos'}</div>
-                        <div className="text-[10px] text-slate-400 font-medium">{req.createdBy?.section || 'Conservation and Develop...'}</div>
+                    <tr key={req.id || idx} className="h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors">
+                      <td className="px-3 py-1.5 text-[13px] font-mono font-medium text-[#1B4332] align-middle text-left whitespace-nowrap">
+                        <span className="px-2 py-0.5 rounded-[4px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200/80 font-mono text-[12px] font-semibold">
+                          {req.trackingNumber}
+                        </span>
                       </td>
-                      <td className="py-4 px-6 font-bold text-slate-800">{req.destination}</td>
-                      <td className="py-4 px-6 text-slate-600 max-w-xs truncate">{req.purpose}</td>
-                      <td className="py-4 px-6 text-slate-600 font-medium">
+                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">
+                        <div className="font-medium text-[#1D1D1F]">{req.createdBy?.name || 'Maria Santos'}</div>
+                        <div className="text-[12px] text-[#86868B]">{req.createdBy?.section || 'Conservation and Develop...'}</div>
+                      </td>
+                      <td className="px-3 py-1.5 text-[13px] font-medium text-[#1D1D1F] align-middle text-left">{req.destination}</td>
+                      <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left max-w-xs truncate">{req.purpose}</td>
+                      <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">
                         {formatDateRangeShort(req.startDate, req.endDate)}
                       </td>
-                      <td className="py-4 px-6 text-slate-400 font-medium">{formatDateDisplay(req.createdAt)}</td>
-                      <td className="py-4 px-6">{renderStatusBadge(req.status)}</td>
-                      <td className="py-4 px-6 text-slate-400">
+                      <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">{formatDateDisplay(req.createdAt)}</td>
+                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">{renderStatusBadge(req.status)}</td>
+                      <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">
                         {(() => {
                           const stepRoleMap: Record<string, number> = {
                             SECTION_CHIEF: 1,
@@ -1913,10 +1952,10 @@ function StaffDashboardContent() {
                           return '-';
                         })()}
                       </td>
-                      <td className="py-4 px-6 text-right">
+                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-right">
                         <button
                           onClick={() => setReviewRequest(req)}
-                          className="px-3 py-1.5 rounded-lg bg-sky-50 text-sky-700 hover:bg-sky-100 font-bold text-[11px] transition-colors cursor-pointer"
+                          className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
                         >
                           View
                         </button>
@@ -1924,8 +1963,8 @@ function StaffDashboardContent() {
                     </tr>
                   ))
                 ) : (
-                  <tr>
-                    <td colSpan={9} className="py-12 text-center text-slate-400 text-xs">
+                  <tr className="h-[42px]">
+                    <td colSpan={9} className="px-3 py-8 text-center text-[13px] text-[#86868B]">
                       No travel order records found matching your filters.
                     </td>
                   </tr>
@@ -1956,27 +1995,30 @@ function StaffDashboardContent() {
     };
 
     return (
-      <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-6 animate-fade-in pb-10 flex flex-col min-h-[560px]">
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between">
+      <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-5 animate-fade-in pb-10 flex flex-col min-h-[560px]">
+        <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <svg className="w-6 h-6 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            <svg className="w-5 h-5 text-[#1B4332] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
             <div>
-              <h3 className="text-sm font-bold text-slate-900">Signatory Notification Center</h3>
-              <p className="text-xs text-slate-500">{unreadCount} unread system notification{unreadCount === 1 ? '' : 's'}</p>
+              <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Signatory Notification Center</h3>
+              <p className="text-[12px] text-[#86868B]">{unreadCount} unread system notification{unreadCount === 1 ? '' : 's'}</p>
             </div>
           </div>
 
-          <button onClick={handleMarkAllRead} className="text-xs font-bold text-[#0B5A3A] hover:underline flex items-center gap-1.5 cursor-pointer">
+          <button
+            onClick={handleMarkAllRead}
+            className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-white hover:bg-[#F2F2F7] text-[#1B4332] border border-[#E5E5E7] transition-colors cursor-pointer"
+          >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
             <span>Mark all as read</span>
           </button>
         </div>
 
-        <div className="space-y-4 flex-1">
+        <div className="space-y-3 flex-1">
           {notifications.length > 0 ? (
             notifications.map((notif: any, idx: number) => {
               // Find the linked TA request (if any) so we can navigate to it on click
@@ -2019,42 +2061,42 @@ function StaffDashboardContent() {
               };
 
               return (
-                <div key={notif.id || idx} className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-5 sm:p-6 space-y-3">
+                <div key={notif.id || idx} className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs p-4 space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                    <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">
                       {formatDayHeading(notif.createdAt)}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-semibold">
+                    <span className="text-[12px] text-[#86868B]">
                       {formatRelativeTime(notif.createdAt)}
                     </span>
                   </div>
                   <div
                     onClick={handleNotifClick}
-                    className={`flex items-start gap-3.5 p-3.5 rounded-xl border transition-all ${
+                    className={`flex items-start gap-3 p-3 rounded-[6px] border transition-colors ${
                       notif.isRead
-                        ? 'bg-slate-50 border-slate-100 hover:bg-slate-100'
-                        : 'bg-emerald-50/60 border-emerald-100 hover:bg-emerald-50'
+                        ? 'bg-[#F5F5F7] border-[#E5E5E7] hover:bg-[#F2F2F7]'
+                        : 'bg-emerald-50/50 border-emerald-200 hover:bg-emerald-50'
                     } ${linkedRequest || notif.requestId ? 'cursor-pointer' : 'cursor-default'}`}
                   >
                     <div className="mt-0.5 shrink-0">
                       {notif.isRead ? (
-                        <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        <svg className="w-4 h-4 text-[#86868B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       ) : (
-                        <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline justify-between gap-2">
-                        <h4 className="text-xs font-bold text-slate-900">{notif.title}</h4>
-                        <span className="text-[10px] text-slate-400 font-medium shrink-0">
+                        <h4 className="text-[14px] font-semibold text-[#1D1D1F]">{notif.title}</h4>
+                        <span className="text-[12px] text-[#86868B] shrink-0">
                           {formatTimeDisplay(notif.createdAt)}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-600 mt-1">{notif.message}</p>
+                      <p className="text-[13px] text-[#1D1D1F] mt-0.5">{notif.message}</p>
                       {(() => {
                         const match = notif.message?.match(/(?:Remarks|Reason):\s*"([^"]+)"/i);
                         let remarksText = match ? match[1] : null;
@@ -2067,14 +2109,14 @@ function StaffDashboardContent() {
                         if (!remarksText) return null;
 
                         return (
-                          <div className="mt-2.5 p-2.5 bg-slate-50/90 rounded-xl border border-slate-200/80 text-xs text-slate-700 shadow-2xs">
-                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#0B5A3A] uppercase tracking-wider mb-1">
-                              <svg className="w-3.5 h-3.5 text-[#0B5A3A] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="mt-2 p-2.5 bg-white rounded-[6px] border border-[#E5E5E7] text-[13px] text-[#1D1D1F]">
+                            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#1B4332] uppercase tracking-wider mb-1">
+                              <svg className="w-3.5 h-3.5 text-[#1B4332] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                               </svg>
                               <span>Signatory Remarks:</span>
                             </div>
-                            <p className="italic text-slate-800 font-medium pl-5">
+                            <p className="italic text-[#1D1D1F] text-[12px] pl-5">
                               &ldquo;{remarksText}&rdquo;
                             </p>
                           </div>
@@ -2082,7 +2124,7 @@ function StaffDashboardContent() {
                       })()}
                       {(linkedRequest || notif.requestId) && (
                         <div className="flex items-center justify-end mt-2">
-                          <span className="text-[10px] font-bold text-[#0B5A3A] flex items-center gap-0.5">
+                          <span className="text-[12px] font-medium text-[#1B4332] flex items-center gap-0.5">
                             Review Request →
                           </span>
                         </div>
@@ -2093,15 +2135,18 @@ function StaffDashboardContent() {
               );
             })
           ) : (
-            <div className="p-12 text-center text-xs text-slate-500 bg-white rounded-2xl border border-slate-200/80">
+            <div className="p-8 text-center text-[13px] text-[#86868B] bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs">
               No notifications found. You are all caught up!
             </div>
           )}
         </div>
 
-        <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between text-xs text-slate-500">
+        <div className="p-3.5 bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs flex items-center justify-between text-[13px] text-[#86868B]">
           <span>Real-time email and push notifications are active for all signatory step endorsements.</span>
-          <button onClick={() => router.push('/staff?tab=dashboard')} className="font-bold text-[#0B5A3A] hover:underline cursor-pointer">
+          <button
+            onClick={() => router.push('/staff?tab=dashboard')}
+            className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 text-[#1B4332] hover:bg-[#F2F2F7] transition-colors cursor-pointer"
+          >
             Back to Dashboard →
           </button>
         </div>
@@ -2114,7 +2159,7 @@ function StaffDashboardContent() {
 
 export default function StaffSignatoryPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading Signatory Portal...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-[13px] text-[#86868B]">Loading Signatory Portal...</div>}>
       <StaffDashboardContent />
     </Suspense>
   );

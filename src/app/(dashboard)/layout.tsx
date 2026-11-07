@@ -231,8 +231,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/employee?tab=dashboard',
       label: 'Dashboard',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
         </svg>
       ),
     },
@@ -241,8 +241,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/employee?tab=create',
       label: 'Create Travel',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       ),
     },
@@ -251,8 +251,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/employee?tab=requests',
       label: 'My Requests',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       ),
     },
@@ -261,8 +261,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/employee?tab=schedule',
       label: 'Travel Schedule',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
       ),
     },
@@ -274,8 +274,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/staff?tab=dashboard',
       label: 'Dashboard',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
         </svg>
       ),
     },
@@ -284,8 +284,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/staff?tab=pending',
       label: 'Pending Approvals',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
     },
@@ -294,8 +294,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/staff?tab=history',
       label: 'Approval History',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
     },
@@ -309,10 +309,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
   if (status === 'loading' && !sessionTimedOut) {
     return (
-      <div className="min-h-screen bg-slate-100 flex items-center justify-center font-sans">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-[#0F4C2E] border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-sm font-semibold text-[#0F4C2E]">Loading TOPS Portal...</span>
+      <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center font-sans">
+        <div className="flex flex-col items-center gap-2.5">
+          <div className="w-7 h-7 border-2 border-[#1B4332] border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-[13px] font-medium text-[#86868B]">Loading TOPS Portal...</span>
         </div>
       </div>
     );
@@ -324,8 +324,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/account-manager?tab=dashboard',
       label: 'Dashboard',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
         </svg>
       ),
     },
@@ -334,8 +334,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/account-manager?tab=accounts',
       label: 'View Accounts',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       ),
     },
@@ -344,8 +344,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/account-manager?tab=pending-accounts',
       label: 'Pending Accounts',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
         </svg>
       ),
     },
@@ -354,8 +354,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/account-manager?tab=password-management',
       label: 'Password Management',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
         </svg>
       ),
     },
@@ -364,9 +364,9 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/account-manager?tab=configuration',
       label: 'Configuration',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       ),
     },
@@ -375,8 +375,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/account-manager?tab=create-travel',
       label: 'Create Travel',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
         </svg>
       ),
     },
@@ -385,8 +385,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/employee?tab=requests',
       label: 'My Requests',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       ),
     },
@@ -395,8 +395,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       href: '/employee?tab=schedule',
       label: 'Travel Dates',
       icon: (
-        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
       ),
     },
@@ -577,29 +577,29 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F6F8] flex font-sans text-slate-800 md:h-screen md:overflow-hidden">
-      {/* Sidebar - Matching TOPS PDF Reference */}
-      <aside className="w-64 bg-[#0F4C2E] text-white flex flex-col shadow-xl z-20 shrink-0 md:fixed md:inset-y-0 md:left-0 md:h-screen">
-        {/* Brand Header */}
-        <div className="p-5 flex items-center gap-3 border-b border-emerald-900/40">
+    <div className="min-h-screen bg-[#F4F6F8] flex font-sans text-[#1D1D1F] md:h-screen md:overflow-hidden">
+      {/* Sidebar - macOS HIG 240px Fixed Desktop Sidebar with DENR Forest-Green Palette */}
+      <aside className="w-[240px] bg-[#0F4C2E] text-white border-r border-emerald-900/40 shadow-xl flex flex-col z-20 shrink-0 md:fixed md:inset-y-0 md:left-0 md:h-screen select-none">
+        {/* Brand Header (52px matching top toolbar) */}
+        <div className="h-[52px] px-4 flex items-center gap-2.5 border-b border-emerald-900/40 shrink-0">
           <img
             src="/Tops-golo.png"
             alt="TOPS Logo"
-            className="w-10 h-10 object-contain drop-shadow-md shrink-0"
+            className="w-8 h-8 object-contain drop-shadow-sm shrink-0"
           />
-          <div>
-            <h1 className="font-black text-base tracking-wider text-white leading-none">TOPS</h1>
-            <p className="text-[9px] font-bold text-emerald-300 tracking-wider uppercase mt-1">DENR-PENRO</p>
+          <div className="min-w-0">
+            <h1 className="font-bold text-[15px] tracking-wider text-white leading-none">TOPS</h1>
+            <p className="text-[10px] font-semibold text-emerald-300 tracking-wider uppercase mt-0.5 truncate">DENR-PENRO</p>
           </div>
         </div>
 
         {/* Navigation Menu */}
-        <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto">
+        <nav className="flex-1 px-2.5 py-3 space-y-4 overflow-y-auto">
           {isAdminPage ? (
             <div className="space-y-4">
               {/* Group 1: OVERVIEW */}
               <div>
-                <p className="px-3 text-[9px] font-bold uppercase tracking-wider text-emerald-400/80 mb-1.5">OVERVIEW</p>
+                <p className="px-[10px] text-[10px] font-semibold uppercase tracking-wider text-emerald-400/85 mb-1">Overview</p>
                 <div className="space-y-0.5">
                   {adminNavOverview.map((link) => {
                     const isActive = currentTab === link.id || (currentTab === 'dashboard' && link.id === 'home');
@@ -607,14 +607,14 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                       <Link
                         key={link.id}
                         href={link.href}
-                        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs tracking-wide transition-all ${
+                        className={`h-8 flex items-center gap-2.5 px-[10px] rounded-[6px] text-[13px] transition-colors ${
                           isActive
-                            ? 'bg-[#2E6F4E] text-white shadow-2xs font-semibold'
-                            : 'text-emerald-100/75 hover:bg-[#165034] hover:text-white font-normal'
+                            ? 'bg-[#2E6F4E] text-white font-semibold shadow-2xs'
+                            : 'text-emerald-100/80 font-normal hover:bg-[#195938] hover:text-white'
                         }`}
                       >
                         {link.icon}
-                        <span>{link.label}</span>
+                        <span className="truncate">{link.label}</span>
                       </Link>
                     );
                   })}
@@ -623,7 +623,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
               {/* Group 2: ANALYTICS & MAPS */}
               <div>
-                <p className="px-3 text-[9px] font-bold uppercase tracking-wider text-emerald-400/80 mb-1.5">ANALYTICS & MAPS</p>
+                <p className="px-[10px] text-[10px] font-semibold uppercase tracking-wider text-emerald-400/85 mb-1">Analytics &amp; Maps</p>
                 <div className="space-y-0.5">
                   {adminNavAnalytics.map((link) => {
                     const isActive = currentTab === link.id;
@@ -631,14 +631,14 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                       <Link
                         key={link.id}
                         href={link.href}
-                        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs tracking-wide transition-all ${
+                        className={`h-8 flex items-center gap-2.5 px-[10px] rounded-[6px] text-[13px] transition-colors ${
                           isActive
-                            ? 'bg-[#2E6F4E] text-white shadow-2xs font-semibold'
-                            : 'text-emerald-100/75 hover:bg-[#165034] hover:text-white font-normal'
+                            ? 'bg-[#2E6F4E] text-white font-semibold shadow-2xs'
+                            : 'text-emerald-100/80 font-normal hover:bg-[#195938] hover:text-white'
                         }`}
                       >
                         {link.icon}
-                        <span>{link.label}</span>
+                        <span className="truncate">{link.label}</span>
                       </Link>
                     );
                   })}
@@ -647,7 +647,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
               {/* Group 3: ADMINISTRATION */}
               <div>
-                <p className="px-3 text-[9px] font-bold uppercase tracking-wider text-emerald-400/80 mb-1.5">ADMINISTRATION</p>
+                <p className="px-[10px] text-[10px] font-semibold uppercase tracking-wider text-emerald-400/85 mb-1">Administration</p>
                 <div className="space-y-0.5">
                   {adminNavAdmin.map((link) => {
                     const isActive = currentTab === link.id;
@@ -655,14 +655,14 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                       <Link
                         key={link.id}
                         href={link.href}
-                        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs tracking-wide transition-all ${
+                        className={`h-8 flex items-center gap-2.5 px-[10px] rounded-[6px] text-[13px] transition-colors ${
                           isActive
-                            ? 'bg-[#2E6F4E] text-white shadow-2xs font-semibold'
-                            : 'text-emerald-100/75 hover:bg-[#165034] hover:text-white font-normal'
+                            ? 'bg-[#2E6F4E] text-white font-semibold shadow-2xs'
+                            : 'text-emerald-100/80 font-normal hover:bg-[#195938] hover:text-white'
                         }`}
                       >
                         {link.icon}
-                        <span>{link.label}</span>
+                        <span className="truncate">{link.label}</span>
                       </Link>
                     );
                   })}
@@ -671,8 +671,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             </div>
           ) : isAccountManagerPage ? (
             <div>
-              <p className="px-4 text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 mb-2">ACCOUNT MANAGEMENT</p>
-              <div className="space-y-1.5">
+              <p className="px-[10px] text-[10px] font-semibold uppercase tracking-wider text-emerald-400/85 mb-1">Account Management</p>
+              <div className="space-y-0.5">
                 {accountManagerNavLinks.map((link) => {
                   const isActive =
                     (link.id === 'requests' && ((pathname.startsWith('/employee') && currentTab === 'requests') || (pathname.startsWith('/account-manager') && currentTab === 'requests'))) ||
@@ -689,15 +689,15 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                           window.dispatchEvent(new CustomEvent('taps:reset-views'));
                         }
                       }}
-                      className={`flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-xs tracking-wide transition-all ${
+                      className={`h-8 flex items-center justify-between px-[10px] rounded-[6px] text-[13px] transition-colors ${
                         isActive
-                          ? 'bg-[#2E6F4E] text-white shadow-md font-bold'
-                          : 'text-emerald-100/80 hover:bg-[#195938] hover:text-white'
+                          ? 'bg-[#2E6F4E] text-white font-semibold shadow-2xs'
+                          : 'text-emerald-100/80 font-normal hover:bg-[#195938] hover:text-white'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2.5 min-w-0">
                         {link.icon}
-                        <span>{link.label}</span>
+                        <span className="truncate">{link.label}</span>
                       </div>
                     </Link>
                   );
@@ -706,8 +706,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             </div>
           ) : isStaffPage ? (
             <div>
-              <p className="px-4 text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 mb-2">MAIN MENU</p>
-              <div className="space-y-1.5">
+              <p className="px-[10px] text-[10px] font-semibold uppercase tracking-wider text-emerald-400/85 mb-1">Main Menu</p>
+              <div className="space-y-0.5">
                 {staffNavLinks.map((link) => {
                   const isActive = currentTab === link.id || (currentTab === 'dashboard' && link.id === 'dashboard');
                   return (
@@ -719,15 +719,15 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                           window.dispatchEvent(new CustomEvent('taps:reset-views'));
                         }
                       }}
-                      className={`flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-xs tracking-wide transition-all ${
+                      className={`h-8 flex items-center justify-between px-[10px] rounded-[6px] text-[13px] transition-colors ${
                         isActive
-                          ? 'bg-[#2E6F4E] text-white shadow-md font-bold'
-                          : 'text-emerald-100/80 hover:bg-[#195938] hover:text-white'
+                          ? 'bg-[#2E6F4E] text-white font-semibold shadow-2xs'
+                          : 'text-emerald-100/80 font-normal hover:bg-[#195938] hover:text-white'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2.5 min-w-0">
                         {link.icon}
-                        <span>{link.label}</span>
+                        <span className="truncate">{link.label}</span>
                       </div>
                     </Link>
                   );
@@ -735,31 +735,34 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           ) : isEmployee ? (
-            <div className="space-y-1.5">
-              {employeeNavLinks.map((link) => {
-                const isActive = pathname.startsWith('/employee') && currentTab === link.id;
-                return (
-                  <Link
-                    key={link.id}
-                    href={link.href}
-                    onClick={() => {
-                      if (typeof window !== 'undefined') {
-                        window.dispatchEvent(new CustomEvent('taps:reset-views'));
-                      }
-                    }}
-                    className={`flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-xs tracking-wide transition-all ${
-                      isActive
-                        ? 'bg-[#2E6F4E] text-white shadow-md font-bold'
-                        : 'text-emerald-100/80 hover:bg-[#195938] hover:text-white'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {link.icon}
-                      <span>{link.label}</span>
-                    </div>
-                  </Link>
-                );
-              })}
+            <div>
+              <p className="px-[10px] text-[10px] font-semibold uppercase tracking-wider text-emerald-400/85 mb-1">Navigation</p>
+              <div className="space-y-0.5">
+                {employeeNavLinks.map((link) => {
+                  const isActive = pathname.startsWith('/employee') && currentTab === link.id;
+                  return (
+                    <Link
+                      key={link.id}
+                      href={link.href}
+                      onClick={() => {
+                        if (typeof window !== 'undefined') {
+                          window.dispatchEvent(new CustomEvent('taps:reset-views'));
+                        }
+                      }}
+                      className={`h-8 flex items-center justify-between px-[10px] rounded-[6px] text-[13px] transition-colors ${
+                        isActive
+                          ? 'bg-[#2E6F4E] text-white font-semibold shadow-2xs'
+                          : 'text-emerald-100/80 font-normal hover:bg-[#195938] hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        {link.icon}
+                        <span className="truncate">{link.label}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           ) : null}
 
@@ -778,13 +781,13 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                         window.dispatchEvent(new CustomEvent('taps:reset-views'));
                       }
                     }}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-xs transition-all ${
+                    className={`h-8 flex items-center gap-2.5 px-[10px] rounded-[6px] text-[13px] transition-colors ${
                       isActive
-                        ? 'bg-[#2E6F4E] text-white shadow-md font-bold'
-                        : 'text-emerald-100/80 hover:bg-[#195938] hover:text-white'
+                        ? 'bg-[#2E6F4E] text-white font-semibold shadow-2xs'
+                        : 'text-emerald-100/80 font-normal hover:bg-[#195938] hover:text-white'
                     }`}
                   >
-                    <span>{link.label}</span>
+                    <span className="truncate">{link.label}</span>
                   </Link>
                 );
               })}
@@ -793,15 +796,15 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Right Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden md:ml-64 md:h-screen">
-        {/* Top Header Bar */}
-        <header className="h-16 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between shadow-xs sticky top-0 z-40 shrink-0">
-          <div>
-            <h2 className="text-base font-bold text-slate-800">{getPageTitle()}</h2>
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden md:ml-[240px] md:h-screen bg-[#F4F6F8]">
+        {/* Top Application Toolbar (52px height, #FFFFFF background, 1px solid #E5E5E7 bottom border) */}
+        <header className="h-[52px] bg-[#FFFFFF] border-b border-[#E5E5E7] px-6 lg:px-8 flex items-center justify-between shadow-2xs sticky top-0 z-40 shrink-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <h2 className="text-[15px] font-semibold text-[#1D1D1F] tracking-tight truncate">{getPageTitle()}</h2>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4">
-            {/* Revised Interactive Notification Bell Dropdown (Matching Reference) */}
+          <div className="flex items-center gap-2.5">
+            {/* Interactive Notification Bell Dropdown */}
             <NotificationBellDropdown
               unreadCount={unreadNotifications}
               notifications={notificationsList}
@@ -829,8 +832,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
               }
             />
 
-            {/* Top User Badge with Google Account-style Profile Management Dropdown */}
-            <div className="pl-2 sm:pl-3 border-l border-slate-200">
+            {/* Top User Badge with Account Profile Management Dropdown */}
+            <div className="pl-2.5 border-l border-[#E5E5E7]">
               <ProfileDropdown />
             </div>
           </div>
@@ -844,8 +847,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
           onView={handleViewNotification}
         />
 
-        {/* Page Content View */}
-        <main className="flex-1 p-6 sm:p-8 w-full overflow-y-auto flex flex-col">
+        {/* Page Content View (24px-32px padding on #F4F6F8 canvas so white cards stand out) */}
+        <main className="flex-1 p-6 lg:p-8 w-full overflow-y-auto flex flex-col bg-[#F4F6F8]">
           {children}
         </main>
       </div>
@@ -855,7 +858,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-100 flex items-center justify-center text-xs text-slate-500">Loading TOPS Portal...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#F4F6F8] flex items-center justify-center text-[13px] text-[#86868B]">Loading TOPS Portal...</div>}>
       <DashboardLayoutContent>{children}</DashboardLayoutContent>
     </Suspense>
   );

@@ -193,34 +193,34 @@ export default function SignaturePad({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {/* Mode Selector Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-2 gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#E5E5E7] pb-2 gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <label className="block text-[11px] font-semibold text-[#1D1D1F] uppercase tracking-wider">
               {label} {required && <span className="text-rose-500">*</span>}
             </label>
-            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200/80">
+            <span className="h-5 inline-flex items-center px-2 rounded-[4px] text-[10px] font-semibold bg-[#1B4332]/10 text-[#1B4332] border border-[#1B4332]/20">
               Stylus Pen / Board / Mouse
             </span>
           </div>
           {description && (
-            <p className="text-[11px] text-slate-400 mt-0.5">{description}</p>
+            <p className="text-[11px] text-[#86868B] mt-0.5">{description}</p>
           )}
         </div>
 
-        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-[11px] font-semibold self-start sm:self-auto">
+        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-[6px] border border-[#E5E5E7] text-[11px] font-medium self-start sm:self-auto">
           <button
             type="button"
             onClick={() => {
               setActiveMode('draw');
               if (uploadedPreview) onChange(null);
             }}
-            className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
+            className={`h-6 px-2.5 rounded-[4px] transition-colors cursor-pointer ${
               activeMode === 'draw'
-                ? 'bg-white text-slate-800 shadow-2xs font-bold'
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-[#0F4C2E] text-white shadow-2xs font-semibold'
+                : 'text-[#86868B] hover:text-[#1D1D1F]'
             }`}
           >
             Draw / Stylus
@@ -231,10 +231,10 @@ export default function SignaturePad({
               setActiveMode('upload');
               if (hasDrawn) onChange(uploadedPreview || null);
             }}
-            className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
+            className={`h-6 px-2.5 rounded-[4px] transition-colors cursor-pointer ${
               activeMode === 'upload'
-                ? 'bg-white text-slate-800 shadow-2xs font-bold'
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-[#0F4C2E] text-white shadow-2xs font-semibold'
+                : 'text-[#86868B] hover:text-[#1D1D1F]'
             }`}
           >
             Upload File
@@ -244,7 +244,7 @@ export default function SignaturePad({
 
       {activeMode === 'draw' ? (
         <div className="space-y-2">
-          <div className="relative border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50/70 overflow-hidden touch-none h-40 flex flex-col justify-between shadow-inner">
+          <div className="relative border border-dashed border-[#E5E5E7] rounded-[8px] bg-[#F5F5F7] overflow-hidden touch-none h-36 flex flex-col justify-between">
             <canvas
               ref={canvasRef}
               onPointerDown={startDrawing}
@@ -256,49 +256,49 @@ export default function SignaturePad({
               className="w-full h-full cursor-crosshair touch-none select-none"
             />
             {!hasDrawn && (
-              <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center text-slate-400 text-xs select-none p-4 text-center">
-                <div className="flex items-center gap-2 mb-1.5 text-slate-400">
-                  <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center text-[#86868B] text-[12px] select-none p-4 text-center">
+                <div className="flex items-center gap-2 mb-1 text-[#86868B]">
+                  <svg className="w-4 h-4 text-[#1B4332]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
-                  <span className="text-slate-300">|</span>
-                  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <span className="text-[#E5E5E7]">|</span>
+                  <svg className="w-4 h-4 text-[#86868B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <span className="font-bold text-slate-600 text-xs">Sign here with your Stylus Pen, Board, or Mouse</span>
-                <span className="text-[10px] text-slate-400 mt-0.5">Smooth pen pressure &amp; drawing tablet digitizers supported</span>
+                <span className="font-semibold text-[#1D1D1F] text-[12px]">Sign here with your Stylus Pen, Board, or Mouse</span>
+                <span className="text-[11px] text-[#86868B] mt-0.5">Smooth pen pressure &amp; drawing tablet digitizers supported</span>
               </div>
             )}
-            <div className="absolute bottom-4 left-6 right-6 border-b border-slate-300/60 pointer-events-none"></div>
+            <div className="absolute bottom-3.5 left-6 right-6 border-b border-[#E5E5E7] pointer-events-none"></div>
           </div>
 
-          <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center justify-between text-[12px]">
             <span
-              className={`text-[11px] font-semibold flex items-center gap-1.5 ${
-                hasDrawn ? 'text-emerald-700' : required ? 'text-amber-700' : 'text-slate-400'
+              className={`text-[11px] font-medium flex items-center gap-1.5 ${
+                hasDrawn ? 'text-emerald-700' : required ? 'text-amber-700' : 'text-[#86868B]'
               }`}
             >
               {hasDrawn ? (
                 <>
-                  <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span>
                   <span>✓ E-Signature captured &amp; attached</span>
                 </>
               ) : required ? (
                 <>
-                  <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0 animate-pulse"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
                   <span>Signature required to proceed</span>
                 </>
               ) : (
                 <span>Optional signature</span>
               )}
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={handleUndo}
                 disabled={history.length === 0}
-                className="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg text-[11px] font-semibold disabled:opacity-40 cursor-pointer transition-colors shadow-2xs"
+                className="h-7 px-2.5 bg-[#FFFFFF] border border-[#E5E5E7] hover:bg-[#F2F2F7] text-[#1D1D1F] rounded-[6px] text-[12px] font-medium disabled:opacity-40 cursor-pointer transition-colors"
               >
                 Undo
               </button>
@@ -306,7 +306,7 @@ export default function SignaturePad({
                 type="button"
                 onClick={handleClear}
                 disabled={!hasDrawn}
-                className="px-2.5 py-1 bg-white border border-slate-200 hover:bg-rose-50 hover:text-rose-600 text-slate-600 rounded-lg text-[11px] font-semibold disabled:opacity-40 cursor-pointer transition-colors shadow-2xs"
+                className="h-7 px-2.5 bg-[#FFFFFF] border border-[#E5E5E7] hover:bg-rose-50 hover:text-rose-600 text-[#1D1D1F] rounded-[6px] text-[12px] font-medium disabled:opacity-40 cursor-pointer transition-colors"
               >
                 Clear
               </button>
@@ -316,41 +316,41 @@ export default function SignaturePad({
       ) : (
         <div className="space-y-2">
           {uploadedPreview ? (
-            <div className="border border-slate-200 rounded-xl p-4 bg-white flex items-center justify-between shadow-2xs">
+            <div className="border border-[#E5E5E7] rounded-[6px] p-3 bg-[#FFFFFF] flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-16 h-12 border border-slate-100 rounded-lg bg-slate-50 flex items-center justify-center overflow-hidden">
+                <div className="w-16 h-11 border border-[#E5E5E7] rounded-[4px] bg-[#F5F5F7] flex items-center justify-center overflow-hidden">
                   <img src={uploadedPreview} alt="Signature Preview" className="max-h-full max-w-full object-contain" />
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-slate-800 block">Uploaded Signature</span>
-                  <span className="text-[10px] text-emerald-600 font-semibold">✓ Ready for registration</span>
+                  <span className="text-[12px] font-semibold text-[#1D1D1F] block">Uploaded Signature</span>
+                  <span className="text-[11px] text-emerald-700 font-medium">✓ Ready for registration</span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={handleRemoveUploaded}
-                className="px-2.5 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-xs font-semibold cursor-pointer transition-colors"
+                className="h-7 px-2.5 bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 rounded-[6px] text-[12px] font-medium cursor-pointer transition-colors"
               >
                 Remove
               </button>
             </div>
           ) : (
-            <label className="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center bg-slate-50/60 hover:bg-slate-50 cursor-pointer block transition-colors">
+            <label className="border border-dashed border-[#E5E5E7] rounded-[8px] p-5 text-center bg-[#F5F5F7] hover:bg-[#F2F2F7] cursor-pointer block transition-colors">
               <input
                 type="file"
                 accept="image/png, image/jpeg"
                 onChange={handleFileUpload}
                 className="hidden"
               />
-              <svg className="w-6 h-6 mx-auto mb-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <svg className="w-5 h-5 mx-auto mb-1 text-[#86868B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              <span className="text-xs font-bold text-slate-700 block">Click to upload signature image</span>
-              <span className="text-[10px] text-slate-400 block mt-0.5">PNG (recommended transparent) or JPEG under 2MB</span>
+              <span className="text-[12px] font-semibold text-[#1D1D1F] block">Click to upload signature image</span>
+              <span className="text-[11px] text-[#86868B] block mt-0.5">PNG (recommended transparent) or JPEG under 2MB</span>
             </label>
           )}
 
-          {uploadError && <p className="text-[11px] text-rose-600 font-semibold">{uploadError}</p>}
+          {uploadError && <p className="text-[11px] text-rose-600 font-medium">{uploadError}</p>}
         </div>
       )}
     </div>

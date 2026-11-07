@@ -112,21 +112,21 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs">
+      <div className="bg-white w-full max-w-2xl rounded-[10px] shadow-2xl border border-[#E5E5E7] overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="bg-[#1B4332] text-white p-6 flex items-center justify-between">
+        <div className="bg-[#1B4332] text-white px-5 h-[52px] border-b border-emerald-900 flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-bold">File Travel Authority (TA) Request</h3>
-            <p className="text-xs text-emerald-200">Step {step} of 4</p>
+            <h3 className="text-[14px] font-bold text-white leading-tight">File Travel Authority (TA) Request</h3>
+            <p className="text-[11px] text-emerald-200">Step {step} of 4</p>
           </div>
-          <button onClick={onClose} className="text-emerald-200 hover:text-white text-xl font-bold p-1">
+          <button onClick={onClose} className="w-7 h-7 rounded-[6px] text-emerald-200 hover:text-white hover:bg-white/10 flex items-center justify-center text-sm font-semibold">
             ✕
           </button>
         </div>
 
         {/* Step Progress Bar */}
-        <div className="flex border-b border-gray-200 bg-gray-50">
+        <div className="flex border-b border-[#E5E5E7] bg-slate-50">
           {[
             { s: 1, label: '1. Basic Info' },
             { s: 2, label: '2. Destination & Map' },
@@ -135,12 +135,12 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
           ].map((item) => (
             <div
               key={item.s}
-              className={`flex-1 py-3 text-center text-xs font-bold transition-all border-b-2 ${
+              className={`flex-1 py-2.5 text-center text-[11px] font-semibold transition-colors border-b-2 ${
                 step === item.s
-                  ? 'border-[#40916C] text-[#1B4332] bg-emerald-50/50'
+                  ? 'border-[#40916C] text-[#1B4332] bg-emerald-50/70'
                   : step > item.s
                   ? 'border-emerald-300 text-emerald-800'
-                  : 'border-transparent text-gray-400'
+                  : 'border-transparent text-[#86868B]'
               }`}
             >
               {item.label}
@@ -149,9 +149,9 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
         </div>
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-4">
+        <div className="p-5 overflow-y-auto flex-1 space-y-4">
           {error && (
-            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-semibold">
+            <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-[12px] rounded-[6px] font-medium">
               {error}
             </div>
           )}
@@ -159,7 +159,7 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
           {step === 1 && (
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
                   Purpose of Travel *
                 </label>
                 <textarea
@@ -168,13 +168,13 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
                   value={formData.purpose}
                   onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
                   placeholder="e.g. Conduct field verification and boundary delineation in Sector 4"
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#40916C] outline-none text-sm"
+                  className="w-full px-2.5 py-2 bg-white border border-[#E5E5E7] rounded-[6px] focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] outline-none text-[13px] text-[#1D1D1F]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
                     Travel Start Date *
                   </label>
                   <input
@@ -182,12 +182,12 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
                     required
                     value={formData.startDate}
                     onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#40916C] outline-none text-sm"
+                    className="w-full h-8 px-2.5 bg-white border border-[#E5E5E7] rounded-[6px] focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] outline-none text-[13px] text-[#1D1D1F]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
                     Travel End Date *
                   </label>
                   <input
@@ -195,7 +195,7 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
                     required
                     value={formData.endDate}
                     onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#40916C] outline-none text-sm"
+                    className="w-full h-8 px-2.5 bg-white border border-[#E5E5E7] rounded-[6px] focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] outline-none text-[13px] text-[#1D1D1F]"
                   />
                 </div>
               </div>
@@ -205,7 +205,7 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
           {step === 2 && (
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
                   Destination Location Name *
                 </label>
                 <input
@@ -214,12 +214,12 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
                   value={formData.destination}
                   onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
                   placeholder="e.g. Brgy. San Jose, Sector 3 Reserve Area"
-                  className="w-full px-3.5 py-2 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#40916C] outline-none text-sm"
+                  className="w-full h-8 px-2.5 bg-white border border-[#E5E5E7] rounded-[6px] focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] outline-none text-[13px] text-[#1D1D1F]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1">
                   Interactive Leaflet Destination Location Picker (Drag pin or click map)
                 </label>
                 <DynamicMapPicker
@@ -229,7 +229,7 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
                     setFormData((prev) => ({ ...prev, destinationLat: lat, destinationLng: lng }))
                   }
                 />
-                <div className="mt-2 text-xs text-gray-500 font-mono">
+                <div className="mt-2 text-[11px] text-[#86868B] font-mono">
                   Coordinates: Lat {formData.destinationLat.toFixed(5)}, Lng {formData.destinationLng.toFixed(5)}
                 </div>
               </div>
@@ -238,7 +238,7 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
 
           {step === 3 && (
             <div className="space-y-4">
-              <p className="text-xs text-gray-500">
+              <p className="text-[12px] text-[#86868B]">
                 Add team members traveling together. All team members are treated equally (no designated lead).
               </p>
 
@@ -248,19 +248,19 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
                   placeholder="Member Name"
                   value={newMemberName}
                   onChange={(e) => setNewMemberName(e.target.value)}
-                  className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-xs"
+                  className="flex-1 h-8 px-2.5 bg-white border border-[#E5E5E7] rounded-[6px] text-[13px] text-[#1D1D1F]"
                 />
                 <input
                   type="text"
                   placeholder="Position"
                   value={newMemberPosition}
                   onChange={(e) => setNewMemberPosition(e.target.value)}
-                  className="w-40 px-3 py-2 bg-gray-50 border border-gray-300 rounded-xl text-xs"
+                  className="w-40 h-8 px-2.5 bg-white border border-[#E5E5E7] rounded-[6px] text-[13px] text-[#1D1D1F]"
                 />
                 <button
                   type="button"
                   onClick={handleAddMember}
-                  className="px-4 py-2 bg-[#40916C] hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold"
+                  className="h-8 px-[14px] bg-[#1B4332] hover:bg-[#143225] text-white rounded-[6px] text-[13px] font-medium"
                 >
                   + Add
                 </button>
@@ -271,15 +271,15 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
                   {formData.teamMembers.map((member, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs"
+                      className="flex items-center justify-between px-3 py-2 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7] text-[13px]"
                     >
                       <div>
-                        <span className="font-bold text-gray-900">{member.name}</span>
-                        <span className="ml-2 text-gray-500">({member.position})</span>
+                        <span className="font-semibold text-[#1D1D1F]">{member.name}</span>
+                        <span className="ml-2 text-[#86868B]">({member.position})</span>
                       </div>
                       <button
                         onClick={() => handleRemoveMember(idx)}
-                        className="text-rose-600 hover:text-rose-800 font-bold"
+                        className="text-red-600 hover:text-red-700 text-xs font-medium"
                       >
                         Remove
                       </button>
@@ -287,7 +287,7 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
                   ))}
                 </div>
               ) : (
-                <div className="p-4 bg-gray-50 border border-dashed border-gray-300 text-center text-xs text-gray-500 rounded-xl">
+                <div className="p-4 bg-[#F5F5F7] border border-dashed border-[#E5E5E7] text-center text-[12px] text-[#86868B] rounded-[6px]">
                   No additional team members added. (Filing as solo travel).
                 </div>
               )}
@@ -296,26 +296,26 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
 
           {step === 4 && (
             <div className="space-y-4">
-              <h4 className="text-sm font-bold text-gray-900 border-b pb-2">Confirm TA Request Summary</h4>
+              <h4 className="text-[14px] font-semibold text-[#1D1D1F] border-b border-[#E5E5E7] pb-2">Confirm TA Request Summary</h4>
 
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-200/60">
-                  <span className="text-gray-500 block">Purpose:</span>
-                  <span className="font-bold text-gray-900">{formData.purpose}</span>
+              <div className="grid grid-cols-2 gap-3 text-[12px]">
+                <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                  <span className="text-[#86868B] block">Purpose:</span>
+                  <span className="font-semibold text-[#1D1D1F]">{formData.purpose}</span>
                 </div>
-                <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-200/60">
-                  <span className="text-gray-500 block">Destination:</span>
-                  <span className="font-bold text-gray-900">{formData.destination}</span>
+                <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                  <span className="text-[#86868B] block">Destination:</span>
+                  <span className="font-semibold text-[#1D1D1F]">{formData.destination}</span>
                 </div>
-                <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-200/60">
-                  <span className="text-gray-500 block">Travel Period:</span>
-                  <span className="font-bold text-gray-900">
+                <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                  <span className="text-[#86868B] block">Travel Period:</span>
+                  <span className="font-semibold text-[#1D1D1F]">
                     {formData.startDate} to {formData.endDate}
                   </span>
                 </div>
-                <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-200/60">
-                  <span className="text-gray-500 block">Team Members:</span>
-                  <span className="font-bold text-gray-900">
+                <div className="p-3 bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                  <span className="text-[#86868B] block">Team Members:</span>
+                  <span className="font-semibold text-[#1D1D1F]">
                     {formData.teamMembers.length > 0
                       ? `${formData.teamMembers.length} member(s)`
                       : 'Solo Travel'}
@@ -323,20 +323,20 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
                 </div>
               </div>
 
-              <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900">
-                ⚡ Upon submission, this request will enter <strong>PENDING_SECTION_CHIEF</strong> status and be routed to the Section Chief for Step 1 approval.
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-[6px] text-[12px] text-amber-900">
+                Upon submission, this request will enter <strong>PENDING_SECTION_CHIEF</strong> status and be routed to the Section Chief for Step 1 approval.
               </div>
             </div>
           )}
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-between">
+        <div className="px-5 py-3.5 bg-[#F5F5F7] border-t border-[#E5E5E7] flex justify-between">
           <button
             type="button"
             disabled={step === 1 || loading}
             onClick={handleBack}
-            className="px-4 py-2 border border-gray-300 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-100 disabled:opacity-30"
+            className="h-8 px-[14px] bg-white border border-[#E5E5E7] rounded-[6px] text-[13px] font-medium text-[#1D1D1F] hover:bg-[#F2F2F7] disabled:opacity-40"
           >
             Back
           </button>
@@ -345,7 +345,7 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
             <button
               type="button"
               onClick={handleNext}
-              className="px-6 py-2 bg-[#1B4332] hover:bg-[#40916C] text-white rounded-xl text-xs font-semibold"
+              className="h-8 px-[14px] bg-[#1B4332] hover:bg-[#143225] text-white rounded-[6px] text-[13px] font-medium"
             >
               Next Step →
             </button>
@@ -354,7 +354,7 @@ export default function TARequestWizard({ isOpen, onClose, onSuccess }: TAReques
               type="button"
               disabled={loading}
               onClick={handleSubmit}
-              className="px-6 py-2 bg-[#40916C] hover:bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-md disabled:opacity-50"
+              className="h-8 px-[14px] bg-[#1B4332] hover:bg-[#143225] text-white rounded-[6px] text-[13px] font-medium disabled:opacity-50"
             >
               {loading ? 'Submitting TA Request...' : 'Submit TA Request'}
             </button>

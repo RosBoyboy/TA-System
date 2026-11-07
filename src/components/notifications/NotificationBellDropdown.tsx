@@ -152,68 +152,68 @@ export default function NotificationBellDropdown({
 
   return (
     <div className="relative z-50" ref={dropdownRef}>
-      {/* Revised Notification Bell Button */}
+      {/* macOS HIG Toolbar Notification Bell Button */}
       <button
         type="button"
         onClick={handleBellButtonClick}
         aria-label={isNotificationsTab ? 'Back to Dashboard' : 'Open notifications'}
         title={isNotificationsTab ? 'Back to Dashboard' : 'Notifications'}
         aria-expanded={isOpen}
-        className={`relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all cursor-pointer ${
-          isOpen || isNotificationsTab ? 'bg-slate-100 text-slate-900 ring-2 ring-emerald-500/20' : ''
+        className={`relative w-8 h-8 flex items-center justify-center rounded-[6px] text-[#86868B] hover:bg-[#F2F2F7] hover:text-[#1D1D1F] transition-colors cursor-pointer ${
+          isOpen || isNotificationsTab ? 'bg-[#F2F2F7] text-[#1D1D1F]' : ''
         }`}
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth={2}
+            strokeWidth={1.75}
             d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
           />
         </svg>
 
-        {/* Unread Red Badge Dot / Counter (Matching User Reference) */}
+        {/* Unread Red Badge Dot / Counter */}
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full bg-[#E63946] text-white text-[9px] font-extrabold ring-2 ring-white shadow-xs animate-pulse">
+          <span className="absolute top-0.5 right-0.5 flex items-center justify-center min-w-[14px] h-3.5 px-1 rounded-full bg-[#E63946] text-white text-[9px] font-semibold ring-1 ring-white">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
-      {/* Floating Notification Popover Dropdown (High z-index, Solid background, Clean scrollbar) */}
+      {/* macOS HIG Notification Popover Dropdown with DENR Header */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-[100] overflow-hidden divide-y divide-slate-100 animate-in fade-in slide-in-from-top-2 duration-200 isolate">
+        <div className="absolute right-0 top-full mt-1.5 w-80 sm:w-96 bg-[#FFFFFF] rounded-[8px] shadow-xl border border-[#E5E5E7] z-[100] overflow-hidden divide-y divide-[#E5E5E7] isolate">
           {/* Header */}
-          <div className="p-4 bg-slate-50 flex items-center justify-between">
+          <div className="h-9 px-3.5 bg-[#0F4C2E] text-white flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+              <h3 className="text-[11px] font-semibold text-white uppercase tracking-wider">
                 Notifications
               </h3>
               {unreadCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-[#0F4C2E] text-[10px] font-extrabold">
+                <span className="h-4 inline-flex items-center px-1.5 rounded-[4px] bg-emerald-800 text-emerald-200 text-[10px] font-semibold border border-emerald-700">
                   {unreadCount} new
                 </span>
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <button
                 type="button"
                 onClick={() => {
                   setIsOpen(false);
                   router.push(notificationCenterHref);
                 }}
-                className="text-[11px] font-bold text-[#0B5A3A] hover:underline cursor-pointer"
+                className="text-[11px] font-medium text-emerald-200 hover:text-white hover:underline cursor-pointer"
               >
                 See All
               </button>
               {unreadCount > 0 && (
                 <>
-                  <span className="w-px h-3 bg-slate-300"></span>
+                  <span className="w-px h-3 bg-emerald-800"></span>
                   <button
                     type="button"
                     onClick={handleMarkAll}
-                    className="text-[11px] font-bold text-[#0B5A3A] hover:underline cursor-pointer"
+                    className="text-[11px] font-medium text-emerald-200 hover:text-white hover:underline cursor-pointer"
                   >
                     Mark all read
                   </button>
@@ -222,18 +222,18 @@ export default function NotificationBellDropdown({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-200/60 transition-colors cursor-pointer"
+                className="text-emerald-200 hover:text-white p-1 rounded-[4px] hover:bg-emerald-800/60 transition-colors cursor-pointer"
                 aria-label="Close popover"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
           </div>
 
-          {/* Notification Items List with Custom Sleek Scrollbar */}
-          <div className="max-h-[380px] overflow-y-auto divide-y divide-slate-100 bg-white [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-track]:bg-slate-50">
+          {/* Notification Items List */}
+          <div className="max-h-[360px] overflow-y-auto divide-y divide-[#E5E5E7] bg-[#FFFFFF]">
             {notifications && notifications.length > 0 ? (
               notifications.slice(0, 8).map((notif) => {
                 const iconInfo = getIconForNotification(notif.title, notif.message);
@@ -243,18 +243,17 @@ export default function NotificationBellDropdown({
                   <div
                     key={notif.id}
                     onClick={() => handleNotificationClick(notif)}
-                    className={`p-3.5 hover:bg-slate-50 transition-colors cursor-pointer flex items-start gap-3 relative ${
-                      isUnread ? 'bg-emerald-50/40' : 'bg-white'
+                    className={`px-3.5 py-2.5 hover:bg-[#F2F2F7] transition-colors cursor-pointer flex items-start gap-2.5 relative ${
+                      isUnread ? 'bg-[#1B4332]/[0.03]' : 'bg-[#FFFFFF]'
                     }`}
                   >
-                    {/* Unread Blue Indicator Dot */}
                     {isUnread && (
-                      <span className="absolute left-2 top-5 w-1.5 h-1.5 rounded-full bg-[#0B5A3A]"></span>
+                      <span className="absolute left-1.5 top-4 w-1.5 h-1.5 rounded-full bg-[#1B4332]"></span>
                     )}
 
                     {/* Icon Badge */}
                     <div
-                      className={`w-8 h-8 rounded-xl ${iconInfo.bg} flex items-center justify-center shrink-0 mt-0.5 shadow-2xs`}
+                      className={`w-7 h-7 rounded-[6px] ${iconInfo.bg} flex items-center justify-center shrink-0 mt-0.5`}
                     >
                       {iconInfo.icon}
                     </div>
@@ -262,14 +261,14 @@ export default function NotificationBellDropdown({
                     {/* Text Details */}
                     <div className="flex-1 min-w-0 pr-1">
                       <div className="flex items-baseline justify-between gap-1.5">
-                        <h4 className={`text-xs truncate ${isUnread ? 'font-bold text-slate-900' : 'font-semibold text-slate-700'}`}>
+                        <h4 className={`text-[12px] truncate ${isUnread ? 'font-semibold text-[#1D1D1F]' : 'font-medium text-[#1D1D1F]'}`}>
                           {notif.title}
                         </h4>
-                        <span className="text-[10px] text-slate-400 shrink-0 font-medium">
+                        <span className="text-[10px] text-[#86868B] shrink-0 font-normal">
                           {formatRelativeTime(notif.createdAt)}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">
+                      <p className="text-[11px] text-[#86868B] mt-0.5 line-clamp-2 leading-snug">
                         {notif.message}
                       </p>
                     </div>
@@ -277,25 +276,25 @@ export default function NotificationBellDropdown({
                 );
               })
             ) : (
-              <div className="p-8 text-center text-xs text-slate-400 space-y-1 bg-white">
-                <svg className="w-8 h-8 mx-auto text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-6 text-center text-[12px] text-[#86868B] space-y-1 bg-[#FFFFFF]">
+                <svg className="w-6 h-6 mx-auto text-[#86868B]/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
-                <p className="font-semibold text-slate-600">No notifications yet</p>
+                <p className="font-medium text-[#1D1D1F]">No notifications yet</p>
                 <p className="text-[11px]">You are all caught up on travel orders.</p>
               </div>
             )}
           </div>
 
           {/* Footer Actions */}
-          <div className="p-3 bg-slate-50 flex items-center justify-between text-xs font-bold text-[#0B5A3A]">
+          <div className="h-8 px-3.5 bg-[#F5F5F7] flex items-center justify-between text-[11px] font-medium text-[#1B4332]">
             <button
               type="button"
               onClick={() => {
                 setIsOpen(false);
                 router.push(dashboardHref);
               }}
-              className="hover:underline flex items-center gap-1 cursor-pointer text-slate-600 hover:text-slate-900"
+              className="hover:underline flex items-center gap-1 cursor-pointer text-[#86868B] hover:text-[#1D1D1F]"
             >
               <span>← Back to Dashboard</span>
             </button>
@@ -306,7 +305,7 @@ export default function NotificationBellDropdown({
                 setIsOpen(false);
                 router.push(notificationCenterHref);
               }}
-              className="hover:underline flex items-center gap-1 cursor-pointer text-[#0B5A3A]"
+              className="hover:underline flex items-center gap-1 cursor-pointer text-[#1B4332]"
             >
               <span>Full Center</span>
               <span>→</span>

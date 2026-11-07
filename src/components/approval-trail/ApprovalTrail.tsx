@@ -48,43 +48,43 @@ export default function ApprovalTrail({ status, approvalSteps = [] }: ApprovalTr
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+    <div className="bg-[#FFFFFF] p-5 rounded-[8px] border border-[#E5E5E7]">
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#E5E5E7]">
         <div>
-          <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Approval Trail Timeline</h4>
-          <p className="text-xs text-gray-500">Strict 3-step sequential authorization progress</p>
+          <h4 className="text-[14px] font-semibold text-[#1D1D1F] tracking-tight">Approval Trail Timeline</h4>
+          <p className="text-[11px] text-[#86868B]">Strict 3-step sequential authorization progress</p>
         </div>
 
-        {/* Overall Status Badge */}
+        {/* Overall Status Badge (20px height, 10px semibold, 8px horizontal padding, 4px radius) */}
         <span
-          className={`px-3 py-1 text-xs font-bold rounded-full border shadow-sm ${
+          className={`h-5 inline-flex items-center px-2 text-[10px] font-semibold rounded-[4px] border ${
             status === 'APPROVED'
-              ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80'
               : status === 'REJECTED_MANUAL'
-              ? 'bg-amber-50 text-amber-900 border-amber-300'
+              ? 'bg-amber-50 text-amber-700 border-amber-200/80'
               : status === 'REJECTED_OVERDUE'
-              ? 'bg-rose-50 text-rose-800 border-rose-300'
-              : 'bg-sky-50 text-sky-800 border-sky-300'
+              ? 'bg-rose-50 text-rose-700 border-rose-200/80'
+              : 'bg-sky-50 text-sky-700 border-sky-200/80'
           }`}
         >
           {formatStatus(status)}
         </span>
       </div>
 
-      <div className="relative pl-6 space-y-8 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-200">
+      <div className="relative pl-6 space-y-4 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-px before:bg-[#E5E5E7]">
         {stepsConfig.map((config) => {
           const { state, label, stepData } = getStepStatus(config.order);
 
           return (
-            <div key={config.order} className="relative flex items-start gap-4">
+            <div key={config.order} className="relative flex items-start gap-3">
               {/* Dot Icon */}
               <div
-                className={`absolute -left-6 top-0 w-6.5 h-6.5 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm border-2 ${
+                className={`absolute -left-6 top-0.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-semibold text-white border ${
                   state === 'APPROVED'
-                    ? 'bg-[#40916C] border-emerald-100'
+                    ? 'bg-[#1B4332] border-emerald-100'
                     : state === 'REJECTED'
                     ? 'bg-[#E63946] border-rose-100'
-                    : 'bg-gray-300 border-gray-100 text-gray-600'
+                    : 'bg-[#F5F5F7] border-[#E5E5E7] text-[#86868B]'
                 }`}
               >
                 {state === 'APPROVED' ? (
@@ -97,18 +97,18 @@ export default function ApprovalTrail({ status, approvalSteps = [] }: ApprovalTr
               </div>
 
               {/* Step Info Box */}
-              <div className="flex-1 bg-gray-50/80 p-4 rounded-xl border border-gray-200/60">
+              <div className="flex-1 bg-[#F5F5F7] p-3.5 rounded-[6px] border border-[#E5E5E7]">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold text-gray-900 uppercase tracking-wide">
+                  <span className="text-[12px] font-semibold text-[#1D1D1F]">
                     Step {config.order}: {config.title}
                   </span>
                   <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                    className={`h-5 inline-flex items-center text-[10px] font-semibold px-2 rounded-[4px] border ${
                       state === 'APPROVED'
-                        ? 'bg-emerald-100 text-emerald-800'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80'
                         : state === 'REJECTED'
-                        ? 'bg-rose-100 text-rose-800'
-                        : 'bg-gray-200 text-gray-700'
+                        ? 'bg-rose-50 text-rose-700 border-rose-200/80'
+                        : 'bg-white text-[#86868B] border-[#E5E5E7]'
                     }`}
                   >
                     {label}
@@ -116,24 +116,24 @@ export default function ApprovalTrail({ status, approvalSteps = [] }: ApprovalTr
                 </div>
 
                 {stepData?.approver?.name && (
-                  <p className="text-xs text-gray-600 font-medium mt-1">
-                    Signatory: <strong className="text-gray-900">{stepData.approver.name}</strong>
+                  <p className="text-[12px] text-[#86868B] font-normal mt-0.5">
+                    Signatory: <strong className="font-medium text-[#1D1D1F]">{stepData.approver.name}</strong>
                     {stepData.approver.email ? ` (${stepData.approver.email})` : ''}
                   </p>
                 )}
 
                 {stepData?.actionDate && (
-                  <p className="text-[11px] text-gray-400 mt-0.5">
+                  <p className="text-[11px] text-[#86868B] mt-0.5">
                     Action Date: {new Date(stepData.actionDate).toLocaleString()}
                   </p>
                 )}
 
                 {stepData?.remarks && (
-                  <div className="mt-2.5 p-2.5 bg-white rounded-lg border border-gray-200 text-xs text-gray-700">
-                    <span className="font-semibold text-gray-900 block text-[11px] uppercase tracking-wider mb-0.5">
+                  <div className="mt-2 p-2.5 bg-[#FFFFFF] rounded-[6px] border border-[#E5E5E7] text-[12px] text-[#1D1D1F]">
+                    <span className="font-semibold text-[#86868B] block text-[10px] uppercase tracking-wider mb-0.5">
                       Remarks / Reason:
                     </span>
-                    "{stepData.remarks}"
+                    &ldquo;{stepData.remarks}&rdquo;
                   </div>
                 )}
               </div>
