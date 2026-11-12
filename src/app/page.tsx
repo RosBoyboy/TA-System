@@ -2,11 +2,29 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 export default function LandingPage() {
+  const { data: session, status } = useSession();
   const [activeSlide, setActiveSlide] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  // Auto-redirect if already signed in
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      const userRole = (session.user as any)?.role || 'EMPLOYEE';
+      let dest = '/employee';
+      if (['SECTION_CHIEF', 'DIVISION_CHIEF', 'HEAD_PENRO'].includes(userRole)) {
+        dest = '/staff';
+      } else if (userRole === 'ACCOUNT_MANAGER') {
+        dest = '/account-manager';
+      } else if (userRole === 'ADMIN') {
+        dest = '/admin';
+      }
+      window.location.href = dest;
+    }
+  }, [status, session]);
 
   const heroBackgrounds = [
     {
@@ -91,18 +109,38 @@ export default function LandingPage() {
 
           {/* Actions */}
           <div className="hidden md:flex items-center gap-3">
-            <Link
-              href="/login"
-              className="px-5 py-2.5 text-sm font-semibold text-white hover:text-emerald-300 transition-colors"
-            >
-              Login
-            </Link>
-            <Link
-              href="/register"
-              className="px-6 py-2.5 bg-[#1B5E20] hover:bg-[#2E7D32] text-white text-sm font-semibold rounded-full shadow-md transition-all hover:scale-105"
-            >
-              Register
-            </Link>
+            {status === 'authenticated' && session?.user ? (
+              <Link
+                href={
+                  ['SECTION_CHIEF', 'DIVISION_CHIEF', 'HEAD_PENRO'].includes((session.user as any)?.role)
+                    ? '/staff'
+                    : (session.user as any)?.role === 'ACCOUNT_MANAGER'
+                    ? '/account-manager'
+                    : (session.user as any)?.role === 'ADMIN'
+                    ? '/admin'
+                    : '/employee'
+                }
+                className="px-6 py-2.5 bg-[#1B5E20] hover:bg-[#2E7D32] text-white text-sm font-semibold rounded-full shadow-md transition-all hover:scale-105 flex items-center gap-2"
+              >
+                <span>Go to Dashboard</span>
+                <span>&rarr;</span>
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="px-5 py-2.5 text-sm font-semibold text-white hover:text-emerald-300 transition-colors"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="px-6 py-2.5 bg-[#1B5E20] hover:bg-[#2E7D32] text-white text-sm font-semibold rounded-full shadow-md transition-all hover:scale-105"
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Hamburger Toggle */}
@@ -219,19 +257,39 @@ export default function LandingPage() {
 
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
-              <Link
-                href="/register"
-                className="px-7 py-3.5 bg-[#1B5E20] hover:bg-[#2E7D32] text-white font-semibold text-sm rounded-full shadow-lg transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[#4ADE80]"
-              >
-                Get Started
-              </Link>
+              {status === 'authenticated' && session?.user ? (
+                <Link
+                  href={
+                    ['SECTION_CHIEF', 'DIVISION_CHIEF', 'HEAD_PENRO'].includes((session.user as any)?.role)
+                      ? '/staff'
+                      : (session.user as any)?.role === 'ACCOUNT_MANAGER'
+                      ? '/account-manager'
+                      : (session.user as any)?.role === 'ADMIN'
+                      ? '/admin'
+                      : '/employee'
+                  }
+                  className="px-8 py-3.5 bg-[#1B5E20] hover:bg-[#2E7D32] text-white font-semibold text-sm rounded-full shadow-lg transition-all hover:scale-[1.02] flex items-center gap-2"
+                >
+                  <span>Go to My Dashboard</span>
+                  <span>&rarr;</span>
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/register"
+                    className="px-7 py-3.5 bg-[#1B5E20] hover:bg-[#2E7D32] text-white font-semibold text-sm rounded-full shadow-lg transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-[#4ADE80]"
+                  >
+                    Get Started
+                  </Link>
 
-              <Link
-                href="/login"
-                className="px-7 py-3.5 bg-transparent border-2 border-white/50 text-white hover:bg-white/10 font-semibold text-sm rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-[#4ADE80]"
-              >
-                Login
-              </Link>
+                  <Link
+                    href="/login"
+                    className="px-7 py-3.5 bg-transparent border-2 border-white/50 text-white hover:bg-white/10 font-semibold text-sm rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-[#4ADE80]"
+                  >
+                    Login
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Stats Strip inside Hero */}

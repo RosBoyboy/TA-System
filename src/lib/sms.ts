@@ -15,8 +15,8 @@ import { resolveFullAddress } from '@/utils/address';
 
 export * from './email';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://rltypymiubbwdhbthsky.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_0h-ghZuNv6gwbWXAAcUdqg_NXpuvBQ9';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : (null as any);
 
 export interface SendSmsParams {
@@ -56,7 +56,7 @@ export interface NotifyRoleParams {
  * Automatically normalizes Philippine phone numbers to 639XXXXXXXXX format for PhilSMS.
  */
 export async function sendSms({ to, message }: SendSmsParams): Promise<boolean> {
-  const philsmsToken = process.env.PHILSMS_API_TOKEN || '3846|uFWtHFbfSY5fWiXMUr8DKSqbO0ZNyz2erK2SquVE39d83d80';
+  const philsmsToken = process.env.PHILSMS_API_TOKEN;
   const philsmsSenderId = process.env.PHILSMS_SENDER_ID || 'PhilSMS';
   const semaphoreApiKey = process.env.SEMAPHORE_API_KEY;
   const semaphoreSenderName = process.env.SEMAPHORE_SENDER_NAME;

@@ -5,9 +5,9 @@ import { prisma, isDummyDbUrl } from '@/lib/prisma';
 import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://rltypymiubbwdhbthsky.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_0h-ghZuNv6gwbWXAAcUdqg_NXpuvBQ9';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : (null as any);
 
 /**
  * GET /api/user/profile
@@ -171,11 +171,12 @@ export async function PATCH(req: Request) {
       updateData.image = image;
     }
 
-    // 5. Division & Section updates (separate organization fields)
+    // 5. Division & Section updates (Restricted: only Account Manager or Admin can reassign organizational units)
+    const isManagerOrAdmin = existingUser.role === 'ADMIN' || existingUser.role === 'ACCOUNT_MANAGER';
     if (existingUser.role === 'HEAD_PENRO') {
       updateData.division = null;
       updateData.section = null;
-    } else {
+    } else if (isManagerOrAdmin) {
       if (division !== undefined && typeof division === 'string') {
         updateData.division = division.trim() || null;
       }

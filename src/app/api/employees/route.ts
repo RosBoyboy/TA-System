@@ -4,11 +4,9 @@ import { authOptions } from '@/lib/auth';
 import { prisma, isDummyDbUrl } from '@/lib/prisma';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://rltypymiubbwdhbthsky.supabase.co';
-const supabaseKey =
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-  'sb_publishable_0h-ghZuNv6gwbWXAAcUdqg_NXpuvBQ9';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : (null as any);
 
 // Non-person alias names and system administrator accounts to exclude from employee travel selection
 const EXCLUDED_NAMES = new Set([

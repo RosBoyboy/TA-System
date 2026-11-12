@@ -4,9 +4,9 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://rltypymiubbwdhbthsky.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_0h-ghZuNv6gwbWXAAcUdqg_NXpuvBQ9';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : (null as any);
 
 export async function GET() {
   try {
@@ -48,14 +48,14 @@ export async function GET() {
 
         if (data) {
           notifications = data;
-          unreadCount = data.filter((n) => !n.isRead).length;
+          unreadCount = (data as any[]).filter((n: any) => !n.isRead).length;
         }
       } catch (sbErr) {
         console.error('[GET Notifications] Supabase fallback error:', sbErr);
       }
     }
 
-    const formattedNotifications = notifications.map((n) => ({
+    const formattedNotifications = (notifications as any[]).map((n: any) => ({
       ...n,
       title: n.title
         ? n.title

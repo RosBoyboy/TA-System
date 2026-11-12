@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
-import { signIn } from 'next-auth/react';
-import { useSearchParams } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { signIn, useSession } from 'next-auth/react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 function LoginForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { data: session, status } = useSession();
   const callbackUrl = searchParams.get('callbackUrl') || '/employee';
 
   const [identifier, setIdentifier] = useState('');
@@ -15,6 +17,22 @@ function LoginForm() {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Auto-redirect if already signed in
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      const userRole = (session.user as any)?.role || 'EMPLOYEE';
+      let dest = '/employee';
+      if (['SECTION_CHIEF', 'DIVISION_CHIEF', 'HEAD_PENRO'].includes(userRole)) {
+        dest = '/staff';
+      } else if (userRole === 'ACCOUNT_MANAGER') {
+        dest = '/account-manager';
+      } else if (userRole === 'ADMIN') {
+        dest = '/admin';
+      }
+      window.location.href = dest;
+    }
+  }, [status, session]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
