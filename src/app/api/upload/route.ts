@@ -40,38 +40,97 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Strict Extension / Type Check (Only PDF and DOC/DOCX)
+    // 2. Strict Extension & MIME Whitelist Check
     const fileName = file.name || 'document';
     const ext = fileName.toLowerCase().split('.').pop() || '';
-    const isPdf = ext === 'pdf' || file.type === 'application/pdf';
-    const isDoc =
-      ext === 'doc' ||
-      ext === 'docx' ||
-      file.type === 'application/msword' ||
-      file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
-    if (!isPdf && !isDoc) {
+    const ALLOWED_EXTENSIONS = new Set(['pdf', 'docx', 'doc']);
+    if (!ALLOWED_EXTENSIONS.has(ext)) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Unsupported file format. Only PDF (.pdf) and Word documents (.doc, .docx) are allowed.',
+          error: 'Unsupported file extension. Only PDF (.pdf) and Word documents (.doc, .docx) are allowed.',
         },
         { status: 400 }
       );
     }
 
+    const ALLOWED_MIME_TYPES = new Set([
+      'application/pdf',
+      'application/x-pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/msword',
+      'application/zip',
+      'application/x-zip-compressed',
+      'application/octet-stream',
+      '',
+    ]);
+
+    if (file.type && !ALLOWED_MIME_TYPES.has(file.type.toLowerCase())) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Unsupported MIME type. Only official PDF (.pdf) and Word documents (.doc, .docx) are allowed.',
+        },
+        { status: 400 }
+      );
+    }
+
+    // 3. Inspect Binary Magic Bytes to Prevent File Spoofing & Disguised Executables
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+
+    if (fileBuffer.length < 4) {
+      return NextResponse.json(
+        { success: false, error: 'File is empty or corrupted.' },
+        { status: 400 }
+      );
+    }
+
+    const isPdfMagic = fileBuffer.slice(0, 4).toString('ascii') === '%PDF';
+    const isDocxMagic =
+      fileBuffer[0] === 0x50 && fileBuffer[1] === 0x4B &&
+      (fileBuffer[2] === 0x03 || fileBuffer[2] === 0x05 || fileBuffer[2] === 0x07);
+    const isDocMagic =
+      fileBuffer[0] === 0xD0 && fileBuffer[1] === 0xCF &&
+      fileBuffer[2] === 0x11 && fileBuffer[3] === 0xE0;
+
+    let detectedType: 'pdf' | 'docx' | 'doc' | null = null;
+    if (ext === 'pdf' && isPdfMagic) {
+      detectedType = 'pdf';
+    } else if (ext === 'docx' && isDocxMagic) {
+      detectedType = 'docx';
+    } else if (ext === 'doc' && (isDocMagic || isDocxMagic)) {
+      detectedType = 'doc';
+    }
+
+    if (!detectedType) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid file signature. The file content does not match a valid PDF or Word document format.',
+        },
+        { status: 400 }
+      );
+    }
+
+    const isPdf = detectedType === 'pdf';
     const cleanFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
     const storagePath = `ta_attachments/${Date.now()}_${cleanFileName}`;
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
 
     let downloadUrl = '';
 
-    // 3. Upload to Supabase Storage 'documents' bucket
+    // 4. Upload to Supabase Storage 'documents' bucket
     try {
+      const canonicalMime = isPdf
+        ? 'application/pdf'
+        : detectedType === 'docx'
+        ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        : 'application/msword';
+
       const { data: uploadData, error: uploadErr } = await supabase.storage
         .from('documents')
         .upload(storagePath, fileBuffer, {
-          contentType: file.type || (isPdf ? 'application/pdf' : 'application/octet-stream'),
+          contentType: canonicalMime,
           upsert: true,
         });
 
@@ -85,10 +144,14 @@ export async function POST(req: Request) {
       console.warn('[Upload API] Storage exception:', storageErr);
     }
 
-    // Fallback if direct storage URL is empty (e.g. data URL for preview/download)
+    // Safe fallback if direct storage URL is empty (e.g. data URL for preview/download)
     if (!downloadUrl) {
-      const mime = file.type || (isPdf ? 'application/pdf' : 'application/octet-stream');
-      downloadUrl = `data:${mime};base64,${fileBuffer.toString('base64')}`;
+      const safeMime = isPdf
+        ? 'application/pdf'
+        : detectedType === 'docx'
+        ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        : 'application/msword';
+      downloadUrl = `data:${safeMime};base64,${fileBuffer.toString('base64')}`;
     }
 
     const attachmentData = {

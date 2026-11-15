@@ -36,13 +36,9 @@ export default function SupportingDocumentsUpload({
       const file = fileList[i];
       const ext = file.name.toLowerCase().split('.').pop() || '';
       const isAllowedExt = ext === 'pdf' || ext === 'doc' || ext === 'docx';
-      const isAllowedMime =
-        file.type === 'application/pdf' ||
-        file.type === 'application/msword' ||
-        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
-      if (!isAllowedExt && !isAllowedMime) {
-        setUploadError(`"${file.name}" is not a valid format. Only PDF (.pdf) and Word documents (.doc, .docx) are allowed.`);
+      if (!isAllowedExt) {
+        setUploadError(`"${file.name}" is not an accepted format. Only PDF (.pdf) and Word documents (.doc, .docx) are allowed.`);
         return;
       }
 

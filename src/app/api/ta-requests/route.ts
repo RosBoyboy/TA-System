@@ -396,6 +396,33 @@ export async function POST(req: Request) {
       initialStatus = submitImmediately ? TARequestStatus.PENDING_SECTION_CHIEF : TARequestStatus.DRAFT;
     }
 
+    // Sanitize supporting document attachments against Stored XSS / fake links
+    const cleanAttachments = Array.isArray(attachments)
+      ? attachments
+          .filter((att: any) => att && typeof att === 'object' && typeof att.name === 'string')
+          .map((att: any) => {
+            const rawUrl = typeof att.url === 'string' ? att.url.trim() : '';
+            // Only allow valid http(s) URLs or safe document data URIs
+            const isSafeHttps = rawUrl.startsWith('https://') || rawUrl.startsWith('http://');
+            const isSafeDataDoc =
+              rawUrl.startsWith('data:application/pdf;') ||
+              rawUrl.startsWith('data:application/msword;') ||
+              rawUrl.startsWith('data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;');
+            const safeUrl = isSafeHttps || isSafeDataDoc ? rawUrl : '';
+
+            return {
+              id: typeof att.id === 'string' ? att.id.substring(0, 64) : `att_${Date.now()}`,
+              name: String(att.name).replace(/[^\w\s.-]/gi, '_').substring(0, 200),
+              type: att.type === 'Word Document' ? 'Word Document' : 'PDF Document',
+              size: typeof att.size === 'string' ? att.size.substring(0, 32) : 'Document',
+              color: att.color === 'blue' ? 'blue' : 'rose',
+              icon: 'doc' as const,
+              url: safeUrl,
+            };
+          })
+          .filter((att: any) => Boolean(att.url))
+      : [];
+
     let request: any = null;
 
     try {
@@ -410,7 +437,7 @@ export async function POST(req: Request) {
           startDate: new Date(startDate),
           endDate: new Date(endDate),
           status: initialStatus,
-          attachments: (Array.isArray(attachments) ? attachments : []) as any,
+          attachments: cleanAttachments as any,
           teamMembers: {
             create: teamMembers.map((member: { name: string; position?: string; userId?: string }) => ({
               name: member.name.trim(),
@@ -449,7 +476,7 @@ export async function POST(req: Request) {
           startDate: new Date(startDate).toISOString(),
           endDate: new Date(endDate).toISOString(),
           status: initialStatus,
-          attachments: Array.isArray(attachments) ? attachments : [],
+          attachments: cleanAttachments,
         })
         .select()
         .single();

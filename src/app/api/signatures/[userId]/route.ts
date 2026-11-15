@@ -91,6 +91,8 @@ export async function GET(
       headers: {
         'Content-Type': contentType,
         'Cache-Control': 'private, no-cache, no-store, must-revalidate',
+        'Content-Security-Policy': "default-src 'none'; sandbox",
+        'X-Content-Type-Options': 'nosniff',
       },
     });
   } catch (error: any) {
@@ -134,6 +136,24 @@ export async function POST(
 
     if (!signatureData || typeof signatureData !== 'string' || !signatureData.trim()) {
       return NextResponse.json({ success: false, error: 'Valid signatureData is required' }, { status: 400 });
+    }
+
+    // Restrict signature upload payload size (max 2MB)
+    if (signatureData.length > 2 * 1024 * 1024) {
+      return NextResponse.json({ success: false, error: 'Signature data is too large (max 2MB).' }, { status: 400 });
+    }
+
+    // Only allow safe raster image formats; reject SVG scripts to prevent Stored XSS
+    const isSafeRaster =
+      signatureData.startsWith('data:image/png;base64,') ||
+      signatureData.startsWith('data:image/jpeg;base64,') ||
+      signatureData.startsWith('data:image/webp;base64,');
+
+    if (!isSafeRaster) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid signature format. Only PNG and JPEG raster image formats are supported.' },
+        { status: 400 }
+      );
     }
 
     const savedSignatureUrl = await saveSignatureFile(userId, signatureData);
