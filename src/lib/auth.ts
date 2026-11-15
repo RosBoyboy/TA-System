@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
 import { prisma, isDummyDbUrl } from './prisma';
 import { logAuditEvent } from './auditLog';
+import { checkRateLimit, recordFailedAttempt, resetRateLimit } from './rateLimit';
 import { Role, UserStatus } from '@prisma/client';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -28,13 +29,33 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'Email', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         const rawIdentifier = credentials?.username || credentials?.email;
         if (!rawIdentifier || !credentials?.password) {
           throw new Error('Please enter both your username (or email) and password.');
         }
 
         const cleanIdentifier = rawIdentifier.toLowerCase().trim();
+
+        // Extract client IP from request headers (works on Vercel Edge & local proxies)
+        const forwardedHeader = (req?.headers as any)?.['x-forwarded-for'];
+        const clientIp = typeof forwardedHeader === 'string'
+          ? forwardedHeader.split(',')[0].trim()
+          : (req?.headers as any)?.['x-real-ip'] || 'unknown';
+
+        const ipKey = `ip:${clientIp}`;
+        const userKey = `user:${cleanIdentifier}`;
+
+        // Rate Limiting Check: Block brute-force bots and credential-stuffing
+        const ipCheck = checkRateLimit(ipKey);
+        const userCheck = checkRateLimit(userKey);
+
+        if (ipCheck.isBlocked || userCheck.isBlocked) {
+          const waitSeconds = Math.max(ipCheck.retryAfterSeconds, userCheck.retryAfterSeconds);
+          const waitMinutes = Math.max(1, Math.ceil(waitSeconds / 60));
+          throw new Error(`TOO_MANY_ATTEMPTS: Too many failed login attempts. Please wait ${waitMinutes} minute${waitMinutes > 1 ? 's' : ''} before trying again.`);
+        }
+
         let user: any = null;
 
         // 1. Try fetching via Prisma ORM if DATABASE_URL is properly configured
@@ -83,13 +104,53 @@ export const authOptions: NextAuthOptions = {
         }
 
         if (!user) {
+          recordFailedAttempt(ipKey);
+          const { isLocked, retryAfterSeconds } = recordFailedAttempt(userKey);
+
+          logAuditEvent({
+            actorId: null,
+            actorName: cleanIdentifier,
+            actorRole: 'UNKNOWN',
+            ipAddress: clientIp !== 'unknown' ? clientIp : null,
+            action: 'LOGIN_FAILED',
+            target: 'Session',
+            targetId: null,
+            details: `Failed login attempt: Account "${cleanIdentifier}" not found.`,
+            metadata: { ip: clientIp, identifier: cleanIdentifier, isLocked },
+          }).catch(() => {});
+
+          if (isLocked) {
+            const waitMinutes = Math.max(1, Math.ceil(retryAfterSeconds / 60));
+            throw new Error(`TOO_MANY_ATTEMPTS: Too many failed login attempts. Please wait ${waitMinutes} minute${waitMinutes > 1 ? 's' : ''} before trying again.`);
+          }
+
           throw new Error('No user found with this username or email address.');
         }
 
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
 
         if (!isPasswordValid) {
-          throw new Error('Invalid username/email or password.');
+          recordFailedAttempt(ipKey);
+          const { isLocked, remainingAttempts, retryAfterSeconds } = recordFailedAttempt(userKey);
+
+          logAuditEvent({
+            actorId: user.id,
+            actorName: user.name,
+            actorRole: user.role as string,
+            ipAddress: clientIp !== 'unknown' ? clientIp : null,
+            action: 'LOGIN_FAILED',
+            target: 'Session',
+            targetId: user.id,
+            details: `Failed login attempt: Incorrect password for "${cleanIdentifier}". Remaining attempts: ${remainingAttempts}.`,
+            metadata: { ip: clientIp, identifier: cleanIdentifier, isLocked, remainingAttempts },
+          }).catch(() => {});
+
+          if (isLocked) {
+            const waitMinutes = Math.max(1, Math.ceil(retryAfterSeconds / 60));
+            throw new Error(`TOO_MANY_ATTEMPTS: Too many failed login attempts. Please wait ${waitMinutes} minute${waitMinutes > 1 ? 's' : ''} before trying again.`);
+          }
+
+          throw new Error(`Invalid username/email or password. (${remainingAttempts} attempt${remainingAttempts === 1 ? '' : 's'} remaining)`);
         }
 
         if (user.status === UserStatus.PENDING_REVIEW || user.status === 'PENDING_REVIEW') {
@@ -100,12 +161,16 @@ export const authOptions: NextAuthOptions = {
           throw new Error('ACCOUNT_DEACTIVATED: Your account has been deactivated. Please contact the administrator.');
         }
 
+        // Reset rate limiter on successful authentication
+        resetRateLimit(ipKey);
+        resetRateLimit(userKey);
+
         // Audit Log: Record successful login
         logAuditEvent({
           actorId: user.id,
           actorName: user.name,
           actorRole: user.role as string,
-          ipAddress: null, // NextAuth authorize() doesn't expose request headers; IP captured in API routes
+          ipAddress: clientIp !== 'unknown' ? clientIp : null,
           action: 'LOGIN',
           target: 'Session',
           targetId: user.id,

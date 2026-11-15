@@ -53,6 +53,8 @@ function LoginForm() {
           setError('Your account registration is currently pending review and activation by the Account Manager.');
         } else if (res.error.includes('ACCOUNT_DEACTIVATED')) {
           setError('Your account has been deactivated. Please contact your system administrator.');
+        } else if (res.error.includes('TOO_MANY_ATTEMPTS')) {
+          setError(res.error.replace('TOO_MANY_ATTEMPTS:', '').trim());
         } else {
           setError(res.error || 'Invalid username or password.');
         }
