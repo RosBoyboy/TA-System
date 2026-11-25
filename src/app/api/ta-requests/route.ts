@@ -356,7 +356,7 @@ export async function POST(req: Request) {
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const timeSuffix = Date.now().toString().slice(-4);
     const randomSuffix = Math.floor(100 + Math.random() * 900);
-    const trackingNumber = `TA-${dateStr}-${timeSuffix}${randomSuffix}`;
+    const trackingNumber = `TO-${dateStr}-${timeSuffix}${randomSuffix}`;
 
     // Determine initial approval step based on submitter's role:
     // If a Section Chief files a TO, Step 1 is auto-endorsed and it starts at Step 2 (Division Chief)

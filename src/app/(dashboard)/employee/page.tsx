@@ -1039,7 +1039,7 @@ function EmployeeContent() {
           {/* Welcome / Page Header Banner */}
           <div className="bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white p-5 rounded-[8px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-[8px] bg-white/10 border border-white/15 flex items-center justify-center shrink-0 text-emerald-300">
+              <div className="flex items-center justify-center shrink-0 text-emerald-300">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
@@ -1090,7 +1090,7 @@ function EmployeeContent() {
                   {loading ? 'Fetching records...' : totalCount > 0 ? `${totalCount} submitted to date` : 'No requests filed'}
                 </p>
               </div>
-              <div className="w-9 h-9 rounded-[6px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200 flex items-center justify-center shrink-0">
+              <div className="text-[#0F4C2E] flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
@@ -1108,7 +1108,7 @@ function EmployeeContent() {
                 )}
                 <p className="text-[12px] font-medium text-[#D97706] mt-0.5">Awaiting approval</p>
               </div>
-              <div className="w-9 h-9 rounded-[6px] bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center shrink-0">
+              <div className="text-amber-600 flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -1128,7 +1128,7 @@ function EmployeeContent() {
                   Fully signed TA
                 </p>
               </div>
-              <div className="w-9 h-9 rounded-[6px] bg-emerald-50 text-[#16835D] border border-emerald-200 flex items-center justify-center shrink-0">
+              <div className="text-[#16835D] flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M5 13l4 4L19 7" />
                 </svg>
@@ -1146,7 +1146,7 @@ function EmployeeContent() {
                 )}
                 <p className="text-[12px] font-medium text-[#DC3545] mt-0.5">Needs revision</p>
               </div>
-              <div className="w-9 h-9 rounded-[6px] bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center shrink-0">
+              <div className="text-rose-600 flex items-center justify-center shrink-0">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
@@ -1258,7 +1258,7 @@ function EmployeeContent() {
                         <tr>
                           <td colSpan={5} className="py-12 px-4 text-center">
                             <div className="flex flex-col items-center justify-center max-w-sm mx-auto text-center space-y-2.5">
-                              <div className="w-10 h-10 rounded-[8px] bg-emerald-50 text-[#0F4C2E] flex items-center justify-center border border-emerald-200">
+                              <div className="text-[#0F4C2E] flex items-center justify-center">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
@@ -1387,7 +1387,7 @@ function EmployeeContent() {
                     })
                   ) : (
                     <div className="py-10 flex flex-col items-center justify-center text-center space-y-2">
-                      <div className="w-9 h-9 rounded-[6px] bg-emerald-50 text-[#0F4C2E] flex items-center justify-center border border-emerald-200">
+                      <div className="text-[#0F4C2E] flex items-center justify-center">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
@@ -1415,7 +1415,7 @@ function EmployeeContent() {
             {/* Card 1: File Travel Authority */}
             <div className="bg-white p-5 rounded-[8px] border border-slate-200/80 border-l-4 border-l-[#0F4C2E] shadow-xs space-y-3 flex flex-col justify-between">
               <div>
-                <div className="w-9 h-9 rounded-[6px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200 flex items-center justify-center mb-3">
+                <div className="text-[#0F4C2E] flex items-center justify-center mb-3">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
@@ -1437,7 +1437,7 @@ function EmployeeContent() {
             {/* Card 2: Travel Schedule & Map */}
             <div className="bg-white p-5 rounded-[8px] border border-slate-200/80 border-l-4 border-l-blue-500 shadow-xs space-y-3 flex flex-col justify-between">
               <div>
-                <div className="w-9 h-9 rounded-[6px] bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center mb-3">
+                <div className="text-blue-600 flex items-center justify-center mb-3">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -1459,7 +1459,7 @@ function EmployeeContent() {
             {/* Card 3: DENR Approval Policy */}
             <div className="bg-white p-5 rounded-[8px] border border-slate-200/80 border-l-4 border-l-amber-500 shadow-xs space-y-3 flex flex-col justify-between">
               <div>
-                <div className="w-9 h-9 rounded-[6px] bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center mb-3">
+                <div className="text-amber-600 flex items-center justify-center mb-3">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                   </svg>
@@ -1871,7 +1871,7 @@ function EmployeeContent() {
 
                     <div>
                       <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
-                        Remarks or Special Instructions
+                        Remarks or Special Instructions (Optional)
                       </label>
                       <textarea
                         rows={3}
@@ -1884,14 +1884,14 @@ function EmployeeContent() {
 
                     <div>
                       <label className="block text-[11px] font-semibold text-[#86868B] uppercase tracking-wider mb-1.5">
-                        Certification
+                        Certification (Optional)
                       </label>
                       <input
                         type="text"
                         value={createForm.certification}
                         onChange={(e) => setCreateForm({ ...createForm, certification: e.target.value })}
                         placeholder="Enter certification details..."
-                        className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                        className="w-full md:max-w-xl h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                       />
                     </div>
 
@@ -1903,7 +1903,7 @@ function EmployeeContent() {
                         type="text"
                         value={createForm.contactNumber}
                         onChange={(e) => setCreateForm({ ...createForm, contactNumber: e.target.value })}
-                        className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                        className="w-full sm:max-w-sm h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
                       />
                     </div>
                   </div>
@@ -1927,7 +1927,7 @@ function EmployeeContent() {
                   {/* Document Review Header */}
                   <div className="bg-[#0F4C2E] text-white rounded-[8px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-[6px] bg-white/15 text-white border border-white/20 flex items-center justify-center shrink-0">
+                      <div className="flex items-center justify-center shrink-0 text-white">
                         <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -2335,21 +2335,21 @@ function EmployeeContent() {
                 <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Total Filed</span>
                 <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1 block">{totalReq}</span>
               </div>
-              <div className="w-9 h-9 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-[#0F4C2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-[#0F4C2E] flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
             </div>
 
-            {/* Approved TAs */}
+            {/* Approved TOs */}
             <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-emerald-500 shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider block">Approved TAs</span>
+                <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider block">Approved TOs</span>
                 <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1 block">{appReq}</span>
               </div>
-              <div className="w-9 h-9 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-emerald-700 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
@@ -2361,8 +2361,8 @@ function EmployeeContent() {
                 <span className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider block">Under Review</span>
                 <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1 block">{pendReq}</span>
               </div>
-              <div className="w-9 h-9 rounded-[6px] bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-amber-700 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -2374,8 +2374,8 @@ function EmployeeContent() {
                 <span className="text-[11px] font-semibold text-rose-600 uppercase tracking-wider block">Needs Revision</span>
                 <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1 block">{retReq}</span>
               </div>
-              <div className="w-9 h-9 rounded-[6px] bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-red-700 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
               </div>
@@ -2419,7 +2419,7 @@ function EmployeeContent() {
                 <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                <span>Create TA</span>
+                <span>Create TO</span>
               </button>
             </div>
           </div>
@@ -2878,7 +2878,7 @@ function EmployeeContent() {
         <div className="w-full max-w-5xl xl:max-w-6xl mx-auto space-y-5 animate-fade-in pb-10 flex flex-col min-h-[560px]">
           <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-[6px] bg-[#F5F5F7] text-[#1B4332] border border-[#E5E5E7] flex items-center justify-center">
+              <div className="text-[#1B4332] flex items-center justify-center">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
@@ -3043,19 +3043,8 @@ function EmployeeContent() {
             {/* Modal Navigation Top Bar */}
             <div className="bg-[#F5F5F7] border-b border-[#E5E5E7] px-5 py-3.5 flex items-center justify-between shrink-0 sticky top-0 z-20">
               <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setSelectedRequest(null)}
-                  className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-white border border-[#E5E5E7] text-[#1D1D1F] hover:bg-[#F2F2F7] cursor-pointer"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                  <span>Back</span>
-                </button>
-                <div className="h-4 w-px bg-[#E5E5E7]"></div>
                 <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  {selectedRequest.trackingNumber}
+                  {selectedRequest.trackingNumber?.replace(/^TA-/, 'TO-')}
                 </span>
               </div>
 

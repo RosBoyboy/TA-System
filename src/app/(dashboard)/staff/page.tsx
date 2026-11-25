@@ -5,8 +5,10 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import DynamicMapPicker from '@/components/map/DynamicMapPicker';
 import ApprovalTrail from '@/components/approval-trail/ApprovalTrail';
+import SignaturePad from '@/components/signature/SignaturePad';
 import { TARequestDTO } from '@/types';
 import {
+  parseUtcDate,
   formatDateDisplay,
   formatTimeDisplay,
   formatFullDateTimeDisplay,
@@ -32,6 +34,39 @@ function StaffDashboardContent() {
 
   const [requests, setRequests] = useState<TARequestDTO[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Display-only reference formatter (TA- -> TO-) preserving stored database identifiers
+  const formatToReference = (trackingNumber?: string | null) => {
+    if (!trackingNumber) return '';
+    return trackingNumber.replace(/^TA-/i, 'TO-');
+  };
+
+  // Compact date-range formatter (e.g. "Nov 23–27, 2026") to keep date columns clearly separated
+  const formatCompactDateRange = (
+    startDate?: string | Date | null,
+    endDate?: string | Date | null
+  ) => {
+    if (!startDate || !endDate) return formatDateRangeShort(startDate, endDate);
+    const start = parseUtcDate(startDate);
+    const end = parseUtcDate(endDate);
+    if (!start || !end) return formatDateRangeShort(startDate, endDate);
+
+    const sameYear = start.getFullYear() === end.getFullYear();
+    const sameMonth = sameYear && start.getMonth() === end.getMonth();
+    const sameDay = sameMonth && start.getDate() === end.getDate();
+
+    if (sameDay) return formatDateDisplay(start);
+    if (sameMonth) {
+      const month = start.toLocaleDateString('en-US', { month: 'short' });
+      return `${month} ${start.getDate()}–${end.getDate()}, ${end.getFullYear()}`;
+    }
+    if (sameYear) {
+      const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      return `${startStr}–${endStr}`;
+    }
+    return formatDateRangeShort(start, end);
+  };
 
   // Tab & Review View State
   const [reviewRequest, setReviewRequest] = useState<TARequestDTO | null>(null);
@@ -106,10 +141,32 @@ function StaffDashboardContent() {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [hasDigitalSignature, setHasDigitalSignature] = useState(false);
+  const [hasSavedSignature, setHasSavedSignature] = useState<boolean | null>(null);
+  const [checkingSignature, setCheckingSignature] = useState(false);
+  const [signatureVersion, setSignatureVersion] = useState(0);
+  const [pendingSignatureData, setPendingSignatureData] = useState<string | null>(null);
+  const [savingSignature, setSavingSignature] = useState(false);
   const [remarks, setRemarks] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState('');
+
+  const checkUserSignature = async (uid: string) => {
+    setCheckingSignature(true);
+    try {
+      const res = await fetch(`/api/signatures/${uid}?v=${Date.now()}`, { cache: 'no-store' });
+      setHasSavedSignature(res.ok);
+    } catch {
+      setHasSavedSignature(false);
+    } finally {
+      setCheckingSignature(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.id) {
+      checkUserSignature(user.id);
+    }
+  }, [user?.id]);
 
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -243,7 +300,7 @@ function StaffDashboardContent() {
       return (
         <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-          FOR REVIEW
+          REVIEW
         </span>
       );
     }
@@ -267,6 +324,55 @@ function StaffDashboardContent() {
         IN PROGRESS
       </span>
     );
+  };
+
+  const openApproveModal = (target?: TARequestDTO) => {
+    if (target) {
+      setReviewRequest(target);
+    }
+    setActionError('');
+    setPendingSignatureData(null);
+    setShowApproveModal(true);
+    if (user?.id && hasSavedSignature === null) {
+      checkUserSignature(user.id);
+    }
+  };
+
+  const handleSaveSignatureAndApprove = async () => {
+    if (!user?.id) {
+      setActionError('Unable to verify your account session. Please sign in again.');
+      return;
+    }
+    if (!pendingSignatureData) {
+      setActionError('Please draw or upload your official signature before completing approval.');
+      return;
+    }
+
+    setSavingSignature(true);
+    setActionError('');
+    try {
+      const sigRes = await fetch(`/api/signatures/${user.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ signatureData: pendingSignatureData }),
+      });
+      const sigData = await sigRes.json();
+      if (!sigRes.ok || !sigData.success) {
+        setActionError(sigData.error || 'Failed to save your official signature.');
+        setSavingSignature(false);
+        return;
+      }
+
+      setHasSavedSignature(true);
+      setSignatureVersion((v) => v + 1);
+      setPendingSignatureData(null);
+      setSavingSignature(false);
+
+      await handleAction('APPROVED');
+    } catch (err: any) {
+      setActionError(err.message || 'An error occurred while saving your signature.');
+      setSavingSignature(false);
+    }
   };
 
   const handleAction = async (action: 'APPROVED' | 'REJECTED', targetRequest?: TARequestDTO, customRemarks?: string) => {
@@ -296,7 +402,13 @@ function StaffDashboardContent() {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setActionError(data.error || 'Failed to process approval action.');
+        if (typeof data.error === 'string' && data.error.includes('SIGNATURE_REQUIRED')) {
+          setHasSavedSignature(false);
+          setShowApproveModal(true);
+          setActionError(data.error.replace('SIGNATURE_REQUIRED:', '').trim());
+        } else {
+          setActionError(data.error || 'Failed to process approval action.');
+        }
         setActionLoading(false);
         return;
       }
@@ -306,7 +418,7 @@ function StaffDashboardContent() {
       const reqRef = target;
       setReviewRequest(null);
       setRemarks('');
-      setHasDigitalSignature(false);
+      setPendingSignatureData(null);
 
       // Optimistic instant dashboard status reflection
       setRequests((prev) =>
@@ -334,8 +446,8 @@ function StaffDashboardContent() {
         const actionTitle = action === 'APPROVED' ? 'Travel Endorsement Approved' : 'Travel Request Returned';
         const remarksSuffix = finalRemarks ? ` Remarks: "${finalRemarks}"` : '';
         const actionMsg = action === 'APPROVED'
-          ? `TA Request ${reqRef.trackingNumber || ''} has been endorsed and forwarded to the next signatory.${remarksSuffix}`
-          : `TA Request ${reqRef.trackingNumber || ''} has been returned with your remarks.${finalRemarks ? ` Reason: "${finalRemarks}"` : ''}`;
+          ? `TO Request ${formatToReference(reqRef.trackingNumber)} has been endorsed and forwarded to the next signatory.${remarksSuffix}`
+          : `TO Request ${formatToReference(reqRef.trackingNumber)} has been returned with your remarks.${finalRemarks ? ` Reason: "${finalRemarks}"` : ''}`;
 
         window.dispatchEvent(
           new CustomEvent('taps:new-notification', {
@@ -473,17 +585,30 @@ function StaffDashboardContent() {
     return hasActed || (currentStepNum > myRoleOrder) || r.status === 'APPROVED';
   });
 
-  // 4. Dashboard Activity: Prioritize pending items requiring action, followed by recently processed requests
+  // 4. Dashboard Activity: Combine pending and history records, sorted by most recent activity
+  const getLatestActivityTime = (r: TARequestDTO) => {
+    const timestamps = [
+      r.updatedAt ? new Date(r.updatedAt).getTime() : 0,
+      r.createdAt ? new Date(r.createdAt).getTime() : 0,
+      ...(r.approvalSteps || []).map((s: any) =>
+        s.actionDate ? new Date(s.actionDate).getTime() : 0
+      ),
+    ];
+    return Math.max(...timestamps.filter((t) => !Number.isNaN(t)), 0);
+  };
+
   const dashboardActivityRequests = [
     ...pendingRequests,
     ...historyRequests.filter((hr) => !pendingRequests.some((pr) => pr.id === hr.id)),
-  ];
+  ].sort((a, b) => getLatestActivityTime(b) - getLatestActivityTime(a));
 
   // 5. Filtered Requests for Approval History Tab
   const filteredRequests = historyRequests.filter((r) => {
-    const query = searchQuery.toLowerCase();
+    const query = searchQuery.trim().toLowerCase();
     const matchesSearch =
+      !query ||
       r.trackingNumber?.toLowerCase().includes(query) ||
+      formatToReference(r.trackingNumber).toLowerCase().includes(query) ||
       r.createdBy?.name?.toLowerCase().includes(query) ||
       r.destination?.toLowerCase().includes(query) ||
       r.purpose?.toLowerCase().includes(query);
@@ -522,31 +647,37 @@ function StaffDashboardContent() {
   }).length;
 
   /* -------------------------------------------------------------------------- */
-  /* REVIEW TA REQUEST DETAIL VIEW (Strictly Matching PDF Pages 4, 5 & 6)       */
+  /* REVIEW TO REQUEST DETAIL VIEW (Strictly Matching PDF Pages 4, 5 & 6)       */
   /* -------------------------------------------------------------------------- */
   if (reviewRequest) {
     return (
       <div className="w-full max-w-[1600px] mx-auto space-y-5 animate-fade-in">
+        {/* Back navigation link above header */}
+        <div>
+          <button
+            type="button"
+            onClick={() => setReviewRequest(null)}
+            className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#0F4C2E] hover:text-[#165E3A] hover:underline transition-colors cursor-pointer"
+          >
+            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            <span>Back to Pending Approvals</span>
+          </button>
+        </div>
+
         {/* Header Bar */}
-        <div className="bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white p-4 rounded-[8px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setReviewRequest(null)}
-              className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-white/15 hover:bg-white/25 text-white border border-white/20 transition-colors cursor-pointer"
-            >
-              ← Back
-            </button>
-            <div>
-              <h2 className="text-[22px] font-bold tracking-tight text-white">Review TA Request</h2>
-              <p className="text-[12px] text-emerald-100/90 mt-0.5 flex items-center gap-2">
-                <span className="font-mono font-semibold bg-white/15 px-1.5 py-0.5 rounded-[4px] text-white">
-                  {reviewRequest.trackingNumber}
-                </span>
-                <span>• Submitted on {formatDateDisplay(reviewRequest.createdAt)}</span>
-              </p>
-            </div>
+        <div className="bg-gradient-to-r from-[#0F4C2E] to-[#165E3A] text-white px-5 py-4 rounded-[8px] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className="text-[22px] font-bold tracking-tight text-white">Review TO Request</h2>
+            <p className="text-[12px] text-emerald-100/90 mt-0.5 flex flex-wrap items-center gap-2">
+              <span className="font-mono font-semibold bg-white/15 px-1.5 py-0.5 rounded-[4px] text-white">
+                {formatToReference(reviewRequest.trackingNumber)}
+              </span>
+              <span>• Submitted on {formatDateDisplay(reviewRequest.createdAt)}</span>
+            </p>
           </div>
-          <div>{renderStatusBadge(reviewRequest.status)}</div>
+          <div className="shrink-0">{renderStatusBadge(reviewRequest.status)}</div>
         </div>
 
         {actionError && (
@@ -562,7 +693,7 @@ function StaffDashboardContent() {
             {/* 1. Request Details Card */}
             <div className="bg-white border border-[#E5E5E7] border-t-4 border-t-[#0F4C2E] rounded-[8px] shadow-xs overflow-hidden">
               <div className="bg-emerald-950/[0.04] border-b border-[#E5E5E7] px-4 py-2.5 flex items-center gap-2.5">
-                <span className="w-7 h-7 rounded-[6px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200 flex items-center justify-center shrink-0">
+                <span className="text-[#0F4C2E] flex items-center justify-center shrink-0">
                   <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                   </svg>
@@ -638,7 +769,7 @@ function StaffDashboardContent() {
             {/* 2. Destination Map Card (Matching PDF Page 6) */}
             <div className="bg-white border border-[#E5E5E7] border-t-4 border-t-sky-500 rounded-[8px] shadow-xs overflow-hidden">
               <div className="bg-emerald-950/[0.04] border-b border-[#E5E5E7] px-4 py-2.5 flex items-center gap-2.5">
-                <span className="w-7 h-7 rounded-[6px] bg-sky-50 text-sky-600 border border-sky-200 flex items-center justify-center shrink-0">
+                <span className="text-sky-600 flex items-center justify-center shrink-0">
                   <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
@@ -709,7 +840,7 @@ function StaffDashboardContent() {
                 <div className="bg-white border border-[#E5E5E7] border-t-4 border-t-violet-500 rounded-[8px] shadow-xs overflow-hidden">
                   <div className="bg-emerald-950/[0.04] border-b border-[#E5E5E7] px-4 py-2.5 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <span className="w-7 h-7 rounded-[6px] bg-violet-50 text-violet-600 border border-violet-200 flex items-center justify-center shrink-0">
+                      <span className="text-violet-600 flex items-center justify-center shrink-0">
                         <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.373L8.557 18.315a1.5 1.5 0 11-2.122-2.122l7.694-7.694" />
                         </svg>
@@ -774,7 +905,7 @@ function StaffDashboardContent() {
                       </div>
                     ) : (
                       <div className="flex flex-col items-center justify-center py-6 text-center gap-2">
-                        <div className="w-10 h-10 rounded-[6px] bg-violet-50 border border-violet-200 flex items-center justify-center">
+                        <div className="flex items-center justify-center">
                           <svg className="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
                         </div>
                         <div>
@@ -829,43 +960,11 @@ function StaffDashboardContent() {
                     <div className="bg-[#0F4C2E] text-white px-4 py-2.5 flex items-center justify-between">
                       <span className="text-[14px] font-semibold text-white">Your Action Required</span>
                       <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-amber-400/20 text-amber-200 border border-amber-300/30 uppercase tracking-wider">
-                        FOR REVIEW
+                        REVIEW
                       </span>
                     </div>
 
                     <div className="p-4 space-y-4">
-                      {/* Digital Signature Container */}
-                      <div>
-                        <label className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block mb-1.5">
-                          DIGITAL SIGNATURE
-                        </label>
-                        <div
-                          onClick={() => setHasDigitalSignature(!hasDigitalSignature)}
-                          className={`h-24 rounded-[6px] border-2 border-dashed p-3 flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${
-                            hasDigitalSignature
-                              ? 'border-emerald-500 bg-emerald-50/80 text-emerald-800'
-                              : 'border-emerald-200 bg-emerald-50/30 text-[#0F4C2E] hover:bg-emerald-50/60 hover:border-[#0F4C2E]'
-                          }`}
-                        >
-                          {hasDigitalSignature ? (
-                            <div className="space-y-1">
-                              <div className="w-7 h-7 rounded-full bg-emerald-600 text-white font-semibold text-xs flex items-center justify-center mx-auto shadow-xs">
-                                ✓
-                              </div>
-                              <p className="text-[13px] font-semibold text-emerald-900">Digital Signature Affixed</p>
-                              <p className="text-[11px] text-emerald-700 font-mono">{user?.name || userRole}</p>
-                            </div>
-                          ) : (
-                            <div className="space-y-1">
-                              <svg className="w-5 h-5 text-[#0F4C2E] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                              </svg>
-                              <p className="text-[13px] font-medium text-[#0F4C2E]">Click to sign as Verifier</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
                       {/* Remarks Field */}
                       <div>
                         <label className="text-[11px] font-semibold uppercase tracking-wider text-[#86868B] block mb-1.5">
@@ -900,7 +999,7 @@ function StaffDashboardContent() {
 
                         <button
                           type="button"
-                          onClick={() => setShowApproveModal(true)}
+                          onClick={() => openApproveModal()}
                           disabled={actionLoading}
                           className="flex-1 h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white shadow-xs transition-colors cursor-pointer"
                         >
@@ -961,7 +1060,7 @@ function StaffDashboardContent() {
                     {isProcessed && myStep ? (
                       <>
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-emerald-100 border border-emerald-200 text-[#0F4C2E] flex items-center justify-center font-semibold text-xs shrink-0">
+                          <div className="text-[#0F4C2E] flex items-center justify-center font-semibold text-xs shrink-0">
                             ✓
                           </div>
                           <div>
@@ -1006,30 +1105,96 @@ function StaffDashboardContent() {
           </div>
         </div>
 
-        {/* Approve Confirmation Modal (Strictly Matching PDF Page 7) */}
+        {/* Approve Confirmation Modal (Auto-applies saved authorized signature or requires setup) */}
         {showApproveModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/60 backdrop-blur-xs animate-fade-in">
-            <div className="w-full max-w-lg bg-white border border-[#E5E5E7] rounded-[10px] shadow-xl overflow-hidden">
-              <div className="bg-[#0F4C2E] text-white px-5 py-3.5 flex items-center gap-2.5">
-                <svg className="w-4 h-4 text-emerald-200 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-[14px] font-semibold text-white">Approve Confirmation</span>
+            <div className="w-full max-w-lg bg-white border border-[#E5E5E7] rounded-[10px] shadow-xl overflow-hidden max-h-[92vh] flex flex-col">
+              <div className="bg-[#0F4C2E] text-white px-5 py-3.5 flex items-center justify-between gap-2.5 shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <svg className="w-4 h-4 text-emerald-200 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-[14px] font-semibold text-white">Approve Confirmation</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowApproveModal(false)}
+                  className="text-emerald-200 hover:text-white text-sm cursor-pointer"
+                  aria-label="Close approve confirmation"
+                >
+                  ✕
+                </button>
               </div>
 
-              <div className="p-5 space-y-4">
+              <div className="p-5 space-y-4 overflow-y-auto">
                 <p className="text-[13px] text-[#1D1D1F]">
-                  Are you sure you want to approve this travel request for{' '}
+                  Are you sure you want to approve this travel order request for{' '}
                   <strong className="text-[#0F4C2E] font-semibold">
                     {reviewRequest.createdBy?.name || 'Maria Santos'}
                   </strong>
                   ?
                 </p>
 
+                {actionError && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-[6px] text-[12px] font-medium text-rose-700">
+                    {actionError}
+                  </div>
+                )}
+
+                {checkingSignature || hasSavedSignature === null ? (
+                  <div className="p-3.5 bg-[#F5F5F7] border border-[#E5E5E7] rounded-[6px] flex items-center gap-2.5 text-[12px] text-[#86868B]">
+                    <div className="w-4 h-4 border-2 border-[#0F4C2E] border-t-transparent rounded-full animate-spin shrink-0" />
+                    <span>Verifying your authorized digital signature on file...</span>
+                  </div>
+                ) : hasSavedSignature ? (
+                  <div className="p-3.5 bg-emerald-50/50 border border-emerald-200 rounded-[6px] space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0F4C2E]">
+                        Authorized Signature on File
+                      </span>
+                      <span className="h-5 inline-flex items-center px-2 rounded-[4px] text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 uppercase tracking-wider">
+                        Auto-Applied
+                      </span>
+                    </div>
+                    <div className="bg-white border border-emerald-200/70 rounded-[6px] p-2.5 flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[13px] font-semibold text-[#1D1D1F] truncate">{user?.name || 'Authorized Official'}</p>
+                        <p className="text-[11px] text-[#86868B] truncate">{user?.position || userRole.replace(/_/g, ' ')}</p>
+                      </div>
+                      {user?.id && (
+                        <img
+                          src={`/api/signatures/${user.id}?v=${signatureVersion}`}
+                          alt="Authorized digital signature"
+                          onError={() => setHasSavedSignature(false)}
+                          className="h-11 max-w-[150px] object-contain mix-blend-multiply shrink-0"
+                        />
+                      )}
+                    </div>
+                    <p className="text-[11px] text-emerald-800">
+                      Your saved official signature will be automatically affixed to this Travel Order upon confirmation.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-[6px] text-[12px] text-amber-900">
+                      <strong className="font-semibold">Signature Setup Required:</strong> No authorized digital signature is configured on your account yet. Please draw or upload your official signature below before approving this Travel Order.
+                    </div>
+                    <SignaturePad
+                      required
+                      label="Official Approver Signature"
+                      description="Saved securely to your account and automatically applied on this and future approvals."
+                      onChange={(sig) => {
+                        setPendingSignatureData(sig);
+                        if (actionError) setActionError('');
+                      }}
+                    />
+                  </div>
+                )}
+
                 {/* Legal Consent Callout */}
                 <div className="p-3.5 bg-sky-50 border border-sky-200 rounded-[6px]">
                   <p className="text-[12px] text-sky-900 leading-relaxed">
-                    <strong className="font-semibold text-sky-950">Notice:</strong> By clicking &apos;Affix Signature,&apos; you hereby affirm your explicit intention to authenticate and approve this electronic document and the transaction it embodies. This action serves as your legal consent and is equivalent to a physical handwritten signature.
+                    <strong className="font-semibold text-sky-950">Notice:</strong> By confirming approval, you hereby affirm your explicit intention to authenticate and approve this electronic document using your authorized digital signature. This action serves as your legal consent and is equivalent to a physical handwritten signature.
                   </p>
                 </div>
 
@@ -1037,19 +1202,35 @@ function StaffDashboardContent() {
                   <button
                     type="button"
                     onClick={() => setShowApproveModal(false)}
-                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
+                    disabled={actionLoading || savingSignature}
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer disabled:opacity-50"
                   >
                     Cancel
                   </button>
 
-                  <button
-                    type="button"
-                    disabled={actionLoading}
-                    onClick={() => handleAction('APPROVED')}
-                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white shadow-xs disabled:opacity-50 transition-colors cursor-pointer"
-                  >
-                    {actionLoading ? 'Affixing Signature...' : 'Affix Signature'}
-                  </button>
+                  {hasSavedSignature ? (
+                    <button
+                      type="button"
+                      disabled={actionLoading || checkingSignature}
+                      onClick={() => handleAction('APPROVED')}
+                      className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white shadow-xs disabled:opacity-50 transition-colors cursor-pointer"
+                    >
+                      {actionLoading ? 'Affixing Signature...' : 'Approve & Affix Signature'}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={actionLoading || savingSignature || checkingSignature || !pendingSignatureData}
+                      onClick={handleSaveSignatureAndApprove}
+                      className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 bg-[#0F4C2E] hover:bg-[#165E3A] text-white shadow-xs disabled:opacity-50 transition-colors cursor-pointer"
+                    >
+                      {savingSignature
+                        ? 'Saving Signature...'
+                        : actionLoading
+                        ? 'Approving...'
+                        : 'Save Signature & Approve'}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -1080,7 +1261,7 @@ function StaffDashboardContent() {
                   <div className="p-3 bg-rose-50/40 border border-rose-200/70 rounded-[6px] text-[12px] space-y-1">
                     <div className="flex justify-between">
                       <span className="text-[#86868B]">Reference:</span>
-                      <span className="font-mono font-medium text-[#0F4C2E]">{reviewRequest.trackingNumber}</span>
+                      <span className="font-mono font-medium text-[#0F4C2E]">{formatToReference(reviewRequest.trackingNumber)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[#86868B]">Employee:</span>
@@ -1251,7 +1432,7 @@ function StaffDashboardContent() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Stat 1: Total */}
           <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-[#0F4C2E] shadow-xs flex items-center gap-3.5">
-            <div className="w-9 h-9 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+            <div className="flex items-center justify-center shrink-0">
               <svg className="w-5 h-5 text-[#0F4C2E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
@@ -1264,7 +1445,7 @@ function StaffDashboardContent() {
 
           {/* Stat 2: Approved */}
           <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-emerald-500 shadow-xs flex items-center gap-3.5">
-            <div className="w-9 h-9 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+            <div className="flex items-center justify-center shrink-0">
               <svg className="w-5 h-5 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -1277,7 +1458,7 @@ function StaffDashboardContent() {
 
           {/* Stat 3: Pending */}
           <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-amber-500 shadow-xs flex items-center gap-3.5">
-            <div className="w-9 h-9 rounded-[6px] bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
+            <div className="flex items-center justify-center shrink-0">
               <svg className="w-5 h-5 text-amber-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -1290,7 +1471,7 @@ function StaffDashboardContent() {
 
           {/* Stat 4: Ongoing */}
           <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-blue-500 shadow-xs flex items-center gap-3.5">
-            <div className="w-9 h-9 rounded-[6px] bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+            <div className="flex items-center justify-center shrink-0">
               <svg className="w-5 h-5 text-blue-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
@@ -1302,63 +1483,85 @@ function StaffDashboardContent() {
           </div>
         </div>
 
-        {/* 2-Column Grid (2/3 + 1/3) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column (2/3): Recent Approval Activity Table */}
-          <div className="lg:col-span-2 bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden">
-            <div className="px-4 py-3 border-b border-[#E5E5E7] flex items-center justify-between">
-              <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Recent Approval Activity</h3>
+        {/* 2-Column Grid (9/12 + 3/12 on xl desktop so all 6 columns fit cleanly without horizontal scroll) */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          {/* Left Column: Recent Approval Activity Table */}
+          <div className="xl:col-span-9 bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden">
+            <div className="px-4 py-3 border-b border-[#E5E5E7] flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Recent Approval Activity</h3>
+              </div>
               <button
                 onClick={() => router.push('/staff?tab=pending')}
-                className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 text-[#1B4332] hover:bg-[#F2F2F7] transition-colors cursor-pointer"
+                className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 text-[#1B4332] hover:bg-[#F2F2F7] transition-colors cursor-pointer shrink-0"
               >
                 View All
               </button>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+            {/* Desktop Table (no horizontal scroll on standard desktop screens, latest 5 records) */}
+            <div className="hidden md:block">
+              <table className="w-full text-left border-collapse table-fixed">
+                <colgroup>
+                  <col className="w-[22%]" />
+                  <col />
+                  <col className="w-[136px]" />
+                  <col className="w-[104px]" />
+                  <col className="w-[90px]" />
+                  <col className="w-[72px]" />
+                </colgroup>
                 <thead className="bg-[#F5F5F7] border-b border-[#E5E5E7]">
                   <tr>
-                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">PERSONNEL</th>
-                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">DESTINATION & PURPOSE</th>
-                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">TRAVEL DATES</th>
-                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">DATE FILED</th>
-                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">STATUS</th>
-                    <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-right">ACTIONS</th>
+                    <th className="h-9 px-3 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-left">PERSONNEL</th>
+                    <th className="h-9 px-3 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-left">DESTINATION &amp; PURPOSE</th>
+                    <th className="h-9 px-3 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-left whitespace-nowrap">TRAVEL DATES</th>
+                    <th className="h-9 px-3 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-left whitespace-nowrap">DATE FILED</th>
+                    <th className="h-9 px-2.5 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-center whitespace-nowrap">STATUS</th>
+                    <th className="h-9 px-2.5 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-right whitespace-nowrap">ACTIONS</th>
                   </tr>
                 </thead>
                 <tbody>
                   {dashboardActivityRequests.length > 0 ? (
-                    dashboardActivityRequests.map((req, idx) => (
-                      <tr key={req.id || idx} className="h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-[#F2F2F7] transition-colors">
-                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">
-                          <div className="font-medium text-[#1D1D1F]">{req.createdBy?.name || 'Maria Santos'}</div>
-                          {(req.createdBy?.section || req.createdBy?.division) && (
-                            <div className="text-[12px] text-[#86868B]">
-                              {[req.createdBy?.division, req.createdBy?.section].filter(Boolean).join(' • ')}
+                    dashboardActivityRequests.slice(0, 5).map((req, idx) => {
+                      const unitLabel = [req.createdBy?.division, req.createdBy?.section].filter(Boolean).join(' • ');
+                      const compactTravelRange = formatCompactDateRange(req.startDate, req.endDate);
+                      const fullTravelRange = formatDateRangeShort(req.startDate, req.endDate);
+                      return (
+                        <tr key={req.id || idx} className="border-b border-[#E5E5E7] last:border-b-0 hover:bg-[#F2F2F7] transition-colors">
+                          <td className="px-3 py-2.5 text-[13px] text-[#1D1D1F] align-middle text-left">
+                            <div className="font-medium text-[#1D1D1F] truncate" title={req.createdBy?.name || 'Maria Santos'}>
+                              {req.createdBy?.name || 'Maria Santos'}
                             </div>
-                          )}
-                        </td>
-                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left max-w-xs">
-                          <p className="font-medium text-[#1D1D1F] truncate">{req.destination}</p>
-                          <p className="text-[12px] text-[#86868B] truncate">{req.purpose}</p>
-                        </td>
-                        <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">
-                          {formatDateRangeShort(req.startDate, req.endDate)}
-                        </td>
-                        <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">{formatDateDisplay(req.createdAt)}</td>
-                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">{renderStatusBadge(req.status)}</td>
-                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-right">
-                          <button
-                            onClick={() => setReviewRequest(req)}
-                            className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
-                          >
-                            View
-                          </button>
-                        </td>
-                      </tr>
-                    ))
+                            {unitLabel && (
+                              <div className="text-[11px] text-[#86868B] truncate mt-0.5" title={unitLabel}>
+                                {unitLabel}
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-3 py-2.5 text-[13px] text-[#1D1D1F] align-middle text-left">
+                            <p className="font-medium text-[#1D1D1F] truncate" title={req.destination}>{req.destination}</p>
+                            <p className="text-[11.5px] text-[#86868B] truncate mt-0.5" title={req.purpose}>{req.purpose}</p>
+                          </td>
+                          <td className="px-3 py-2.5 text-[12px] text-[#6E6E73] align-middle text-left whitespace-nowrap overflow-hidden text-ellipsis" title={fullTravelRange}>
+                            {compactTravelRange}
+                          </td>
+                          <td className="px-3 py-2.5 text-[12px] text-[#6E6E73] align-middle text-left whitespace-nowrap overflow-hidden text-ellipsis">
+                            {formatDateDisplay(req.createdAt)}
+                          </td>
+                          <td className="px-2.5 py-2.5 text-[12px] text-[#1D1D1F] align-middle text-center">
+                            {renderStatusBadge(req.status)}
+                          </td>
+                          <td className="px-2.5 py-2.5 text-[12px] text-[#1D1D1F] align-middle text-right">
+                            <button
+                              onClick={() => setReviewRequest(req)}
+                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
+                            >
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr className="h-[42px]">
                       <td colSpan={6} className="px-3 py-8 text-center text-[13px] text-[#86868B]">
@@ -1369,10 +1572,50 @@ function StaffDashboardContent() {
                 </tbody>
               </table>
             </div>
+
+            {/* Mobile Card List (< md) */}
+            <div className="md:hidden divide-y divide-[#E5E5E7]">
+              {dashboardActivityRequests.length > 0 ? (
+                dashboardActivityRequests.slice(0, 5).map((req, idx) => {
+                  const unitLabel = [req.createdBy?.division, req.createdBy?.section].filter(Boolean).join(' • ');
+                  return (
+                    <div key={req.id || idx} className="p-3.5 space-y-2.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-[13px] font-semibold text-[#1D1D1F] truncate">{req.createdBy?.name || 'Maria Santos'}</p>
+                          {unitLabel && <p className="text-[11px] text-[#86868B] truncate">{unitLabel}</p>}
+                        </div>
+                        <div className="shrink-0">{renderStatusBadge(req.status)}</div>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[12.5px] font-medium text-[#1D1D1F] truncate" title={req.destination}>{req.destination}</p>
+                        <p className="text-[12px] text-[#86868B] line-clamp-2" title={req.purpose}>{req.purpose}</p>
+                      </div>
+                      <div className="flex items-center justify-between gap-2 pt-1 text-[11.5px] text-[#86868B]">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
+                          <span>Travel: {formatCompactDateRange(req.startDate, req.endDate)}</span>
+                          <span>Filed: {formatDateDisplay(req.createdAt)}</span>
+                        </div>
+                        <button
+                          onClick={() => setReviewRequest(req)}
+                          className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer shrink-0"
+                        >
+                          View
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="px-3 py-8 text-center text-[13px] text-[#86868B]">
+                  No recent approval activity in your unit.
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Right Column (1/3): Approval Workflow SOP Card */}
-          <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden flex flex-col justify-between relative isolate">
+          {/* Right Column: Approval Workflow SOP Card */}
+          <div className="xl:col-span-3 bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden flex flex-col justify-between relative isolate">
             <div>
               <div className="bg-[#F5F5F7] border-b border-[#E5E5E7] px-4 py-3">
                 <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Approval Workflow</h3>
@@ -1439,9 +1682,22 @@ function StaffDashboardContent() {
   /* TAB 2: PENDING APPROVALS VIEW (Strictly Matching PDF Page 2)               */
   /* -------------------------------------------------------------------------- */
   if (currentTab === 'pending') {
+    const pendingQuery = searchQuery.trim().toLowerCase();
+    const filteredPendingRequests = pendingQuery
+      ? pendingRequests.filter((r) =>
+          r.createdBy?.name?.toLowerCase().includes(pendingQuery) ||
+          r.trackingNumber?.toLowerCase().includes(pendingQuery) ||
+          formatToReference(r.trackingNumber).toLowerCase().includes(pendingQuery) ||
+          r.destination?.toLowerCase().includes(pendingQuery) ||
+          r.purpose?.toLowerCase().includes(pendingQuery) ||
+          r.createdBy?.division?.toLowerCase().includes(pendingQuery) ||
+          r.createdBy?.section?.toLowerCase().includes(pendingQuery)
+        )
+      : pendingRequests;
+
     const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.checked) {
-        setSelectedIds(pendingRequests.map((r) => r.id));
+        setSelectedIds(filteredPendingRequests.map((r) => r.id));
       } else {
         setSelectedIds([]);
       }
@@ -1459,13 +1715,13 @@ function StaffDashboardContent() {
           <div>
             <h2 className="text-[22px] font-bold tracking-tight text-[#1D1D1F]">Pending Approvals</h2>
             <p className="text-[13px] text-[#86868B] mt-0.5">
-              Requests requiring your immediate action ({pendingRequests.length})
+              Requests requiring your immediate action ({filteredPendingRequests.length})
             </p>
           </div>
 
           {/* Search & Filter Header Bar */}
           <div className="flex items-center gap-2.5">
-            <div className="relative w-72">
+            <div className="relative w-full sm:w-72">
               <input
                 type="text"
                 placeholder="Search Personnel, ID, Dest..."
@@ -1478,7 +1734,7 @@ function StaffDashboardContent() {
               </svg>
             </div>
 
-            <button className="h-8 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white border border-[#E5E5E7] text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors">
+            <button className="h-8 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white border border-[#E5E5E7] text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors shrink-0">
               <svg className="w-3.5 h-3.5 text-[#86868B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
@@ -1488,75 +1744,95 @@ function StaffDashboardContent() {
 
         {/* Table Container */}
         <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          {/* Desktop Table (>= xl). Fixed widths for date/status/action columns; fluid text columns truncate. */}
+          <div className="hidden xl:block overflow-x-auto">
+            <table className="w-full min-w-[900px] text-left border-collapse table-fixed">
+              <colgroup>
+                <col className="w-[40px]" />
+                <col className="w-[19%]" />
+                <col />
+                <col />
+                <col className="w-[132px]" />
+                <col className="w-[106px]" />
+                <col className="w-[88px]" />
+                <col className="w-[164px] 2xl:w-[240px]" />
+              </colgroup>
               <thead className="bg-emerald-950/[0.04] border-b border-[#E5E5E7]">
                 <tr>
-                  <th className="h-8 px-3 w-10 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">
+                  <th className="h-9 px-3 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-center">
                     <input
                       type="checkbox"
                       onChange={handleSelectAll}
-                      checked={pendingRequests.length > 0 && selectedIds.length === pendingRequests.length}
+                      checked={filteredPendingRequests.length > 0 && selectedIds.length === filteredPendingRequests.length}
                       className="rounded border-[#E5E5E7] text-[#1B4332] focus:ring-[#1B4332]"
+                      aria-label="Select all pending requests"
                     />
                   </th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">PERSONNEL</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">DESTINATION</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left max-w-xs">PURPOSE</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">TRAVEL DATES</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">DATE FILED</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">STATUS</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-right">ACTIONS</th>
+                  <th className="h-9 px-3 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-left whitespace-nowrap">PERSONNEL</th>
+                  <th className="h-9 px-3 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-left whitespace-nowrap">DESTINATION</th>
+                  <th className="h-9 px-3 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-left whitespace-nowrap">PURPOSE</th>
+                  <th className="h-9 px-3 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-left whitespace-nowrap">TRAVEL DATES</th>
+                  <th className="h-9 px-3 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-left whitespace-nowrap">DATE FILED</th>
+                  <th className="h-9 px-3 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-center whitespace-nowrap">STATUS</th>
+                  <th className="h-9 px-3 text-[10.5px] font-semibold uppercase tracking-wider text-[#86868B] text-right whitespace-nowrap">ACTIONS</th>
                 </tr>
               </thead>
               <tbody>
-                {pendingRequests.length > 0 ? (
-                  pendingRequests.map((req, idx) => {
+                {filteredPendingRequests.length > 0 ? (
+                  filteredPendingRequests.map((req, idx) => {
                     const isSelected = selectedIds.includes(req.id);
+                    const displayRef = formatToReference(req.trackingNumber);
+                    const unitLabel = [req.createdBy?.division, req.createdBy?.section].filter(Boolean).join(' • ');
+                    const fullTravelRange = formatDateRangeShort(req.startDate, req.endDate);
 
                     return (
-                      <tr key={req.id || idx} className={`h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors ${isSelected ? 'bg-emerald-50/40' : ''}`}>
-                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">
+                      <tr key={req.id || idx} className={`border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors ${isSelected ? 'bg-emerald-50/40' : ''}`}>
+                        <td className="px-3 py-2.5 text-[13px] text-[#1D1D1F] align-middle text-center">
                           <input
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => handleToggleSelect(req.id)}
                             className="rounded border-[#E5E5E7] text-[#1B4332] focus:ring-[#1B4332]"
+                            aria-label={`Select ${displayRef}`}
                           />
                         </td>
-                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">
-                          <div className="font-medium text-[#1D1D1F]">{req.createdBy?.name || 'Maria Santos'}</div>
-                          <div className="text-[12px] text-[#86868B] font-mono">{req.trackingNumber}</div>
-                          {(req.createdBy?.section || req.createdBy?.division) && (
-                            <div className="mt-1 flex flex-wrap gap-1">
-                              {req.createdBy?.division && (
-                                <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-[#F5F5F7] text-[#86868B] border border-[#E5E5E7]">
-                                  {req.createdBy.division}
-                                </span>
-                              )}
-                              {req.createdBy?.section && (
-                                <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                  {req.createdBy.section}
-                                </span>
-                              )}
+                        <td className="px-3 py-2.5 text-[13px] text-[#1D1D1F] align-middle text-left">
+                          <div className="font-medium text-[#1D1D1F] truncate leading-snug" title={req.createdBy?.name || 'Maria Santos'}>
+                            {req.createdBy?.name || 'Maria Santos'}
+                          </div>
+                          <div className="text-[11px] font-mono text-[#86868B] truncate mt-0.5" title={displayRef}>
+                            {displayRef}
+                          </div>
+                          {unitLabel && (
+                            <div className="text-[11px] text-emerald-700 truncate mt-0.5" title={unitLabel}>
+                              {unitLabel}
                             </div>
                           )}
                         </td>
-                        <td className="px-3 py-1.5 text-[13px] font-medium text-[#1D1D1F] align-middle text-left">{req.destination}</td>
-                        <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left max-w-xs leading-relaxed">{req.purpose}</td>
-                        <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">
-                          {formatDateRangeShort(req.startDate, req.endDate)}
+                        <td className="px-3 py-2.5 text-[12.5px] font-medium text-[#1D1D1F] align-middle text-left">
+                          <span className="line-clamp-2 break-words leading-snug" title={req.destination}>{req.destination}</span>
                         </td>
-                        <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">{formatDateDisplay(req.createdAt)}</td>
-                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">{renderStatusBadge(req.status)}</td>
-                        <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-right whitespace-nowrap">
-                          <div className="inline-flex items-center justify-end gap-1.5">
+                        <td className="px-3 py-2.5 text-[12.5px] text-[#6E6E73] align-middle text-left">
+                          <span className="line-clamp-2 break-words leading-snug" title={req.purpose}>{req.purpose}</span>
+                        </td>
+                        <td
+                          className="px-3 py-2.5 text-[12px] text-[#6E6E73] align-middle text-left whitespace-nowrap overflow-hidden text-ellipsis"
+                          title={fullTravelRange}
+                        >
+                          {formatCompactDateRange(req.startDate, req.endDate)}
+                        </td>
+                        <td className="px-3 py-2.5 text-[12px] text-[#6E6E73] align-middle text-left whitespace-nowrap overflow-hidden text-ellipsis">
+                          {formatDateDisplay(req.createdAt)}
+                        </td>
+                        <td className="px-3 py-2.5 text-[12px] text-[#1D1D1F] align-middle text-center">
+                          {renderStatusBadge(req.status)}
+                        </td>
+                        <td className="px-3 py-2.5 text-[12px] text-[#1D1D1F] align-middle text-right">
+                          {/* 2x grid on standard desktops (Approve | Disapprove, View Docs below); single row on wide screens */}
+                          <div className="ml-auto grid grid-cols-2 gap-1 w-fit 2xl:flex 2xl:items-center 2xl:justify-end">
                             <button
-                              onClick={() => {
-                                setReviewRequest(req);
-                                setShowApproveModal(true);
-                              }}
-                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-[#1B4332] hover:bg-[#143225] text-white transition-colors cursor-pointer"
+                              onClick={() => openApproveModal(req)}
+                              className="h-7 px-2 text-[11.5px] font-medium rounded-[6px] inline-flex items-center justify-center whitespace-nowrap bg-[#1B4332] hover:bg-[#143225] text-white transition-colors cursor-pointer"
                             >
                               Approve
                             </button>
@@ -1568,19 +1844,16 @@ function StaffDashboardContent() {
                                 setActionError('');
                                 setShowRejectModal(true);
                               }}
-                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition-colors cursor-pointer"
+                              className="h-7 px-2 text-[11.5px] font-medium rounded-[6px] inline-flex items-center justify-center whitespace-nowrap bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition-colors cursor-pointer"
                             >
                               Disapprove
                             </button>
 
                             <button
                               onClick={() => setReviewRequest(req)}
-                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
+                              className="col-span-2 h-7 px-2 text-[11.5px] font-medium rounded-[6px] inline-flex items-center justify-center whitespace-nowrap bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
                             >
-                              <svg className="w-3.5 h-3.5 text-[#86868B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                              </svg>
-                              <span>View Docs</span>
+                              View Docs
                             </button>
                           </div>
                         </td>
@@ -1596,6 +1869,98 @@ function StaffDashboardContent() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile & Tablet Card List (< xl) */}
+          <div className="xl:hidden divide-y divide-[#E5E5E7]">
+            {filteredPendingRequests.length > 0 ? (
+              filteredPendingRequests.map((req, idx) => {
+                const isSelected = selectedIds.includes(req.id);
+                return (
+                  <div
+                    key={req.id || idx}
+                    className={`p-4 space-y-3 transition-colors ${isSelected ? 'bg-emerald-50/40' : ''}`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-2.5 min-w-0">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleToggleSelect(req.id)}
+                          className="rounded border-[#E5E5E7] text-[#1B4332] focus:ring-[#1B4332] mt-1 shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <div className="text-[13.5px] font-semibold text-[#1D1D1F] truncate">
+                            {req.createdBy?.name || 'Maria Santos'}
+                          </div>
+                          <div className="text-[11px] font-mono text-[#86868B] truncate">
+                            {formatToReference(req.trackingNumber)}
+                          </div>
+                          {(req.createdBy?.division || req.createdBy?.section) && (
+                            <div className="mt-1.5 flex flex-wrap gap-1">
+                              {req.createdBy?.division && (
+                                <span className="inline-block max-w-full px-1.5 py-0.5 text-[10px] font-medium leading-tight rounded-[4px] bg-[#F5F5F7] text-[#6E6E73] border border-[#E5E5E7] truncate">
+                                  {req.createdBy.division}
+                                </span>
+                              )}
+                              {req.createdBy?.section && (
+                                <span className="inline-block max-w-full px-1.5 py-0.5 text-[10px] font-medium leading-tight rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200 truncate">
+                                  {req.createdBy.section}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="shrink-0">{renderStatusBadge(req.status)}</div>
+                    </div>
+
+                    <div className="pl-6 space-y-1">
+                      <p className="text-[12.5px] font-medium text-[#1D1D1F]" title={req.destination}>
+                        {req.destination}
+                      </p>
+                      <p className="text-[12px] text-[#6E6E73] line-clamp-2" title={req.purpose}>
+                        {req.purpose}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-[11.5px] text-[#86868B]">
+                        <span>Travel Dates: {formatCompactDateRange(req.startDate, req.endDate)}</span>
+                        <span>Filed: {formatDateDisplay(req.createdAt)}</span>
+                      </div>
+                    </div>
+
+                    <div className="pl-6 flex flex-wrap items-center gap-2 pt-1">
+                      <button
+                        onClick={() => openApproveModal(req)}
+                        className="h-7 px-3 text-xs font-medium rounded-[6px] inline-flex items-center justify-center bg-[#1B4332] hover:bg-[#143225] text-white transition-colors cursor-pointer"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => {
+                          setReviewRequest(req);
+                          setRemarks('');
+                          setActionError('');
+                          setShowRejectModal(true);
+                        }}
+                        className="h-7 px-3 text-xs font-medium rounded-[6px] inline-flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition-colors cursor-pointer"
+                      >
+                        Disapprove
+                      </button>
+                      <button
+                        onClick={() => setReviewRequest(req)}
+                        className="h-7 px-3 text-xs font-medium rounded-[6px] inline-flex items-center justify-center bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
+                      >
+                        View Docs
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="px-3 py-8 text-center text-[13px] text-[#86868B]">
+                No pending requests requiring your action.
+              </div>
+            )}
           </div>
         </div>
 
@@ -1724,7 +2089,7 @@ function StaffDashboardContent() {
           <div className="relative flex-1 w-full">
             <input
               type="text"
-              placeholder="Search by Employee Name or TA Number..."
+              placeholder="Search by Employee Name or TO Number..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-8 pl-8 pr-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
@@ -1901,67 +2266,106 @@ function StaffDashboardContent() {
 
         {/* History Table */}
         <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          {/* Desktop & Tablet Table (>= md, fits all 9 columns on 1280px+ without horizontal scroll) */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full min-w-[940px] text-left border-collapse table-fixed">
+              <colgroup>
+                <col className="w-[148px]" />
+                <col className="w-[14%]" />
+                <col className="w-[12%]" />
+                <col />
+                <col className="w-[118px]" />
+                <col className="w-[92px]" />
+                <col className="w-[86px]" />
+                <col className="w-[94px]" />
+                <col className="w-[66px]" />
+              </colgroup>
               <thead className="bg-emerald-950/[0.04] border-b border-[#E5E5E7]">
                 <tr>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">TA NUMBER</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">PERSONNEL</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">DESTINATION</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left max-w-xs">PURPOSE</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">TRAVEL DATES</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">DATE FILED</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">STATUS</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">ACTION DATE</th>
-                  <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-right">ACTIONS</th>
+                  <th className="h-9 px-2 text-[10.5px] font-semibold uppercase tracking-wide text-[#86868B] whitespace-nowrap text-left">TO NUMBER</th>
+                  <th className="h-9 px-2 text-[10.5px] font-semibold uppercase tracking-wide text-[#86868B] whitespace-nowrap text-left">PERSONNEL</th>
+                  <th className="h-9 px-2 text-[10.5px] font-semibold uppercase tracking-wide text-[#86868B] whitespace-nowrap text-left">DESTINATION</th>
+                  <th className="h-9 px-2 text-[10.5px] font-semibold uppercase tracking-wide text-[#86868B] whitespace-nowrap text-left">PURPOSE</th>
+                  <th className="h-9 px-2 text-[10.5px] font-semibold uppercase tracking-wide text-[#86868B] whitespace-nowrap text-left">TRAVEL DATES</th>
+                  <th className="h-9 px-2 text-[10.5px] font-semibold uppercase tracking-wide text-[#86868B] whitespace-nowrap text-left">DATE FILED</th>
+                  <th className="h-9 px-1.5 text-[10.5px] font-semibold uppercase tracking-wide text-[#86868B] whitespace-nowrap text-center">STATUS</th>
+                  <th className="h-9 px-2 text-[10.5px] font-semibold uppercase tracking-wide text-[#86868B] whitespace-nowrap text-left">ACTION DATE</th>
+                  <th className="h-9 px-2 text-[10.5px] font-semibold uppercase tracking-wide text-[#86868B] whitespace-nowrap text-right">ACTIONS</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredRequests.length > 0 ? (
-                  filteredRequests.map((req, idx) => (
-                    <tr key={req.id || idx} className="h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors">
-                      <td className="px-3 py-1.5 text-[13px] font-mono font-medium text-[#1B4332] align-middle text-left whitespace-nowrap">
-                        <span className="px-2 py-0.5 rounded-[4px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200/80 font-mono text-[12px] font-semibold">
-                          {req.trackingNumber}
-                        </span>
-                      </td>
-                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">
-                        <div className="font-medium text-[#1D1D1F]">{req.createdBy?.name || 'Maria Santos'}</div>
-                        <div className="text-[12px] text-[#86868B]">{req.createdBy?.section || 'Conservation and Develop...'}</div>
-                      </td>
-                      <td className="px-3 py-1.5 text-[13px] font-medium text-[#1D1D1F] align-middle text-left">{req.destination}</td>
-                      <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left max-w-xs truncate">{req.purpose}</td>
-                      <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">
-                        {formatDateRangeShort(req.startDate, req.endDate)}
-                      </td>
-                      <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">{formatDateDisplay(req.createdAt)}</td>
-                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">{renderStatusBadge(req.status)}</td>
-                      <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">
-                        {(() => {
-                          const stepRoleMap: Record<string, number> = {
-                            SECTION_CHIEF: 1,
-                            DIVISION_CHIEF: 2,
-                            HEAD_PENRO: 3,
-                          };
-                          const myStepNum = stepRoleMap[userRole];
-                          const myStep = req.approvalSteps?.find((s: any) => s.order === myStepNum);
-                          if (myStep?.actionDate && myStep?.action !== 'PENDING') {
-                            return formatDateDisplay(myStep.actionDate);
-                          }
-                          if (req.status === 'APPROVED') return formatDateDisplay(req.updatedAt || req.createdAt);
-                          return '-';
-                        })()}
-                      </td>
-                      <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-right">
-                        <button
-                          onClick={() => setReviewRequest(req)}
-                          className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
-                        >
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                  ))
+                  filteredRequests.map((req, idx) => {
+                    const displayRef = formatToReference(req.trackingNumber);
+                    const unitSubtext = [req.createdBy?.division, req.createdBy?.section].filter(Boolean).join(' • ') || 'Conservation and Development Section';
+                    const compactTravelRange = formatCompactDateRange(req.startDate, req.endDate);
+                    const fullTravelRange = formatDateRangeShort(req.startDate, req.endDate);
+                    const actionDateDisplay = (() => {
+                      const stepRoleMap: Record<string, number> = {
+                        SECTION_CHIEF: 1,
+                        DIVISION_CHIEF: 2,
+                        HEAD_PENRO: 3,
+                      };
+                      const myStepNum = stepRoleMap[userRole];
+                      const myStep = req.approvalSteps?.find((s: any) => s.order === myStepNum);
+                      if (myStep?.actionDate && myStep?.action !== 'PENDING') {
+                        return formatDateDisplay(myStep.actionDate);
+                      }
+                      if (req.status === 'APPROVED') return formatDateDisplay(req.updatedAt || req.createdAt);
+                      return '-';
+                    })();
+
+                    return (
+                      <tr key={req.id || idx} className="border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors">
+                        <td className="px-2 py-2.5 text-[12px] font-mono font-medium text-[#1B4332] align-middle text-left whitespace-nowrap">
+                          <span
+                            title={displayRef}
+                            className="inline-block max-w-full px-1.5 py-0.5 rounded-[4px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200/80 font-mono text-[11px] font-semibold truncate"
+                          >
+                            {displayRef}
+                          </span>
+                        </td>
+                        <td className="px-2 py-2.5 text-[12.5px] text-[#1D1D1F] align-middle text-left">
+                          <div className="font-medium text-[#1D1D1F] truncate leading-snug" title={req.createdBy?.name || 'Maria Santos'}>
+                            {req.createdBy?.name || 'Maria Santos'}
+                          </div>
+                          <div className="text-[11px] text-[#86868B] truncate mt-0.5 leading-snug" title={unitSubtext}>
+                            {unitSubtext}
+                          </div>
+                        </td>
+                        <td className="px-2 py-2.5 text-[12.5px] font-medium text-[#1D1D1F] align-middle text-left">
+                          <div className="truncate" title={req.destination}>
+                            {req.destination}
+                          </div>
+                        </td>
+                        <td className="px-2 py-2.5 text-[12.5px] text-[#6E6E73] align-middle text-left">
+                          <div className="truncate" title={req.purpose}>
+                            {req.purpose}
+                          </div>
+                        </td>
+                        <td className="px-2 py-2.5 text-[12px] text-[#6E6E73] align-middle text-left whitespace-nowrap overflow-hidden text-ellipsis" title={fullTravelRange}>
+                          {compactTravelRange}
+                        </td>
+                        <td className="px-2 py-2.5 text-[12px] text-[#6E6E73] align-middle text-left whitespace-nowrap overflow-hidden text-ellipsis">
+                          {formatDateDisplay(req.createdAt)}
+                        </td>
+                        <td className="px-1.5 py-2.5 text-[12px] text-[#1D1D1F] align-middle text-center">
+                          {renderStatusBadge(req.status)}
+                        </td>
+                        <td className="px-2 py-2.5 text-[12px] text-[#6E6E73] align-middle text-left whitespace-nowrap overflow-hidden text-ellipsis">
+                          {actionDateDisplay}
+                        </td>
+                        <td className="px-2 py-2.5 text-[12px] text-[#1D1D1F] align-middle text-right">
+                          <button
+                            onClick={() => setReviewRequest(req)}
+                            className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer"
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr className="h-[42px]">
                     <td colSpan={9} className="px-3 py-8 text-center text-[13px] text-[#86868B]">
@@ -1971,6 +2375,66 @@ function StaffDashboardContent() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card List (< md) */}
+          <div className="md:hidden divide-y divide-[#E5E5E7]">
+            {filteredRequests.length > 0 ? (
+              filteredRequests.map((req, idx) => {
+                const displayRef = formatToReference(req.trackingNumber);
+                const unitSubtext = [req.createdBy?.division, req.createdBy?.section].filter(Boolean).join(' • ');
+                const actionDateDisplay = (() => {
+                  const stepRoleMap: Record<string, number> = {
+                    SECTION_CHIEF: 1,
+                    DIVISION_CHIEF: 2,
+                    HEAD_PENRO: 3,
+                  };
+                  const myStepNum = stepRoleMap[userRole];
+                  const myStep = req.approvalSteps?.find((s: any) => s.order === myStepNum);
+                  if (myStep?.actionDate && myStep?.action !== 'PENDING') {
+                    return formatDateDisplay(myStep.actionDate);
+                  }
+                  if (req.status === 'APPROVED') return formatDateDisplay(req.updatedAt || req.createdAt);
+                  return '-';
+                })();
+
+                return (
+                  <div key={req.id || idx} className="p-3.5 space-y-2.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="px-2 py-0.5 rounded-[4px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200/80 font-mono text-[11px] font-semibold">
+                        {displayRef}
+                      </span>
+                      <div className="shrink-0">{renderStatusBadge(req.status)}</div>
+                    </div>
+                    <div>
+                      <p className="text-[13px] font-semibold text-[#1D1D1F] truncate">{req.createdBy?.name || 'Maria Santos'}</p>
+                      {unitSubtext && <p className="text-[11px] text-[#86868B] truncate">{unitSubtext}</p>}
+                    </div>
+                    <div className="space-y-0.5">
+                      <p className="text-[12.5px] font-medium text-[#1D1D1F] truncate" title={req.destination}>{req.destination}</p>
+                      <p className="text-[12px] text-[#6E6E73] line-clamp-2" title={req.purpose}>{req.purpose}</p>
+                    </div>
+                    <div className="flex items-center justify-between gap-2 pt-1 text-[11.5px] text-[#86868B]">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
+                        <span>Travel: {formatCompactDateRange(req.startDate, req.endDate)}</span>
+                        <span>Filed: {formatDateDisplay(req.createdAt)}</span>
+                        <span>Action: {actionDateDisplay}</span>
+                      </div>
+                      <button
+                        onClick={() => setReviewRequest(req)}
+                        className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5E7] transition-colors cursor-pointer shrink-0"
+                      >
+                        View
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="px-3 py-8 text-center text-[13px] text-[#86868B]">
+                No travel order records found matching your filters.
+              </div>
+            )}
           </div>
         </div>
       </div>

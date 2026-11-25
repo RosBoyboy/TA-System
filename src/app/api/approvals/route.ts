@@ -154,6 +154,44 @@ export async function POST(req: Request) {
     }
 
     if (action === 'APPROVED') {
+      // Verify the approver has an authorized digital signature configured before allowing approval
+      let approverSignatureUrl: string | null = null;
+      if (usePrisma) {
+        try {
+          const approverUser = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { signatureUrl: true },
+          });
+          approverSignatureUrl = approverUser?.signatureUrl || null;
+        } catch (sigErr) {
+          console.warn('[Approvals API] Prisma signature lookup error, falling back to Supabase...', sigErr);
+        }
+      }
+
+      if (!approverSignatureUrl && supabaseUrl && supabaseKey) {
+        try {
+          const { data: sbApprover } = await supabase
+            .from('User')
+            .select('signatureUrl')
+            .eq('id', userId)
+            .maybeSingle();
+          approverSignatureUrl = sbApprover?.signatureUrl || null;
+        } catch (sbSigErr) {
+          console.warn('[Approvals API] Supabase signature lookup error:', sbSigErr);
+        }
+      }
+
+      if (!approverSignatureUrl || !String(approverSignatureUrl).trim()) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              'SIGNATURE_REQUIRED: No authorized digital signature is configured on your account. Please set up your official signature before completing approval.',
+          },
+          { status: 400 }
+        );
+      }
+
       let nextStatus = request.status;
       let notificationMsg = '';
       const cleanRemarks = remarks ? remarks.trim() : '';
@@ -371,6 +409,7 @@ export async function POST(req: Request) {
                 previousStatus: request.status,
                 newStatus: nextStatus,
                 remarks: cleanRemarks || null,
+                signatureApplied: true,
               },
             })
           );

@@ -557,7 +557,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
       switch (currentTab) {
         case 'pending': return 'Pending Approvals';
         case 'history': return 'Approval History';
-        case 'review': return 'Review TA Request';
+        case 'review': return 'Review TO Request';
         case 'notifications': return 'Notification Center';
         default: return 'Dashboard';
       }

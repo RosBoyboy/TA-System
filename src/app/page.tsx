@@ -353,7 +353,7 @@ export default function LandingPage() {
       <section className="pt-6 pb-14 px-6 sm:px-10 lg:px-12 max-w-[1400px] mx-auto w-full">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div className="bg-white p-8 rounded-2xl border border-[#DDE5DD] shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
-            <div className="w-13 h-13 rounded-full bg-[#1B5E20]/10 text-[#1B5E20] flex items-center justify-center mx-auto mb-4">
+            <div className="text-[#1B5E20] flex items-center justify-center mx-auto mb-4">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3Z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" />
@@ -365,7 +365,7 @@ export default function LandingPage() {
           </div>
 
           <div className="bg-white p-8 rounded-2xl border border-[#DDE5DD] shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
-            <div className="w-13 h-13 rounded-full bg-[#1B5E20]/10 text-[#1B5E20] flex items-center justify-center mx-auto mb-4">
+            <div className="text-[#1B5E20] flex items-center justify-center mx-auto mb-4">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <circle cx="9" cy="8" r="3" strokeWidth={2} />
                 <path strokeLinecap="round" strokeWidth={2} d="M3.5 20c0-3.5 2.7-6 5.5-6s5.5 2.5 5.5 6" />
@@ -378,7 +378,7 @@ export default function LandingPage() {
           </div>
 
           <div className="bg-white p-8 rounded-2xl border border-[#DDE5DD] shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
-            <div className="w-13 h-13 rounded-full bg-[#1B5E20]/10 text-[#1B5E20] flex items-center justify-center mx-auto mb-4">
+            <div className="text-[#1B5E20] flex items-center justify-center mx-auto mb-4">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.73 21a2 2 0 01-3.46 0" />
@@ -390,7 +390,7 @@ export default function LandingPage() {
           </div>
 
           <div className="bg-white p-8 rounded-2xl border border-[#DDE5DD] shadow-sm hover:shadow-md transition-all hover:-translate-y-1">
-            <div className="w-13 h-13 rounded-full bg-[#1B5E20]/10 text-[#1B5E20] flex items-center justify-center mx-auto mb-4">
+            <div className="text-[#1B5E20] flex items-center justify-center mx-auto mb-4">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <rect x="3" y="3" width="7" height="7" rx="1" strokeWidth={2} />
                 <rect x="14" y="3" width="7" height="7" rx="1" strokeWidth={2} />
@@ -421,7 +421,7 @@ export default function LandingPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <article className="bg-white p-8 rounded-2xl border border-[#DDE5DD] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#1B5E20]/10 text-[#1B5E20] flex items-center justify-center mb-5">
+            <div className="text-[#1B5E20] flex items-center justify-center mb-5">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1Z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 3v5h5" />
@@ -434,7 +434,7 @@ export default function LandingPage() {
           </article>
 
           <article className="bg-white p-8 rounded-2xl border border-[#DDE5DD] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#1B5E20]/10 text-[#1B5E20] flex items-center justify-center mb-5">
+            <div className="text-[#1B5E20] flex items-center justify-center mb-5">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3Z" />
               </svg>
@@ -446,7 +446,7 @@ export default function LandingPage() {
           </article>
 
           <article className="bg-white p-8 rounded-2xl border border-[#DDE5DD] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#1B5E20]/10 text-[#1B5E20] flex items-center justify-center mb-5">
+            <div className="text-[#1B5E20] flex items-center justify-center mb-5">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
@@ -458,7 +458,7 @@ export default function LandingPage() {
           </article>
 
           <article className="bg-white p-8 rounded-2xl border border-[#DDE5DD] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#1B5E20]/10 text-[#1B5E20] flex items-center justify-center mb-5">
+            <div className="text-[#1B5E20] flex items-center justify-center mb-5">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
               </svg>
@@ -470,7 +470,7 @@ export default function LandingPage() {
           </article>
 
           <article className="bg-white p-8 rounded-2xl border border-[#DDE5DD] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#1B5E20]/10 text-[#1B5E20] flex items-center justify-center mb-5">
+            <div className="text-[#1B5E20] flex items-center justify-center mb-5">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               </svg>
@@ -482,7 +482,7 @@ export default function LandingPage() {
           </article>
 
           <article className="bg-white p-8 rounded-2xl border border-[#DDE5DD] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
-            <div className="w-12 h-12 rounded-xl bg-[#1B5E20]/10 text-[#1B5E20] flex items-center justify-center mb-5">
+            <div className="text-[#1B5E20] flex items-center justify-center mb-5">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
               </svg>
@@ -512,7 +512,7 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-center relative">
           {/* Step 1 */}
           <div className="space-y-3">
-            <div className="w-14 h-14 rounded-full bg-[#1B5E20] text-white flex items-center justify-center mx-auto text-xl font-black shadow-lg ring-8 ring-[#1B5E20]/10">
+            <div className="w-14 h-14 rounded-full bg-[#1B5E20] text-white flex items-center justify-center mx-auto text-xl font-black">
               1
             </div>
             <h3 className="text-base font-bold text-[#1E293B]">Submit Request</h3>
@@ -521,7 +521,7 @@ export default function LandingPage() {
 
           {/* Step 2 */}
           <div className="space-y-3">
-            <div className="w-14 h-14 rounded-full bg-[#1B5E20] text-white flex items-center justify-center mx-auto text-xl font-black shadow-lg ring-8 ring-[#1B5E20]/10">
+            <div className="w-14 h-14 rounded-full bg-[#1B5E20] text-white flex items-center justify-center mx-auto text-xl font-black">
               2
             </div>
             <h3 className="text-base font-bold text-[#1E293B]">Staff Reviews</h3>
@@ -530,7 +530,7 @@ export default function LandingPage() {
 
           {/* Step 3 */}
           <div className="space-y-3">
-            <div className="w-14 h-14 rounded-full bg-[#1B5E20] text-white flex items-center justify-center mx-auto text-xl font-black shadow-lg ring-8 ring-[#1B5E20]/10">
+            <div className="w-14 h-14 rounded-full bg-[#1B5E20] text-white flex items-center justify-center mx-auto text-xl font-black">
               3
             </div>
             <h3 className="text-base font-bold text-[#1E293B]">Manager Approves</h3>
@@ -539,7 +539,7 @@ export default function LandingPage() {
 
           {/* Step 4 */}
           <div className="space-y-3">
-            <div className="w-14 h-14 rounded-full bg-[#1B5E20] text-white flex items-center justify-center mx-auto text-xl font-black shadow-lg ring-8 ring-[#1B5E20]/10">
+            <div className="w-14 h-14 rounded-full bg-[#1B5E20] text-white flex items-center justify-center mx-auto text-xl font-black">
               4
             </div>
             <h3 className="text-base font-bold text-[#1E293B]">Receive Order</h3>
@@ -589,15 +589,15 @@ export default function LandingPage() {
 
             <ul className="space-y-2.5 pt-2 text-sm font-semibold text-[#1E293B]">
               <li className="flex items-center gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-[#1B5E20]/10 text-[#1B5E20] flex items-center justify-center text-xs shrink-0">✓</span>
+                <span className="text-[#1B5E20] flex items-center justify-center text-xs shrink-0">✓</span>
                 <span>End-to-end encrypted data handling</span>
               </li>
               <li className="flex items-center gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-[#1B5E20]/10 text-[#1B5E20] flex items-center justify-center text-xs shrink-0">✓</span>
+                <span className="text-[#1B5E20] flex items-center justify-center text-xs shrink-0">✓</span>
                 <span>Role-based access control</span>
               </li>
               <li className="flex items-center gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-[#1B5E20]/10 text-[#1B5E20] flex items-center justify-center text-xs shrink-0">✓</span>
+                <span className="text-[#1B5E20] flex items-center justify-center text-xs shrink-0">✓</span>
                 <span>Full audit trail on every request</span>
               </li>
             </ul>
