@@ -12,7 +12,7 @@ import {
   isTravelOverlappingPeriod,
   parseUtcDate,
 } from '@/lib/date';
-import { exportApprovalHistoryToCSV, printApprovalHistoryReport } from '@/utils/export';
+import { exportApprovalHistoryToCSV, printApprovalHistoryReport, downloadThesisDataCSV } from '@/utils/export';
 
 interface ApprovalStepItem {
   id: string;
@@ -975,7 +975,41 @@ function AdminPortalContent() {
                       </svg>
                       <div>
                         <div className="font-semibold text-[#1D1D1F] text-[13px]">Export to CSV / Excel</div>
-                        <div className="text-[11px] text-[#86868B]">Download spreadsheet file</div>
+                        <div className="text-[11px] text-[#86868B]">Download full filtered records</div>
+                      </div>
+                    </button>
+                    <div className="my-1 border-t border-emerald-100" />
+                    <div className="px-3 py-1 text-[11px] font-semibold text-emerald-800 uppercase tracking-wider">
+                      Thesis UAT Data Collection
+                    </div>
+                    <button
+                      onClick={() => {
+                        setShowExportMenu(false);
+                        downloadThesisDataCSV('approvals');
+                      }}
+                      className="w-full px-3 py-2 text-left rounded-[6px] hover:bg-emerald-50 text-[#1D1D1F] hover:text-[#1B4332] flex items-center gap-2.5 transition-colors cursor-pointer"
+                    >
+                      <svg className="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div>
+                        <div className="font-semibold text-[#1D1D1F] text-[13px]">Thesis: Approval Response Times</div>
+                        <div className="text-[11px] text-[#86868B]">Request ID, Submitted At, Approved At (CSV)</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowExportMenu(false);
+                        downloadThesisDataCSV('notifications');
+                      }}
+                      className="w-full px-3 py-2 text-left rounded-[6px] hover:bg-emerald-50 text-[#1D1D1F] hover:text-[#1B4332] flex items-center gap-2.5 transition-colors cursor-pointer"
+                    >
+                      <svg className="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                      </svg>
+                      <div>
+                        <div className="font-semibold text-[#1D1D1F] text-[13px]">Thesis: Notification Delivery Log</div>
+                        <div className="text-[11px] text-[#86868B]">Request ID, Type, Sent At, Delivered At (CSV)</div>
                       </div>
                     </button>
                   </div>

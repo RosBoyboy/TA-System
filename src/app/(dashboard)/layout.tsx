@@ -219,7 +219,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     const targetHref = pathname.startsWith('/staff')
       ? '/staff?tab=notifications'
       : pathname.startsWith('/account-manager')
-      ? '/account-manager?tab=dashboard'
+      ? (item.requestId ? '/account-manager?tab=requests' : '/account-manager?tab=dashboard')
       : pathname.startsWith('/admin')
       ? '/admin?tab=home'
       : '/employee?tab=notifications';
@@ -392,7 +392,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     },
     {
       id: 'requests',
-      href: '/employee?tab=requests',
+      href: '/account-manager?tab=requests',
       label: 'My Requests',
       icon: (
         <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,7 +402,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     },
     {
       id: 'schedule',
-      href: '/employee?tab=schedule',
+      href: '/account-manager?tab=schedule',
       label: 'Travel Dates',
       icon: (
         <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -572,7 +572,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         case 'create-travel':
         case 'create': return 'Create Travel Order';
         case 'requests': return 'My Requests';
-        case 'schedule': return 'Travel Dates';
+        case 'schedule':
+        case 'travel-dates': return 'Travel Dates';
         default: return 'Dashboard';
       }
     }

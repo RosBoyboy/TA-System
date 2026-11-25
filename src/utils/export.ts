@@ -395,3 +395,17 @@ export function printApprovalHistoryReport({
   printWindow.document.write(html);
   printWindow.document.close();
 }
+
+/**
+ * Downloads official Thesis UAT Data Collection CSV from the server API.
+ * Guarantees full database records, exact 3 or 4 columns, and ISO timestamps (+08:00).
+ */
+export function downloadThesisDataCSV(type: 'approvals' | 'notifications') {
+  const link = document.createElement('a');
+  link.href = `/api/admin/thesis-data?type=${type}&format=csv`;
+  link.setAttribute('download', '');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+

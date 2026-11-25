@@ -222,43 +222,65 @@ export async function notifyUser({
     }
 
     // 2. Create in-app notification in DB (unless skipDbInsert is true)
+    const nowTime = new Date();
+    const notifType = channel === 'SMS' ? 'SMS' : channel === 'EMAIL' ? 'Email' : 'In-App';
+
     if (!skipDbInsert) {
       try {
-      const dbChannel = channel === 'EMAIL' ? 'IN_APP' : channel;
-      notification = await prisma.notification.create({
-        data: {
-          userId,
-          requestId: requestId || null,
-          title,
-          message,
-          channel: dbChannel as any,
-          smsStatus: channel === 'IN_APP' ? 'SENT' : 'PENDING',
-        },
-      });
-    } catch (prismaErr) {
-      console.warn('[notifyUser] Prisma notification create fallback to Supabase...', prismaErr);
-      if (supabaseUrl && supabaseKey) {
-        const notifId = 'notif_' + Math.random().toString(36).substring(2, 11);
         const dbChannel = channel === 'EMAIL' ? 'IN_APP' : channel;
-        const { data: sbNotif } = await supabase
-          .from('Notification')
-          .insert({
+        notification = await prisma.notification.create({
+          data: {
+            userId,
+            requestId: requestId || null,
+            request_id: requestId || null,
+            type: notifType,
+            sent_at: nowTime,
+            delivered_at: nowTime,
+            title,
+            message,
+            channel: dbChannel as any,
+            smsStatus: channel === 'IN_APP' ? 'SENT' : 'PENDING',
+          },
+        });
+      } catch (prismaErr) {
+        console.warn('[notifyUser] Prisma notification create fallback to Supabase...', prismaErr);
+        if (supabaseUrl && supabaseKey) {
+          const notifId = 'notif_' + Math.random().toString(36).substring(2, 11);
+          const dbChannel = channel === 'EMAIL' ? 'IN_APP' : channel;
+          const notifPayload: any = {
             id: notifId,
             userId,
             requestId: requestId || null,
+            request_id: requestId || null,
+            type: notifType,
+            sent_at: nowTime.toISOString(),
+            delivered_at: nowTime.toISOString(),
             title,
             message,
             channel: dbChannel,
             smsStatus: channel === 'IN_APP' ? 'SENT' : 'PENDING',
             isRead: false,
-            createdAt: new Date().toISOString(),
-          })
-          .select('*')
-          .single();
+            createdAt: nowTime.toISOString(),
+          };
 
-        notification = sbNotif || { id: notifId, userId, title, message, createdAt: new Date().toISOString() };
+          let { data: sbNotif, error: sbErr } = await supabase
+            .from('Notification')
+            .insert(notifPayload)
+            .select('*')
+            .single();
+
+          if (sbErr && sbErr.code === '42703') {
+            delete notifPayload.request_id;
+            delete notifPayload.type;
+            delete notifPayload.sent_at;
+            delete notifPayload.delivered_at;
+            const retry = await supabase.from('Notification').insert(notifPayload).select('*').single();
+            sbNotif = retry.data;
+          }
+
+          notification = sbNotif || { id: notifId, userId, title, message, createdAt: nowTime.toISOString() };
+        }
       }
-    }
     }
 
     // Fast-path: If purely in-app notification, return immediately without performing external network calls
@@ -269,24 +291,75 @@ export async function notifyUser({
     // 3. Fire SMS if channel includes SMS/BOTH and phone is available
     if ((channel === 'SMS' || channel === 'BOTH') && phoneNumber) {
       try {
+        const smsSentTime = new Date();
         const smsSuccess = await sendSms({
           to: phoneNumber,
           message: `[TOPS] ${title}: ${message}`,
         });
+        const smsDeliveredTime = smsSuccess ? new Date() : null;
 
         if (notification?.id) {
           try {
             await prisma.notification.update({
               where: { id: notification.id },
-              data: { smsStatus: smsSuccess ? 'SENT' : 'FAILED' },
+              data: {
+                smsStatus: smsSuccess ? 'SENT' : 'FAILED',
+                ...(channel === 'SMS'
+                  ? {
+                      type: 'SMS',
+                      sent_at: smsSentTime,
+                      delivered_at: smsDeliveredTime,
+                    }
+                  : {}),
+              },
             });
           } catch {
             if (supabaseUrl && supabaseKey) {
-              await supabase
-                .from('Notification')
-                .update({ smsStatus: smsSuccess ? 'SENT' : 'FAILED' })
-                .eq('id', notification.id);
+              const updateData: any = {
+                smsStatus: smsSuccess ? 'SENT' : 'FAILED',
+                ...(channel === 'SMS'
+                  ? {
+                      type: 'SMS',
+                      sent_at: smsSentTime.toISOString(),
+                      delivered_at: smsDeliveredTime?.toISOString() || null,
+                    }
+                  : {}),
+              };
+              let upRes = await supabase.from('Notification').update(updateData).eq('id', notification.id);
+              if (upRes?.error && upRes.error.code === '42703') {
+                delete updateData.type;
+                delete updateData.sent_at;
+                delete updateData.delivered_at;
+                await supabase.from('Notification').update(updateData).eq('id', notification.id);
+              }
             }
+          }
+        }
+
+        // For thesis notification logs: if channel is BOTH, log explicit SMS delivery row
+        if (channel === 'BOTH' && requestId && supabaseUrl && supabaseKey) {
+          const smsLogPayload: any = {
+            id: 'notif_sms_' + Math.random().toString(36).substring(2, 11),
+            userId,
+            requestId,
+            request_id: requestId,
+            type: 'SMS',
+            title: `[SMS] ${title}`,
+            message,
+            channel: 'SMS',
+            smsStatus: smsSuccess ? 'SENT' : 'FAILED',
+            sent_at: smsSentTime.toISOString(),
+            delivered_at: smsDeliveredTime?.toISOString() || null,
+            isRead: true,
+            createdAt: smsSentTime.toISOString(),
+          };
+          let logRes = await supabase.from('Notification').insert(smsLogPayload);
+          if (logRes?.error && logRes.error.code === '42703') {
+            delete smsLogPayload.request_id;
+            delete smsLogPayload.type;
+            delete smsLogPayload.sent_at;
+            delete smsLogPayload.delivered_at;
+            await supabase.from('Notification').insert(smsLogPayload);
           }
         }
       } catch (smsErr) {
@@ -387,6 +460,7 @@ export async function notifyUser({
           }
           plainText += `\nView Online: ${actionUrl || `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/employee?tab=requests`}\n\n---\nRepublic of the Philippines\nDepartment of Environment and Natural Resources - PENRO`;
 
+          const emailSentTime = new Date();
           await sendEmail({
             to: email,
             subject: `[DENR TOPS] ${title}`,
@@ -394,6 +468,34 @@ export async function notifyUser({
             text: plainText,
             attachments,
           });
+          const emailDeliveredTime = new Date();
+
+          // For thesis notification logs: log Email delivery row
+          if (requestId && supabaseUrl && supabaseKey) {
+            const emailLogPayload: any = {
+              id: 'notif_email_' + Math.random().toString(36).substring(2, 11),
+              userId,
+              requestId,
+              request_id: requestId,
+              type: 'Email',
+              title: `[Email] ${title}`,
+              message,
+              channel: 'EMAIL',
+              smsStatus: 'SENT',
+              sent_at: emailSentTime.toISOString(),
+              delivered_at: emailDeliveredTime.toISOString(),
+              isRead: true,
+              createdAt: emailSentTime.toISOString(),
+            };
+            let emailLogRes = await supabase.from('Notification').insert(emailLogPayload);
+            if (emailLogRes?.error && emailLogRes.error.code === '42703') {
+              delete emailLogPayload.request_id;
+              delete emailLogPayload.type;
+              delete emailLogPayload.sent_at;
+              delete emailLogPayload.delivered_at;
+              await supabase.from('Notification').insert(emailLogPayload);
+            }
+          }
         } else {
           console.warn(`[notifyUser] Skipping email dispatch, invalid recipient email: "${email}"`);
         }
