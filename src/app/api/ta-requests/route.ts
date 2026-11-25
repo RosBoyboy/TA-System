@@ -424,6 +424,7 @@ export async function POST(req: Request) {
       : [];
 
     let request: any = null;
+    const submittedAtDate = submitImmediately ? new Date() : null;
 
     try {
       request = await prisma.tARequest.create({
@@ -437,6 +438,7 @@ export async function POST(req: Request) {
           startDate: new Date(startDate),
           endDate: new Date(endDate),
           status: initialStatus,
+          submitted_at: submittedAtDate,
           attachments: cleanAttachments as any,
           teamMembers: {
             create: teamMembers.map((member: { name: string; position?: string; userId?: string }) => ({
@@ -462,24 +464,34 @@ export async function POST(req: Request) {
       console.warn('[POST TA Request] Prisma error, using Supabase REST API fallback...', err);
       
       const reqId = 'ta_req_' + Math.random().toString(36).substring(2, 11);
+      const reqInsertData: any = {
+        id: reqId,
+        trackingNumber,
+        createdById: userId,
+        purpose: purpose.trim(),
+        destination: destination.trim(),
+        destinationLat: destinationLat ? parseFloat(destinationLat) : null,
+        destinationLng: destinationLng ? parseFloat(destinationLng) : null,
+        startDate: new Date(startDate).toISOString(),
+        endDate: new Date(endDate).toISOString(),
+        status: initialStatus,
+        submitted_at: submittedAtDate ? submittedAtDate.toISOString() : null,
+        attachments: cleanAttachments,
+      };
       
-      const { data: newReq, error: reqErr } = await supabase
+      let { data: newReq, error: reqErr } = await supabase
         .from('TARequest')
-        .insert({
-          id: reqId,
-          trackingNumber,
-          createdById: userId,
-          purpose: purpose.trim(),
-          destination: destination.trim(),
-          destinationLat: destinationLat ? parseFloat(destinationLat) : null,
-          destinationLng: destinationLng ? parseFloat(destinationLng) : null,
-          startDate: new Date(startDate).toISOString(),
-          endDate: new Date(endDate).toISOString(),
-          status: initialStatus,
-          attachments: cleanAttachments,
-        })
+        .insert(reqInsertData)
         .select()
         .single();
+
+      // Gracefully handle if submitted_at column is not yet migrated in Supabase
+      if (reqErr && reqErr.code === '42703') {
+        delete reqInsertData.submitted_at;
+        const retryRes = await supabase.from('TARequest').insert(reqInsertData).select().single();
+        newReq = retryRes.data;
+        reqErr = retryRes.error;
+      }
 
       if (newReq && !reqErr) {
         request = newReq;

@@ -113,6 +113,8 @@ model TARequest {
   status         TARequestStatus @default(DRAFT)
   resubmitCount  Int             @default(0)
   attachments    Json?           @default("[]")
+  submitted_at   DateTime?       @map("submitted_at")
+  approved_at    DateTime?       @map("approved_at")
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
@@ -152,11 +154,15 @@ model ApprovalStep {
 }
 
 model Notification {
-  id        String              @id @default(cuid())
-  userId    String
-  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  requestId String?
-  request   TARequest?          @relation(fields: [requestId], references: [id], onDelete: SetNull)
+  id           String              @id @default(cuid())
+  userId       String
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestId    String?
+  request_id   String?             @map("request_id")
+  type         String?             @map("type")
+  sent_at      DateTime?           @map("sent_at")
+  delivered_at DateTime?           @map("delivered_at")
+  request      TARequest?          @relation(fields: [requestId], references: [id], onDelete: SetNull)
   title     String
   message   String
   isRead    Boolean             @default(false)

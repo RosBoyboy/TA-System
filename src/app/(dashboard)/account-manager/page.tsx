@@ -6,7 +6,9 @@ import DynamicMapPicker from '@/components/map/DynamicMapPicker';
 import { formatNominatimAddress } from '@/utils/address';
 import SignaturePad from '@/components/signature/SignaturePad';
 import SupportingDocumentsUpload from '@/components/travel-order/SupportingDocumentsUpload';
-import { AttachmentDTO } from '@/types';
+import TravelOrderModal from '@/components/travel-order/TravelOrderModal';
+import { AttachmentDTO, TARequestDTO } from '@/types';
+import { formatFullDateTimeDisplay, formatDateRangeShort } from '@/lib/date';
 
 interface UserRecord {
   id: string;
@@ -24,17 +26,6 @@ interface UserRecord {
   address?: string | null;
   createdAt: string;
   updatedAt?: string;
-}
-
-interface TARequestRecord {
-  id: string;
-  trackingNumber: string;
-  purpose: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-  status: string;
-  createdAt: string;
 }
 
 const roleDisplayNames: Record<string, string> = {
@@ -278,14 +269,6 @@ function AccountManagerContent() {
   const router = useRouter();
   const activeTab = searchParams.get('tab') || 'dashboard';
 
-  useEffect(() => {
-    if (activeTab === 'requests') {
-      router.replace('/employee?tab=requests');
-    } else if (activeTab === 'schedule' || activeTab === 'travel-dates') {
-      router.replace('/employee?tab=schedule');
-    }
-  }, [activeTab, router]);
-
   // System Users State
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [counts, setCounts] = useState({
@@ -359,11 +342,25 @@ function AccountManagerContent() {
     regionName: 'Region IV-A CALABARZON',
   });
 
-  // Create Travel 5-Step Wizard State for Account Manager (Matching Employee Portal)
-  const [myTaRequests, setMyTaRequests] = useState<TARequestRecord[]>([]);
+  // Create Travel 5-Step Wizard & TA Requests State for Account Manager (Matching Employee Portal)
+  const [myTaRequests, setMyTaRequests] = useState<TARequestDTO[]>([]);
   const [taSubTab, setTaSubTab] = useState<'create' | 'list'>('create');
   const [wizardStep, setWizardStep] = useState(1);
   const [formError, setFormError] = useState('');
+
+  // My Requests & Travel Schedule Tab States
+  const [selectedTaRequest, setSelectedTaRequest] = useState<TARequestDTO | null>(null);
+  const [travelOrderModalRequest, setTravelOrderModalRequest] = useState<TARequestDTO | null>(null);
+  const [scheduleCalendarDate, setScheduleCalendarDate] = useState(() => new Date());
+  const [taSearchQuery, setTaSearchQuery] = useState('');
+  const [taStatusFilter, setTaStatusFilter] = useState('ALL');
+
+  // Resubmit / Date Revision Modal State
+  const [resubmitModalRequest, setResubmitModalRequest] = useState<TARequestDTO | null>(null);
+  const [resubmitStartDate, setResubmitStartDate] = useState('');
+  const [resubmitEndDate, setResubmitEndDate] = useState('');
+  const [resubmitLoading, setResubmitLoading] = useState(false);
+  const [resubmitError, setResubmitError] = useState('');
 
   const getInitialCreateForm = () => ({
     departureDate: '',
@@ -570,7 +567,142 @@ function AccountManagerContent() {
       }
     };
     fetchEmployees();
+
+    const handleRealtimeRefresh = () => {
+      fetchMyTaRequests();
+    };
+    const handleResetViews = () => {
+      setSelectedTaRequest(null);
+      setTravelOrderModalRequest(null);
+    };
+    window.addEventListener('taps:refresh-notifications', handleRealtimeRefresh);
+    window.addEventListener('taps:new-notification', handleRealtimeRefresh);
+    window.addEventListener('taps:reset-views', handleResetViews);
+
+    return () => {
+      window.removeEventListener('taps:refresh-notifications', handleRealtimeRefresh);
+      window.removeEventListener('taps:new-notification', handleRealtimeRefresh);
+      window.removeEventListener('taps:reset-views', handleResetViews);
+    };
   }, []);
+
+  // Sync and refetch TA requests when activeTab changes
+  useEffect(() => {
+    setSelectedTaRequest(null);
+    setTravelOrderModalRequest(null);
+    if (activeTab === 'requests' || activeTab === 'schedule' || activeTab === 'travel-dates' || activeTab === 'create-travel') {
+      fetchMyTaRequests();
+    }
+  }, [activeTab]);
+
+  // Auto-focus the travel schedule calendar to the user's latest request's month
+  useEffect(() => {
+    if (myTaRequests.length > 0) {
+      const primary = myTaRequests.find((r) => r.status === 'APPROVED') || myTaRequests[0];
+      if (primary && primary.startDate) {
+        const d = new Date(primary.startDate);
+        if (!isNaN(d.getTime())) {
+          setScheduleCalendarDate(new Date(d.getFullYear(), d.getMonth(), 1));
+        }
+      }
+    }
+  }, [myTaRequests]);
+
+  const handleTaResubmit = async () => {
+    if (!resubmitModalRequest || !resubmitStartDate || !resubmitEndDate) return;
+    setResubmitLoading(true);
+    setResubmitError('');
+
+    try {
+      const res = await fetch(`/api/ta-requests/${resubmitModalRequest.id}/resubmit`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          startDate: resubmitStartDate,
+          endDate: resubmitEndDate,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setResubmitError(data.error || 'Failed to resubmit request.');
+        setResubmitLoading(false);
+        return;
+      }
+
+      showToast('Travel Order resubmitted successfully! Approval restarted at Section Chief.', 'success');
+      setResubmitModalRequest(null);
+      setSelectedTaRequest(null);
+      setResubmitStartDate('');
+      setResubmitEndDate('');
+      fetchMyTaRequests();
+    } catch (err: any) {
+      setResubmitError(err.message || 'An error occurred while resubmitting.');
+    } finally {
+      setResubmitLoading(false);
+    }
+  };
+
+  const renderTaStatusBadge = (status: string) => {
+    switch (status) {
+      case 'APPROVED':
+        return (
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-[#16835D] border border-emerald-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#16835D] shrink-0"></span>
+            Approved
+          </span>
+        );
+      case 'PENDING_SECTION_CHIEF':
+        return (
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-blue-50 text-[#2580B8] border border-blue-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2580B8] shrink-0 animate-pulse"></span>
+            Pending Section Chief
+          </span>
+        );
+      case 'PENDING_DIVISION_CHIEF':
+        return (
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-blue-50 text-[#2580B8] border border-blue-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2580B8] shrink-0 animate-pulse"></span>
+            Pending Division Chief
+          </span>
+        );
+      case 'PENDING_HEAD_PENRO':
+        return (
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-amber-50 text-[#D97706] border border-amber-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0 animate-pulse"></span>
+            Pending Head of PENRO
+          </span>
+        );
+      case 'PENDING':
+        return (
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-amber-50 text-[#D97706] border border-amber-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0"></span>
+            Pending
+          </span>
+        );
+      case 'REJECTED_MANUAL':
+        return (
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0"></span>
+            Returned (Needs Revision)
+          </span>
+        );
+      case 'REJECTED_OVERDUE':
+        return (
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-rose-50 text-[#DC3545] border border-rose-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#DC3545] shrink-0"></span>
+            Overdue
+          </span>
+        );
+      default:
+        return (
+          <span className="h-5 inline-flex items-center justify-center gap-1.5 px-2 text-[10px] font-semibold rounded-[4px] bg-slate-100 text-slate-600 border border-slate-200 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-500 shrink-0"></span>
+            Draft
+          </span>
+        );
+    }
+  };
 
   const handleEmployeeSelect = (name: string) => {
     const emp = employeeList.find((item) => item.name === name);
@@ -880,7 +1012,8 @@ function AccountManagerContent() {
       setWizardStep(1);
       setCreateForm(getInitialCreateForm());
       setTaSubTab('list');
-      fetchMyTaRequests();
+      await fetchMyTaRequests();
+      router.push('/account-manager?tab=requests');
     } catch (err: any) {
       showToast(err.message || 'An error occurred submitting TA request.', 'error');
     } finally {
@@ -2614,6 +2747,7 @@ function AccountManagerContent() {
                         <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Destination</th>
                         <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Dates</th>
                         <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center">Status</th>
+                        <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#E5E5E7]">
@@ -2629,17 +2763,16 @@ function AccountManagerContent() {
                             {new Date(req.startDate).toLocaleDateString()} - {new Date(req.endDate).toLocaleDateString()}
                           </td>
                           <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center">
-                            <span
-                              className={`h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] uppercase ${
-                                req.status === 'APPROVED'
-                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                  : req.status === 'REJECTED' || req.status === 'RETURNED'
-                                  ? 'bg-red-50 text-red-700 border border-red-200'
-                                  : 'bg-amber-50 text-amber-700 border border-amber-200'
-                              }`}
+                            {renderTaStatusBadge(req.status)}
+                          </td>
+                          <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-right whitespace-nowrap">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedTaRequest(req)}
+                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-white border border-[#E5E5E7] hover:bg-[#F2F2F7] text-[#1D1D1F] cursor-pointer"
                             >
-                              {req.status}
-                            </span>
+                              <span>View</span>
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -2651,6 +2784,555 @@ function AccountManagerContent() {
           )}
         </div>
       )}
+
+      {/* TAB 7: MY REQUESTS / MY TRAVEL AUTHORITIES */}
+      {activeTab === 'requests' && (() => {
+        const filteredTa = myTaRequests.filter((r) => {
+          const matchesSearch =
+            r.trackingNumber.toLowerCase().includes(taSearchQuery.toLowerCase()) ||
+            r.destination.toLowerCase().includes(taSearchQuery.toLowerCase()) ||
+            r.purpose.toLowerCase().includes(taSearchQuery.toLowerCase());
+
+          const matchesStatus = taStatusFilter === 'ALL' || r.status === taStatusFilter;
+          return matchesSearch && matchesStatus;
+        });
+
+        const totalReq = myTaRequests.length;
+        const appReq = myTaRequests.filter((r) => r.status === 'APPROVED').length;
+        const pendReq = myTaRequests.filter((r) => r.status && r.status.startsWith('PENDING')).length;
+        const retReq = myTaRequests.filter((r) => r.status && r.status.startsWith('REJECTED')).length;
+
+        return (
+          <div className="w-full max-w-[1600px] mx-auto space-y-5 animate-fade-in pb-10 flex flex-col">
+            {/* Header & Quick Summary Strip */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {/* Total Filed */}
+              <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-[#0F4C2E] shadow-xs flex items-center justify-between">
+                <div>
+                  <span className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">Total Filed</span>
+                  <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1 block">{totalReq}</span>
+                </div>
+                <div className="w-9 h-9 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-[#0F4C2E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Approved TAs */}
+              <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-emerald-500 shadow-xs flex items-center justify-between">
+                <div>
+                  <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider block">Approved TAs</span>
+                  <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1 block">{appReq}</span>
+                </div>
+                <div className="w-9 h-9 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Under Review */}
+              <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-amber-500 shadow-xs flex items-center justify-between">
+                <div>
+                  <span className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider block">Under Review</span>
+                  <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1 block">{pendReq}</span>
+                </div>
+                <div className="w-9 h-9 rounded-[6px] bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Needs Revision */}
+              <div className="bg-white p-4 rounded-[8px] border border-[#E5E5E7] border-l-4 border-l-rose-500 shadow-xs flex items-center justify-between">
+                <div>
+                  <span className="text-[11px] font-semibold text-rose-600 uppercase tracking-wider block">Needs Revision</span>
+                  <span className="text-[24px] font-bold tracking-tight text-[#1D1D1F] mt-1 block">{retReq}</span>
+                </div>
+                <div className="w-9 h-9 rounded-[6px] bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Search, Filter & Action Bar */}
+            <div className="bg-white p-3.5 rounded-[8px] border border-[#E5E5E7] shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="relative flex-1 w-full">
+                <input
+                  type="text"
+                  placeholder="Search by reference, destination, or purpose..."
+                  value={taSearchQuery}
+                  onChange={(e) => setTaSearchQuery(e.target.value)}
+                  className="w-full h-8 pl-8 pr-3 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                />
+                <svg className="w-4 h-4 text-[#86868B] absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+
+              <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                <select
+                  value={taStatusFilter}
+                  onChange={(e) => setTaStatusFilter(e.target.value)}
+                  className="h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332] w-full sm:w-auto cursor-pointer"
+                >
+                  <option value="ALL">All Statuses</option>
+                  <option value="APPROVED">Approved</option>
+                  <option value="PENDING_SECTION_CHIEF">Pending Section Chief</option>
+                  <option value="PENDING_DIVISION_CHIEF">Pending Division Chief</option>
+                  <option value="PENDING_HEAD_PENRO">Pending Head of PENRO</option>
+                  <option value="REJECTED_MANUAL">Returned (Needs Revision)</option>
+                  <option value="DRAFT">Draft</option>
+                </select>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTaSubTab('create');
+                    router.push('/account-manager?tab=create-travel');
+                  }}
+                  className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white shrink-0 cursor-pointer"
+                >
+                  <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>Create TA</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Table Container Card */}
+            <div className="bg-white border border-[#E5E5E7] rounded-[8px] shadow-xs overflow-hidden min-h-[420px] flex flex-col justify-between">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-emerald-950/[0.04] border-b border-[#E5E5E7]">
+                    <tr>
+                      <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Reference No.</th>
+                      <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Destination(s)</th>
+                      <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Travel Dates</th>
+                      <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-center min-w-[160px]">Status</th>
+                      <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-left">Filed Date</th>
+                      <th className="h-8 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#86868B] whitespace-nowrap text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredTa.length > 0 ? (
+                      filteredTa.map((req) => (
+                        <tr key={req.id} className="h-[42px] border-b border-[#E5E5E7] last:border-b-0 hover:bg-emerald-50/40 transition-colors">
+                          <td className="px-3 py-1.5 text-[13px] font-medium font-mono text-[#1B4332] align-middle text-left whitespace-nowrap">
+                            <span className="px-2 py-0.5 rounded-[4px] bg-emerald-50 text-[#0F4C2E] border border-emerald-200/80 font-mono text-[12px] font-semibold">
+                              {req.trackingNumber}
+                            </span>
+                          </td>
+                          <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-left">
+                            <div className="flex items-center gap-1.5">
+                              <svg className="w-3.5 h-3.5 text-[#86868B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                              <span className="truncate max-w-[300px]">{req.destination}</span>
+                            </div>
+                          </td>
+                          <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">
+                            <div className="flex items-center gap-1.5">
+                              <svg className="w-3.5 h-3.5 text-[#86868B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              <span>{new Date(req.startDate).toLocaleDateString()} - {new Date(req.endDate).toLocaleDateString()}</span>
+                            </div>
+                          </td>
+                          <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-center min-w-[160px]">{renderTaStatusBadge(req.status)}</td>
+                          <td className="px-3 py-1.5 text-[13px] text-[#86868B] align-middle text-left whitespace-nowrap">{new Date(req.createdAt).toLocaleDateString()}</td>
+                          <td className="px-3 py-1.5 text-[13px] text-[#1D1D1F] align-middle text-right space-x-1.5 whitespace-nowrap">
+                            {req.status === 'APPROVED' && (
+                              <button
+                                type="button"
+                                onClick={() => setTravelOrderModalRequest(req)}
+                                className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 text-emerald-700 cursor-pointer"
+                                title="Print Official Approved Travel Order"
+                              >
+                                <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                </svg>
+                                <span>Print Travel Order</span>
+                              </button>
+                            )}
+                            {req.status === 'REJECTED_MANUAL' && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setResubmitModalRequest(req);
+                                  setResubmitStartDate(new Date(req.startDate).toISOString().slice(0, 10));
+                                  setResubmitEndDate(new Date(req.endDate).toISOString().slice(0, 10));
+                                  setResubmitError('');
+                                }}
+                                className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-700 cursor-pointer"
+                                title="Revise travel dates and resubmit"
+                              >
+                                <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span>Revise Dates</span>
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => setSelectedTaRequest(req)}
+                              className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-white border border-[#E5E5E7] hover:bg-[#F2F2F7] text-[#1D1D1F] cursor-pointer"
+                              title="View Full Details"
+                            >
+                              <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              <span>View</span>
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="py-12 text-center text-[13px] text-[#86868B]">
+                          No travel authorities found matching the filter.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Table Footer & Information Bar */}
+              <div className="px-4 py-2.5 bg-[#F5F5F7] border-t border-[#E5E5E7] flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-[12px] text-[#86868B]">
+                  <span>Showing <strong className="text-[#1D1D1F] font-semibold">{filteredTa.length}</strong> of <strong className="text-[#1D1D1F] font-semibold">{myTaRequests.length}</strong> Travel Authority records</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-[12px] text-[#86868B] mr-1 hidden sm:inline">Page 1 of 1</span>
+                  <button
+                    disabled
+                    className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors border border-[#E5E5E7] bg-white text-[#86868B] cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    disabled
+                    className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors border border-[#E5E5E7] bg-white text-[#86868B] cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Notice Card at Bottom */}
+            <div className="p-3.5 bg-[#F5F5F7] rounded-[8px] border border-[#E5E5E7] flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2.5">
+                <svg className="w-4 h-4 text-[#1B4332] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-[13px] text-[#1D1D1F] leading-snug">
+                  <strong className="font-semibold">Need to modify or cancel a submitted request?</strong>{' '}
+                  <span className="text-[#86868B]">Requests pending review can be recalled or edited prior to Head of PENRO approval.</span>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => router.push('/account-manager?tab=schedule')}
+                className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors text-[#1B4332] hover:bg-[#E5E5E7]/60 whitespace-nowrap hidden md:inline-flex cursor-pointer"
+              >
+                View Travel Schedule →
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* TAB 8: TRAVEL SCHEDULE / TRAVEL DATES */}
+      {(activeTab === 'schedule' || activeTab === 'travel-dates') && (() => {
+        const schedYear = scheduleCalendarDate.getFullYear();
+        const schedMonth = scheduleCalendarDate.getMonth();
+        const schedMonthLabel = scheduleCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        const daysInMonth = new Date(schedYear, schedMonth + 1, 0).getDate();
+        const firstDayIndex = new Date(schedYear, schedMonth, 1).getDay();
+        const prevMonthDays = new Date(schedYear, schedMonth, 0).getDate();
+
+        const handlePrevMonth = () => setScheduleCalendarDate(new Date(schedYear, schedMonth - 1, 1));
+        const handleNextMonth = () => setScheduleCalendarDate(new Date(schedYear, schedMonth + 1, 1));
+        const handleToday = () => setScheduleCalendarDate(new Date());
+
+        const approvedList = myTaRequests.filter((r) => r.status === 'APPROVED');
+        const totalTravelDays = approvedList.reduce((acc, r) => {
+          const s = new Date(r.startDate).getTime();
+          const e = new Date(r.endDate).getTime();
+          if (isNaN(s) || isNaN(e)) return acc;
+          const days = Math.max(1, Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1);
+          return acc + days;
+        }, 0);
+        const completedTripsCount = approvedList.length;
+        const uniqueDestinationsCount = new Set(
+          approvedList.map((r) => r.destination?.trim()).filter(Boolean)
+        ).size;
+
+        const nowMs = new Date().setHours(0, 0, 0, 0);
+        const upcomingRequests = myTaRequests
+          .filter((r) => (r.status === 'APPROVED' || (r.status && r.status.startsWith('PENDING'))) && new Date(r.endDate).getTime() >= nowMs)
+          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+        const nextUpcoming = upcomingRequests[0] || approvedList[0];
+
+        const scheduledItineraries = myTaRequests.filter(
+          (r) => r.status === 'APPROVED' || (r.status && r.status.startsWith('PENDING'))
+        );
+
+        return (
+          <div className="w-full max-w-[1600px] mx-auto space-y-5 animate-fade-in">
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+              {/* Calendar Main Box */}
+              <div className="xl:col-span-8 2xl:col-span-9 bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden">
+                <div className="px-5 py-3.5 bg-slate-100/90 border-b border-[#E5E5E7] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h3 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Monthly Travel Schedule</h3>
+                    <p className="text-[12px] text-[#86868B] mt-0.5">Overview of scheduled, approved, and pending field travel itineraries</p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="h-7 px-2.5 inline-flex items-center justify-center bg-white text-[#1B4332] border border-[#E5E5E7] rounded-[6px] text-xs font-semibold">
+                      {schedMonthLabel}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleToday}
+                      className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-white border border-[#E5E5E7] hover:bg-emerald-50/50 text-[#1D1D1F] cursor-pointer"
+                    >
+                      Today
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handlePrevMonth}
+                      className="h-7 w-7 inline-flex items-center justify-center rounded-[6px] bg-white border border-[#E5E5E7] hover:bg-emerald-50/50 text-[#86868B] hover:text-[#1D1D1F] transition-colors cursor-pointer"
+                      title="Previous Month"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNextMonth}
+                      className="h-7 w-7 inline-flex items-center justify-center rounded-[6px] bg-white border border-[#E5E5E7] hover:bg-emerald-50/50 text-[#86868B] hover:text-[#1D1D1F] transition-colors cursor-pointer"
+                      title="Next Month"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-5">
+                  <div className="grid grid-cols-7 gap-2 text-center text-xs">
+                    {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((d, i) => (
+                      <div key={i} className="font-semibold text-[#86868B] py-1.5 text-[11px] uppercase tracking-wider">{d}</div>
+                    ))}
+
+                    {Array.from({ length: firstDayIndex }).map((_, idx) => {
+                      const prevDay = prevMonthDays - firstDayIndex + idx + 1;
+                      return (
+                        <div
+                          key={`prev-${idx}`}
+                          className="min-h-[76px] sm:min-h-[92px] p-2 rounded-[6px] border border-[#E5E5E7]/60 bg-[#F5F5F7]/50 text-[#86868B]/40 flex flex-col justify-between"
+                        >
+                          <span className="text-right text-[12px] font-medium">{prevDay}</span>
+                        </div>
+                      );
+                    })}
+
+                    {Array.from({ length: daysInMonth }).map((_, i) => {
+                      const day = i + 1;
+                      const dayRequests = myTaRequests.filter((r) => {
+                        if (!r.startDate || !r.endDate) return false;
+                        const start = new Date(r.startDate);
+                        start.setHours(0, 0, 0, 0);
+                        const end = new Date(r.endDate);
+                        end.setHours(23, 59, 59, 999);
+                        const checkDate = new Date(schedYear, schedMonth, day, 12, 0, 0, 0);
+                        return checkDate >= start && checkDate <= end;
+                      });
+
+                      const hasRequests = dayRequests.length > 0;
+                      const isToday =
+                        new Date().getFullYear() === schedYear &&
+                        new Date().getMonth() === schedMonth &&
+                        new Date().getDate() === day;
+
+                      return (
+                        <div
+                          key={day}
+                          onClick={() => {
+                            if (dayRequests.length === 1) {
+                              setSelectedTaRequest(dayRequests[0]);
+                            }
+                          }}
+                          className={`min-h-[84px] sm:min-h-[100px] p-2 rounded-[6px] border flex flex-col justify-between transition-colors ${
+                            isToday
+                              ? 'border-[#1B4332] bg-white ring-1 ring-[#1B4332]/20 text-[#1D1D1F]'
+                              : hasRequests
+                              ? 'border-[#E5E5E7] bg-white hover:bg-[#F2F2F7] text-[#1D1D1F]'
+                              : 'border-[#E5E5E7] bg-white hover:bg-[#F2F2F7] text-[#1D1D1F]'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            {isToday ? (
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#1B4332]"></span>
+                            ) : <span></span>}
+                            <span className={`text-right text-[12px] font-medium ${isToday ? 'text-[#1B4332] font-bold' : 'text-[#86868B]'}`}>
+                              {day}
+                            </span>
+                          </div>
+
+                          {hasRequests ? (
+                            <div className="space-y-1 w-full mt-auto">
+                              {dayRequests.map((req) => {
+                                const isApp = req.status === 'APPROVED';
+                                const isPend = req.status && req.status.startsWith('PENDING');
+
+                                return (
+                                  <button
+                                    key={req.id}
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedTaRequest(req);
+                                    }}
+                                    className={`w-full text-left text-[10px] px-1.5 py-0.5 rounded-[4px] font-semibold truncate flex items-center gap-1 transition-colors cursor-pointer border ${
+                                      isApp
+                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                                        : isPend
+                                        ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                                        : 'bg-[#F5F5F7] text-[#86868B] border-[#E5E5E7] hover:bg-[#F2F2F7]'
+                                    }`}
+                                    title={`${isApp ? 'Approved' : isPend ? 'Under Review' : req.status}: ${req.destination || req.purpose} (${req.trackingNumber})`}
+                                  >
+                                    <span className="truncate">{req.destination || req.trackingNumber}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Statistics & Upcoming Itineraries Panel */}
+              <div className="xl:col-span-4 2xl:col-span-3 space-y-5">
+                <div className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden">
+                  <div className="px-4 py-3 bg-slate-100/90 border-b border-[#E5E5E7] flex items-center justify-between">
+                    <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Travel Statistics</h3>
+                    <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      FY {schedYear}
+                    </span>
+                  </div>
+                  <div className="p-4 space-y-3 text-[13px]">
+                    <div className="flex justify-between py-1.5 border-b border-[#E5E5E7]">
+                      <span className="text-[#86868B]">Total Travel Days</span>
+                      <span className="font-semibold text-[#1D1D1F]">{totalTravelDays} days</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#E5E5E7]">
+                      <span className="text-[#86868B]">Approved / Completed Trips</span>
+                      <span className="font-semibold text-[#1D1D1F]">
+                        {completedTripsCount} {completedTripsCount === 1 ? 'trip' : 'trips'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#E5E5E7]">
+                      <span className="text-[#86868B]">Destinations Visited</span>
+                      <span className="font-semibold text-[#1D1D1F]">
+                        {uniqueDestinationsCount} {uniqueDestinationsCount === 1 ? 'location' : 'locations'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-1.5">
+                      <span className="text-[#86868B]">Upcoming Itinerary</span>
+                      <span className="font-semibold text-[#1B4332]">
+                        {nextUpcoming
+                          ? formatDateRangeShort(nextUpcoming.startDate, nextUpcoming.endDate)
+                          : 'None scheduled'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Scheduled Itineraries Card */}
+                <div className="bg-white rounded-[8px] border border-[#E5E5E7] shadow-xs overflow-hidden">
+                  <div className="px-4 py-3 bg-[#F5F5F7] border-b border-[#E5E5E7] flex items-center justify-between">
+                    <h3 className="text-[14px] font-semibold text-[#1D1D1F]">Scheduled Itineraries</h3>
+                    <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] bg-white text-[#86868B] border border-[#E5E5E7]">
+                      {scheduledItineraries.length} active
+                    </span>
+                  </div>
+
+                  <div className="p-4">
+                    {scheduledItineraries.length > 0 ? (
+                      <div className="space-y-2.5">
+                        {scheduledItineraries.map((itinerary) => {
+                          const isApproved = itinerary.status === 'APPROVED';
+                          const sDate = new Date(itinerary.startDate);
+                          const eDate = new Date(itinerary.endDate);
+                          const daysCount = Math.max(1, Math.round((eDate.getTime() - sDate.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+
+                          return (
+                            <div
+                              key={itinerary.id}
+                              onClick={() => setSelectedTaRequest(itinerary)}
+                              className="p-3 rounded-[6px] border border-[#E5E5E7] bg-white hover:bg-[#F2F2F7] transition-colors cursor-pointer"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="font-mono text-[13px] font-medium text-[#1B4332]">
+                                  {itinerary.trackingNumber}
+                                </span>
+                                <span
+                                  className={`h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] ${
+                                    isApproved
+                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                      : 'bg-amber-50 text-amber-700 border border-amber-200'
+                                  }`}
+                                >
+                                  {isApproved ? 'Approved' : 'Under Review'}
+                                </span>
+                              </div>
+                              <p className="text-[13px] font-medium text-[#1D1D1F] flex items-center gap-1.5 mt-1.5">
+                                <svg className="w-3.5 h-3.5 text-[#86868B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span className="truncate">{itinerary.destination}</span>
+                              </p>
+                              <p className="text-[12px] text-[#86868B] mt-1 flex items-center gap-1.5">
+                                <svg className="w-3.5 h-3.5 text-[#86868B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span>{formatDateRangeShort(itinerary.startDate, itinerary.endDate)} ({daysCount} {daysCount === 1 ? 'day' : 'days'})</span>
+                              </p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="p-6 text-center text-[13px] text-[#86868B] bg-[#F5F5F7] rounded-[6px] border border-[#E5E5E7]">
+                        No scheduled itineraries found.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Activation Modal */}
       {selectedUserForActivation && (
@@ -3097,6 +3779,389 @@ function AccountManagerContent() {
           </div>
         </div>
       )}
+
+      {/* Floating TA Request Detail / Document History & Signatory List Modal */}
+      {selectedTaRequest && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-fade-in overflow-y-auto">
+          <div className="bg-white border border-[#E5E5E7] rounded-[10px] shadow-xl overflow-hidden w-full max-w-4xl flex flex-col my-auto max-h-[92vh]">
+            <div className="bg-[#F5F5F7] border-b border-[#E5E5E7] px-5 py-3.5 flex items-center justify-between shrink-0 sticky top-0 z-20">
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setSelectedTaRequest(null)}
+                  className="h-7 px-2.5 text-xs font-medium rounded-[6px] inline-flex items-center justify-center gap-1 transition-colors bg-white border border-[#E5E5E7] text-[#1D1D1F] hover:bg-[#F2F2F7] cursor-pointer"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  <span>Back</span>
+                </button>
+                <div className="h-4 w-px bg-[#E5E5E7]"></div>
+                <span className="h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  {selectedTaRequest.trackingNumber}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {selectedTaRequest.status === 'REJECTED_MANUAL' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setResubmitModalRequest(selectedTaRequest);
+                      setResubmitStartDate(new Date(selectedTaRequest.startDate).toISOString().slice(0, 10));
+                      setResubmitEndDate(new Date(selectedTaRequest.endDate).toISOString().slice(0, 10));
+                      setResubmitError('');
+                    }}
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-700 cursor-pointer"
+                    title="Revise travel dates and resubmit"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>Revise &amp; Resubmit</span>
+                  </button>
+                )}
+
+                {selectedTaRequest.status === 'APPROVED' && (
+                  <button
+                    type="button"
+                    onClick={() => setTravelOrderModalRequest(selectedTaRequest)}
+                    className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white cursor-pointer"
+                    title="View and Print Official Approved Travel Order"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>Print Travel Order</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedTaRequest(null)}
+                  className="h-8 w-8 rounded-[6px] bg-white border border-[#E5E5E7] hover:bg-[#F2F2F7] text-[#86868B] hover:text-[#1D1D1F] flex items-center justify-center transition-colors cursor-pointer"
+                  title="Close"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 sm:p-8 overflow-y-auto space-y-8 bg-white">
+              {/* 1. DOCUMENT HISTORY */}
+              <section className="space-y-5">
+                <div className="text-center space-y-1">
+                  <h2 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Document History</h2>
+                  <p className="text-[12px] text-[#86868B]">A chronological record of all events and updates.</p>
+                </div>
+
+                <div className="relative max-w-2xl mx-auto py-3">
+                  <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#E5E5E7] -translate-x-1/2 z-0"></div>
+
+                  <div className="relative z-10 my-4 flex items-center w-full">
+                    <div className="w-1/2 pr-6 text-right">
+                      <div className="inline-block bg-white p-4 rounded-[8px] border border-[#E5E5E7] shadow-xs text-left max-w-sm w-full">
+                        <h4 className="text-[14px] font-semibold text-[#1D1D1F]">{selectedTaRequest.createdBy?.name || 'Account Manager'}</h4>
+                        <p className="text-[12px] text-[#86868B] mt-1">
+                          Submitted on <span className="font-medium text-[#1D1D1F]">{formatFullDateTimeDisplay(selectedTaRequest.createdAt)}</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="absolute left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shadow-xs border-2 border-white">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+
+                    <div className="w-1/2 pl-6 invisible"></div>
+                  </div>
+                </div>
+              </section>
+
+              <div className="border-t border-[#E5E5E7] w-3/4 mx-auto"></div>
+
+              {/* 2. SIGNATORY LIST */}
+              <section className="space-y-5">
+                <div className="text-center space-y-1">
+                  <h2 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Signatory List</h2>
+                  <p className="text-[12px] text-[#86868B]">Required signatories for document approval.</p>
+                </div>
+
+                <div className="relative max-w-2xl mx-auto py-3">
+                  <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#E5E5E7] -translate-x-1/2 z-0"></div>
+
+                  {[
+                    { order: 1, defaultName: 'Section Chief', role: 'Verifier' },
+                    { order: 2, defaultName: 'Division Chief', role: 'Verifier' },
+                    { order: 3, defaultName: 'Head of PENRO', role: 'Final Signatory' },
+                  ].map((sig, index) => {
+                    const isLeft = index % 2 === 0;
+                    const step = selectedTaRequest.approvalSteps?.find((s) => s.order === sig.order);
+                    const name = step?.approver?.name || (step as any)?.designatedApprover?.name || sig.defaultName;
+                    const isCustomName = name && name.trim().toLowerCase() !== sig.defaultName.toLowerCase();
+                    const roleSubtitle = isCustomName ? `${sig.defaultName} · ${sig.role}` : sig.role;
+                    const isApproved = step?.action === 'APPROVED';
+                    const isRejected = step?.action === 'REJECTED';
+
+                    const nodeClasses = isApproved
+                      ? 'bg-[#1B4332] text-white'
+                      : isRejected
+                      ? 'bg-red-600 text-white'
+                      : 'bg-[#86868B] text-white';
+
+                    const cardBorderClass = isApproved
+                      ? 'border-emerald-200 bg-emerald-50/40'
+                      : isRejected
+                      ? 'border-red-200 bg-red-50/40'
+                      : 'border-[#E5E5E7] bg-white';
+
+                    return (
+                      <div key={sig.order} className="relative z-10 my-6 flex items-center w-full">
+                        <div className={`w-1/2 pr-6 text-right ${isLeft ? 'block' : 'invisible'}`}>
+                          <div className={`inline-block p-4 rounded-[8px] border shadow-xs text-left max-w-sm w-full ${cardBorderClass}`}>
+                            <h4 className="text-[14px] font-semibold text-[#1D1D1F]">{name}</h4>
+                            <p className="text-[12px] text-[#86868B] mt-0.5">{roleSubtitle}</p>
+                            {isApproved && step?.actionDate && (
+                              <p className="text-[11px] text-emerald-700 font-medium mt-1.5 flex items-center gap-1 justify-end">
+                                <svg className="w-3 h-3 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Approved · {formatFullDateTimeDisplay(step.actionDate)}</span>
+                              </p>
+                            )}
+                            {isRejected && (
+                              <div className="mt-1.5">
+                                <p className="text-[11px] text-red-700 font-medium flex items-center gap-1 justify-end">
+                                  <svg className="w-3 h-3 text-red-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                  <span>Returned · {formatFullDateTimeDisplay(step?.actionDate || step?.updatedAt)}</span>
+                                </p>
+                                {step?.remarks && (
+                                  <div className="mt-2 p-2.5 bg-red-50 border border-red-200 rounded-[6px] text-left">
+                                    <span className="text-[10px] font-semibold text-red-700 uppercase tracking-wider block">Return Remarks:</span>
+                                    <p className="text-[12px] text-red-800 font-medium mt-0.5">{step.remarks}</p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className={`absolute left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center text-xs shadow-xs border-2 border-white ${nodeClasses}`}>
+                          {isApproved ? (
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : isRejected ? (
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          ) : (
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                            </svg>
+                          )}
+                        </div>
+
+                        <div className={`w-1/2 pl-6 text-left ${!isLeft ? 'block' : 'invisible'}`}>
+                          <div className={`inline-block p-4 rounded-[8px] border shadow-xs text-left max-w-sm w-full ${cardBorderClass}`}>
+                            <h4 className="text-[14px] font-semibold text-[#1D1D1F]">{name}</h4>
+                            <p className="text-[12px] text-[#86868B] mt-0.5">{roleSubtitle}</p>
+                            {isApproved && step?.actionDate && (
+                              <p className="text-[11px] text-emerald-700 font-medium mt-1.5 flex items-center gap-1">
+                                <svg className="w-3 h-3 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Approved · {formatFullDateTimeDisplay(step.actionDate)}</span>
+                              </p>
+                            )}
+                            {isRejected && (
+                              <div className="mt-1.5">
+                                <p className="text-[11px] text-red-700 font-medium flex items-center gap-1">
+                                  <svg className="w-3 h-3 text-red-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                  <span>Returned · {formatFullDateTimeDisplay(step?.actionDate || step?.updatedAt)}</span>
+                                </p>
+                                {step?.remarks && (
+                                  <div className="mt-2 p-2.5 bg-red-50 border border-red-200 rounded-[6px] text-left">
+                                    <span className="text-[10px] font-semibold text-red-700 uppercase tracking-wider block">Return Remarks:</span>
+                                    <p className="text-[12px] text-red-800 font-medium mt-0.5">{step.remarks}</p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+
+              {/* Supporting Documents Section */}
+              {selectedTaRequest.attachments && (selectedTaRequest.attachments as any[]).length > 0 && (
+                <>
+                  <div className="border-t border-[#E5E5E7] w-3/4 mx-auto"></div>
+                  <section className="space-y-4 max-w-2xl mx-auto">
+                    <div className="text-center space-y-1">
+                      <h2 className="text-[18px] font-semibold tracking-tight text-[#1D1D1F]">Supporting Documents</h2>
+                      <p className="text-[12px] text-[#86868B]">Uploaded documentation for this Travel Authority.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                      {(selectedTaRequest.attachments as any[]).map((doc: any, idx: number) => {
+                        const isPdf = doc.name?.toLowerCase().endsWith('.pdf') || doc.type?.includes('pdf');
+                        const formattedSize = typeof doc.size === 'number'
+                          ? doc.size < 1024 * 1024
+                            ? `${(doc.size / 1024).toFixed(1)} KB`
+                            : `${(doc.size / (1024 * 1024)).toFixed(1)} MB`
+                          : (doc.size || '');
+
+                        return (
+                          <div
+                            key={doc.id || idx}
+                            onClick={() => doc.url && window.open(doc.url, '_blank')}
+                            className="flex items-center justify-between p-3 rounded-[8px] bg-white border border-[#E5E5E7] hover:bg-[#F2F2F7] transition-colors cursor-pointer group"
+                            title={`Open ${doc.name}`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className={`h-5 inline-flex items-center justify-center px-2 text-[10px] font-semibold rounded-[4px] shrink-0 ${
+                                isPdf ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-blue-50 text-blue-700 border border-blue-200'
+                              }`}>
+                                {isPdf ? 'PDF' : 'DOC'}
+                              </span>
+                              <div className="min-w-0">
+                                <p className="text-[13px] font-medium text-[#1D1D1F] truncate group-hover:text-[#1B4332] transition-colors">{doc.name}</p>
+                                <p className="text-[11px] text-[#86868B]">{formattedSize}</p>
+                              </div>
+                            </div>
+                            <div className="w-7 h-7 rounded-[6px] bg-[#F5F5F7] group-hover:bg-[#1B4332] group-hover:text-white flex items-center justify-center text-[#86868B] shrink-0 transition-colors">
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Resubmit / Date Revision Modal */}
+      {resubmitModalRequest && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white border border-[#E5E5E7] rounded-[10px] shadow-xl overflow-hidden w-full max-w-lg">
+            <div className="bg-[#F5F5F7] border-b border-[#E5E5E7] px-5 py-3.5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-[#1B4332] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span className="text-[14px] font-semibold text-[#1D1D1F]">Revise Travel Dates &amp; Resubmit</span>
+              </div>
+              <button
+                onClick={() => setResubmitModalRequest(null)}
+                className="h-7 w-7 rounded-[6px] inline-flex items-center justify-center text-[#86868B] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              <div className="p-3 bg-[#F5F5F7] border border-[#E5E5E7] rounded-[8px] text-[13px] space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-[#86868B]">Reference:</span>
+                  <span className="font-mono font-medium text-[#1B4332]">{resubmitModalRequest.trackingNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#86868B]">Destination:</span>
+                  <span className="font-medium text-[#1D1D1F]">{resubmitModalRequest.destination}</span>
+                </div>
+                {(() => {
+                  const rejectedStep = resubmitModalRequest.approvalSteps?.find((s: any) => s.action === 'REJECTED');
+                  if (!rejectedStep?.remarks) return null;
+                  return (
+                    <div className="pt-1.5 mt-1.5 border-t border-[#E5E5E7] text-amber-800">
+                      <span className="font-semibold block text-[12px]">Chief&apos;s Return Remarks:</span>
+                      <p className="italic mt-0.5 text-[12px]">&ldquo;{rejectedStep.remarks}&rdquo;</p>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {resubmitError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-[6px] text-[13px] font-medium text-red-700">
+                  {resubmitError}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-1.5">
+                    New Departure Date <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={resubmitStartDate}
+                    onChange={(e) => setResubmitStartDate(e.target.value)}
+                    className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block mb-1.5">
+                    New Arrival Date <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={resubmitEndDate}
+                    onChange={(e) => setResubmitEndDate(e.target.value)}
+                    className="w-full h-8 px-2.5 text-[13px] text-[#1D1D1F] bg-white border border-[#E5E5E7] rounded-[6px] focus:outline-none focus:ring-2 focus:ring-[#1B4332]/20 focus:border-[#1B4332]"
+                  />
+                </div>
+              </div>
+
+              <p className="text-[12px] text-[#86868B] leading-relaxed">
+                Upon resubmission, this request will restart verification at <strong className="text-[#1D1D1F] font-semibold">Step 1 (Section Chief)</strong> with your updated dates.
+              </p>
+
+              <div className="flex justify-end items-center gap-2.5 pt-3 border-t border-[#E5E5E7]">
+                <button
+                  type="button"
+                  onClick={() => setResubmitModalRequest(null)}
+                  className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-white border border-[#E5E5E7] text-[#1D1D1F] hover:bg-[#F2F2F7] cursor-pointer"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  disabled={resubmitLoading || !resubmitStartDate || !resubmitEndDate}
+                  onClick={handleTaResubmit}
+                  className="h-8 px-[14px] text-[13px] font-medium rounded-[6px] inline-flex items-center justify-center gap-1.5 transition-colors bg-[#1B4332] hover:bg-[#143225] text-white disabled:opacity-50 cursor-pointer"
+                >
+                  {resubmitLoading ? 'Resubmitting...' : 'Confirm Resubmission'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Official Travel Order Printable Document Modal */}
+      <TravelOrderModal
+        isOpen={!!travelOrderModalRequest}
+        onClose={() => setTravelOrderModalRequest(null)}
+        request={travelOrderModalRequest}
+      />
     </div>
   );
 }

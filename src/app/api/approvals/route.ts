@@ -186,7 +186,11 @@ export async function POST(req: Request) {
 
           await prisma.tARequest.update({
             where: { id: requestId },
-            data: { status: nextStatus as TARequestStatus, updatedAt: new Date() },
+            data: {
+              status: nextStatus as TARequestStatus,
+              updatedAt: new Date(),
+              ...(nextStatus === 'APPROVED' ? { approved_at: new Date() } : {}),
+            },
           });
 
           updateSucceeded = true;
@@ -196,6 +200,12 @@ export async function POST(req: Request) {
       }
 
       if (!updateSucceeded) {
+        const reqUpdatePayload: any = {
+          status: nextStatus,
+          updatedAt: new Date().toISOString(),
+          ...(nextStatus === 'APPROVED' ? { approved_at: new Date().toISOString() } : {}),
+        };
+
         const [sbStepRes, sbReqRes] = await Promise.all([
           supabase
             .from('ApprovalStep')
@@ -208,14 +218,19 @@ export async function POST(req: Request) {
             .eq('id', currentStep.id),
           supabase
             .from('TARequest')
-            .update({ status: nextStatus, updatedAt: new Date().toISOString() })
+            .update(reqUpdatePayload)
             .eq('id', requestId),
         ]);
+
+        if (sbReqRes?.error && sbReqRes.error.code === '42703') {
+          delete reqUpdatePayload.approved_at;
+          await supabase.from('TARequest').update(reqUpdatePayload).eq('id', requestId);
+        }
 
         if (sbStepRes.error) {
           console.error('[Approvals API] Supabase Step update error:', sbStepRes.error);
         }
-        if (sbReqRes.error) {
+        if (sbReqRes.error && sbReqRes.error.code !== '42703') {
           console.error('[Approvals API] Supabase TARequest update error:', sbReqRes.error);
         }
       }

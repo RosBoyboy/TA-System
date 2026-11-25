@@ -111,6 +111,7 @@ export async function PATCH(
               startDate: new Date(startDate),
               endDate: new Date(endDate),
               status: TARequestStatus.PENDING_SECTION_CHIEF,
+              submitted_at: new Date(),
               resubmitCount: { increment: 1 },
             },
           });
@@ -132,17 +133,31 @@ export async function PATCH(
         })
         .eq('requestId', requestId);
 
-      const { data: sbUpdated } = await supabase
+      const updateData: any = {
+        startDate: new Date(startDate).toISOString(),
+        endDate: new Date(endDate).toISOString(),
+        status: 'PENDING_SECTION_CHIEF',
+        submitted_at: new Date().toISOString(),
+        resubmitCount: (request.resubmitCount || 0) + 1,
+      };
+
+      let { data: sbUpdated, error: sbErr } = await supabase
         .from('TARequest')
-        .update({
-          startDate: new Date(startDate).toISOString(),
-          endDate: new Date(endDate).toISOString(),
-          status: 'PENDING_SECTION_CHIEF',
-          resubmitCount: (request.resubmitCount || 0) + 1,
-        })
+        .update(updateData)
         .eq('id', requestId)
         .select('*')
         .single();
+
+      if (sbErr && sbErr.code === '42703') {
+        delete updateData.submitted_at;
+        const retryRes = await supabase
+          .from('TARequest')
+          .update(updateData)
+          .eq('id', requestId)
+          .select('*')
+          .single();
+        sbUpdated = retryRes.data;
+      }
 
       updatedRequest = sbUpdated || { ...request, status: 'PENDING_SECTION_CHIEF' };
     }
